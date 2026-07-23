@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block title %}{{ category.name }} — {{ site_settings.store_name }}{% endblock %}
+{% block content %}
+
+<div class="breadcrumb">
+  <a href="{% url 'home' %}" data-i18n="nav_home"></a> / <span>{{ category.name }}</span>
+</div>
+
+<section id="products" style="padding:24px 0 80px;">
+  <div class="sec-head">
+    {% if category.subcategories.all %}
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span>{% for s in category.subcategories.all %}{{ s.name }}{% if not forloop.last %} · {% endif %}{% endfor %}</div>
+    {% endif %}
+    <h2>{{ category.name }}</h2>
+  </div>
+  <div class="toolbar">
+    <div class="count" id="result-count" data-count="{{ result_count }}" data-search="{{ search_term }}">{{ result_count }} รายการ</div>
+    <form method="get" id="sort-form">
+      {% if search_term %}<input type="hidden" name="search" value="{{ search_term }}">{% endif %}
+      <select name="sort" id="sort-select" onchange="document.getElementById('sort-form').submit()">
+        <option value="default" {% if sort == "default" %}selected{% endif %}>···</option>
+        <option value="price-asc" {% if sort == "price-asc" %}selected{% endif %}>₭ ↑</option>
+        <option value="price-desc" {% if sort == "price-desc" %}selected{% endif %}>₭ ↓</option>
+        <option value="rating" {% if sort == "rating" %}selected{% endif %}>★</option>
+      </select>
+    </form>
+  </div>
+  {% if products %}
+  <div class="product-grid">
+    {% for p in products %}{% include "store/_product_card.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="ic-lg"><span class="ic" data-ic="search"></span></div>
+    <h3 data-i18n="no_results"></h3>
+  </div>
+  {% endif %}
+</section>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  fillIcons();
+  setupScrollReveal('.product-card');
+
+  var countEl = document.getElementById('result-count');
+  function renderResultCount() {
+    var n = countEl.dataset.count;
+    var search = countEl.dataset.search;
+    countEl.textContent = t('results_count_label').replace('{n}', n) + (search ? ' · "' + search + '"' : '');
+  }
+  renderResultCount();
+  var _origOnLangChange = onLangChange;
+  onLangChange = function () { _origOnLangChange(); renderResultCount(); };
+</script>
+{% endblock %}

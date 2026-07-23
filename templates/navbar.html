@@ -24,10 +24,10 @@
               <div class="mega-right-panel {% if forloop.first %}active{% endif %}" data-cat="{{ c.slug }}" style="{% if not forloop.first %}display:none;{% endif %}">
                 <div class="mega-right-head">
                   <span data-cat-name="{{ c.slug }}">{{ c.name }}</span>
-                  <a href="{% url 'home' %}?cat={{ c.slug }}" data-i18n="view_all"><span class="ic" data-ic="arrowRight"></span></a>
+                  <a href="{% url 'category_detail' c.slug %}" data-i18n="view_all"><span class="ic" data-ic="arrowRight"></span></a>
                 </div>
                 <div class="mega-sub-grid">
-                  {% for s in c.subcategories.all %}<a href="{% url 'home' %}?cat={{ c.slug }}" class="mega-sub-item" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}
+                  {% for s in c.subcategories.all %}<a href="{% url 'category_detail' c.slug %}" class="mega-sub-item" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}
                 </div>
                 <div class="mega-brands">
                   {% for b in nav_brands %}<span class="brand-chip">{{ b.name }}</span>{% endfor %}
@@ -92,12 +92,12 @@
     {% for c in nav_categories %}
     <div class="drawer-cat-item">
       <div class="drawer-cat-row">
-        <a href="{% url 'home' %}?cat={{ c.slug }}" class="drawer-cat-link"><span class="ic" data-ic="{{ c.icon }}"></span><span data-cat-name="{{ c.slug }}">{{ c.name }}</span></a>
+        <a href="{% url 'category_detail' c.slug %}" class="drawer-cat-link"><span class="ic" data-ic="{{ c.icon }}"></span><span data-cat-name="{{ c.slug }}">{{ c.name }}</span></a>
         {% if c.subcategories.all %}<button type="button" class="drawer-cat-toggle" onclick="toggleDrawerSubcat('{{ c.slug }}')"><span class="ic chev" data-ic="chevronDown"></span></button>{% endif %}
       </div>
       {% if c.subcategories.all %}
       <div class="drawer-subcat-list" id="drawer-sub-{{ c.slug }}">
-        <div>{% for s in c.subcategories.all %}<a href="{% url 'home' %}?cat={{ c.slug }}" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}</div>
+        <div>{% for s in c.subcategories.all %}<a href="{% url 'category_detail' c.slug %}" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}</div>
       </div>
       {% endif %}
     </div>

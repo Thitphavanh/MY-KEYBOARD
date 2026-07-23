@@ -3,7 +3,7 @@
 {% block title %}{{ product.name }} — NexByte Computer{% endblock %}
 {% block content %}
 <div class="breadcrumb">
-  <a href="{% url 'home' %}" data-i18n="nav_home"></a> / <a href="{% url 'home' %}?cat={{ product.category.slug }}">{{ product.category.name }}</a> / <span>{{ product.name }}</span>
+  <a href="{% url 'home' %}" data-i18n="nav_home"></a> / <a href="{% url 'category_detail' product.category.slug %}">{{ product.category.name }}</a> / <span>{{ product.name }}</span>
 </div>
 
 <div class="detail-wrap">

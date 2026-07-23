@@ -101,6 +101,35 @@ def home(request):
     return render(request, "store/home.html", context)
 
 
+def category_detail(request, slug):
+    category = get_object_or_404(Category, slug=slug)
+    search_term = request.GET.get("search", "").strip()
+    sort = request.GET.get("sort", "default")
+
+    products = Product.objects.select_related("category", "brand").prefetch_related("images").filter(category=category)
+    if search_term:
+        products = products.filter(Q(name__icontains=search_term) | Q(brand__name__icontains=search_term))
+
+    if sort == "price-asc":
+        products = products.order_by("price")
+    elif sort == "price-desc":
+        products = products.order_by("-price")
+    elif sort == "rating":
+        products = products.order_by("-rating")
+
+    wishlist_ids = set(get_wishlist(request).products.values_list("pk", flat=True))
+
+    context = {
+        "category": category,
+        "products": products,
+        "result_count": products.count(),
+        "search_term": search_term,
+        "sort": sort,
+        "wishlist_ids": wishlist_ids,
+    }
+    return render(request, "store/category.html", context)
+
+
 def search_suggest(request):
     query = request.GET.get("q", "").strip()
     results = []

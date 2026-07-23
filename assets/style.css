@@ -294,11 +294,11 @@ footer{border-top:1px solid var(--border); padding:44px 0 0; margin-top:80px; ba
   margin:32px auto 0; max-width:1200px; padding:0 32px;
 }
 .hero-carousel{position:relative; border-radius:var(--radius-lg); overflow:hidden;}
-.hero-slides{position:relative; aspect-ratio:1200/420; background:var(--panel); transition:height .3s ease;}
+.hero-slides{position:relative; aspect-ratio:1200/420; background:var(--panel);}
 .hero-slide{position:absolute; inset:0; opacity:0; pointer-events:none; transition:opacity .6s ease;}
 .hero-slide.active{opacity:1; pointer-events:auto;}
 .hero-slide a{display:block; width:100%; height:100%;}
-.hero-banner-img{width:100%; height:100%; object-fit:contain; display:block;}
+.hero-banner-img{width:100%; height:100%; object-fit:cover; object-position:center; display:block;}
 .hero-arrow{
   position:absolute; top:50%; transform:translateY(-50%); width:42px;height:42px; border-radius:50%;
   background:rgba(10,9,19,0.55); border:1px solid var(--border-strong); color:#fff; z-index:20;
