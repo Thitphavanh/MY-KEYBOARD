@@ -1,0 +1,108 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}แดชบอร์ด — NexByte Computer{% endblock %}
+{% block admin_header_title %}<span data-i18n="admin_dashboard_title">แดชบอร์ดผู้ดูแลระบบ</span>{% endblock %}
+{% block admin_header_sub %}<span data-i18n="admin_dashboard_sub">ภาพรวมสถิติตัวเลขและการขาย</span>{% endblock %}
+
+{% block admin_content %}
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-card-text"><div class="lb" data-i18n="admin_stat_members">สมาชิกทั้งหมด</div><div class="val">{{ total_members }}</div></div>
+    <div class="stat-card-ic"><span class="ic" data-ic="user"></span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-text"><div class="lb" data-i18n="admin_stat_sales">ยอดขายรวมเดือนนี้</div><div class="val">{{ revenue_this_month|kip }}</div></div>
+    <div class="stat-card-ic"><span class="ic" data-ic="chart"></span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-text"><div class="lb" data-i18n="admin_stat_orders">คำสั่งซื้อทั้งหมด</div><div class="val">{{ total_orders }}</div></div>
+    <div class="stat-card-ic"><span class="ic" data-ic="grid"></span></div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-card-text"><div class="lb" data-i18n="admin_stat_pending">รอดำเนินการ</div><div class="val">{{ pending_orders }}</div></div>
+    <div class="stat-card-ic"><span class="ic" data-ic="clock"></span></div>
+  </div>
+</div>
+
+<div class="admin-card">
+  <div class="admin-card-head"><div class="card-ic"><span class="ic" data-ic="chart"></span></div><h3 data-i18n="admin_chart_title">ยอดขาย 7 วันล่าสุด</h3></div>
+  <p class="card-sub" data-i18n="admin_chart_sub">ยอดรวมคำสั่งซื้อแยกตามวัน</p>
+  <div class="bar-chart">
+    {% for c in chart %}
+    <div class="bar-col">
+      <div class="bar-value">{% if c.total %}{{ c.total|kip }}{% endif %}</div>
+      <div class="bar" style="height:{{ c.height }}px;" title="{{ c.total|kip }}"></div>
+      <div class="bar-label">{{ c.label }}</div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+<div class="admin-card">
+  <div class="admin-card-head"><div class="card-ic"><span class="ic" data-ic="truck"></span></div><h3 data-i18n="admin_recent_orders_title">คำสั่งซื้อล่าสุด</h3></div>
+  <p class="card-sub" data-i18n="admin_recent_orders_sub">5 รายการล่าสุด</p>
+  <div style="overflow-x:auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th data-i18n="order_no_label">หมายเลขออเดอร์</th>
+          <th data-i18n="admin_th_date">วันที่สั่งซื้อ</th>
+          <th data-i18n="admin_th_recipient">ชื่อผู้รับ</th>
+          <th data-i18n="cart_total_label">ยอดรวมชำระ</th>
+          <th data-i18n="status_label" style="width:180px;">สถานะ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for o in recent_orders %}
+        <tr>
+          <td class="mono"><a href="{% url 'admin_order_detail' o.pk %}" style="color:var(--violet-2); font-weight:600;">#{{ o.order_number }}</a></td>
+          <td>{{ o.created_at }}</td>
+          <td>{{ o.shipping_name|default:"-" }}</td>
+          <td>{{ o.total|kip }}</td>
+          <td>
+            <form method="post" action="{% url 'admin_order_status_update' o.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <input type="hidden" name="next" value="{{ request.get_full_path }}">
+              <select name="status" onchange="this.form.submit()" class="status-select status-select-{{ o.status }}">
+                <option value="pending" {% if o.status == 'pending' %}selected{% endif %} data-i18n="order_status_pending">รอชำระเงิน</option>
+                <option value="preparing" {% if o.status == 'preparing' %}selected{% endif %} data-i18n="order_status_preparing">กำลังเตรียมสินค้า</option>
+                <option value="shipping" {% if o.status == 'shipping' %}selected{% endif %} data-i18n="order_status_shipping">กำลังจัดส่ง</option>
+                <option value="delivered" {% if o.status == 'delivered' %}selected{% endif %} data-i18n="order_status_delivered">จัดส่งสำเร็จ</option>
+              </select>
+            </form>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td class="empty-row" colspan="5" data-i18n="admin_no_orders">ยังไม่มีคำสั่งซื้อ</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block extra_admin_head %}
+<style>
+  .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:28px;}
+  .stat-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-md); padding:20px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
+  .stat-card-text{display:flex; flex-direction:column; gap:6px; min-width:0;}
+  .stat-card .lb{font-size:11.5px; color:var(--text-faint);}
+  .stat-card .val{font-size:24px; font-weight:800;}
+  .stat-card-ic{
+    width:44px; height:44px; flex:none; border-radius:14px;
+    background:var(--stat-icon, var(--violet-2)); color:#fff;
+    box-shadow:0 10px 22px -8px color-mix(in srgb, var(--stat-icon, var(--violet-2)) 35%, transparent);
+    display:flex; align-items:center; justify-content:center;
+  }
+  .stat-card-ic .icon{width:20px; height:20px;}
+  .bar-chart{display:flex; align-items:flex-end; gap:10px; height:190px; padding:10px 4px 0;}
+  .bar-chart .bar-col{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:6px; min-width:0;}
+  .bar-chart .bar{width:100%; max-width:36px; border-radius:6px 6px 0 0; background:linear-gradient(180deg,var(--violet-2),var(--violet-dim)); min-height:3px;}
+  .bar-chart .bar-value{font-size:10px; color:var(--text-dim); white-space:nowrap;}
+  .bar-chart .bar-label{font-size:10.5px; color:var(--text-faint); white-space:nowrap;}
+  @media (max-width:900px){ .stat-grid{grid-template-columns:1fr 1fr;} }
+</style>
+{% endblock %}

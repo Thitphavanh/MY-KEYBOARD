@@ -1,0 +1,160 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block title %}{% block admin_title %}จัดการร้านค้า — NexByte Computer{% endblock %}{% endblock %}
+{% block extra_head %}
+<style>
+  .admin-main{max-width:1100px; margin:0 auto; padding:30px 32px 100px;}
+  .admin-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg); padding:26px; margin-bottom:22px;}
+  .admin-card h3{font-size:16px; margin-bottom:4px;}
+  .admin-card .card-sub{font-size:12.5px; color:var(--text-dim); margin-bottom:18px;}
+  .admin-card-head{display:flex; align-items:center; gap:12px; margin-bottom:4px;}
+  .admin-card-head .card-ic{
+    width:36px; height:36px; flex:none; border-radius:10px; background:rgba(139,124,246,0.12);
+    border:1px solid var(--border-strong); color:var(--violet-2); display:flex; align-items:center; justify-content:center;
+  }
+  .admin-card-head h3{margin-bottom:0;}
+  table.admin-table{width:100%; border-collapse:collapse; font-size:13px;}
+  table.admin-table th{text-align:left; font-size:11px; color:var(--text-faint); font-weight:600; padding:8px 10px; border-bottom:1px solid var(--border); white-space:nowrap;}
+  table.admin-table td{padding:10px; border-bottom:1px solid var(--border); vertical-align:middle;}
+  table.admin-table tr:last-child td{border-bottom:none;}
+  .empty-row{text-align:center; color:var(--text-faint); padding:24px; font-size:13px;}
+  
+  .admin-nav{display:flex; gap:12px; margin-bottom:28px; overflow-x:auto; padding-bottom:8px; border-bottom:1px solid var(--border);}
+  .admin-nav .btn{padding:8px 16px; font-size:13px; text-decoration:none; border-radius:8px;}
+  .admin-nav .btn-solid{background:var(--violet-2); color:#fff;}
+  .admin-nav .btn-outline{border:1px solid var(--border); color:var(--text-dim);}
+  .admin-nav .btn-outline:hover{background:rgba(255,255,255,0.05); color:var(--text);}
+  
+  /* Additional backoffice helpers */
+  .badge{display:inline-block; padding:3px 8px; font-size:11px; border-radius:6px; font-weight:600;}
+  .badge-pending{background:rgba(234,179,8,0.15); color:#eab308;}
+  .badge-preparing{background:rgba(59,130,246,0.15); color:#3b82f6;}
+  .badge-shipping{background:rgba(168,85,247,0.15); color:#a855f7;}
+  .badge-delivered{background:rgba(34,197,94,0.15); color:#22c55e;}
+  
+  .crud-actions{display:flex; gap:8px; align-items:center;}
+  .crud-actions a, .crud-actions button{
+    background:none; border:none; color:var(--text-dim); cursor:pointer; padding:6px; border-radius:6px; transition:all 0.2s;
+    display:inline-flex; align-items:center; justify-content:center; text-decoration:none;
+  }
+  .crud-actions a:hover, .crud-actions button:hover{
+    background:rgba(255,255,255,0.08); color:var(--text);
+  }
+  .crud-actions .delete-btn:hover{
+    background:rgba(239,68,68,0.15); color:#ef4444;
+  }
+  
+  /* Forms backoffice styling */
+  .backoffice-form .field{margin-bottom:18px;}
+  .backoffice-form label{display:block; font-size:13px; margin-bottom:6px; color:var(--text-dim);}
+  .backoffice-form input[type="text"], 
+  .backoffice-form input[type="number"], 
+  .backoffice-form input[type="email"], 
+  .backoffice-form input[type="url"], 
+  .backoffice-form select, 
+  .backoffice-form textarea{
+    width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--border);
+    border-radius:9px; padding:11px 13px; font-size:13.5px; color:var(--text);
+  }
+  .backoffice-form input[type="checkbox"]{
+    margin-right:8px;
+  }
+  .backoffice-form select{
+    appearance: none;
+    -webkit-appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23f3f1fa' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 16px;
+    padding-right: 40px;
+  }
+  
+  .img-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(120px, 1fr)); gap:12px; margin-bottom:15px;}
+  .img-card{border:1px solid var(--border); border-radius:8px; overflow:hidden; position:relative; background:var(--panel);}
+  .img-card img{width:100%; height:90px; object-fit:cover; display:block;}
+  .img-card .del-chk{position:absolute; top:6px; right:6px; background:rgba(0,0,0,0.6); padding:4px; border-radius:4px;}
+  
+  .spec-row{display:flex; gap:10px; margin-bottom:8px;}
+  .spec-row input{flex:1;}
+  
+  select.status-select{
+    border-radius:6px; padding:4px 24px 4px 8px; font-size:12px; font-weight:600; cursor:pointer;
+    appearance:none; -webkit-appearance:none; border:none;
+    background-repeat: no-repeat;
+    background-position: right 6px center;
+    background-size: 10px;
+    height: 28px;
+    display: inline-block;
+    width: auto;
+  }
+  select.status-select-pending{
+    background-color:rgba(234,179,8,0.15); color:#eab308;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23eab308' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+  select.status-select-preparing{
+    background-color:rgba(59,130,246,0.15); color:#3b82f6;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%233b82f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+  select.status-select-shipping{
+    background-color:rgba(168,85,247,0.15); color:#a855f7;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%23a855f7' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+  select.status-select-delivered{
+    background-color:rgba(34,197,94,0.15); color:#22c55e;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%2322c55e' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+  
+  @media(max-width:768px){
+    .admin-main{padding:20px 16px 80px;}
+    .admin-card{padding:16px; border-radius:var(--radius-md) !important; margin-bottom:16px;}
+    .admin-nav{
+      gap:8px; margin-bottom:20px; padding-bottom:10px;
+      overflow-x: auto; -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+    }
+    .admin-nav .btn{padding:8px 12px; font-size:12px; flex:none; display:inline-block;}
+    
+    .admin-card > div[style*="display:grid"],
+    .admin-card > div[style*="display: grid"],
+    div[style*="display: grid; grid-template-columns"],
+    div[style*="display:grid; grid-template-columns"] {
+      grid-template-columns: 1fr !important;
+      gap: 16px !important;
+    }
+    
+    div[style*="overflow-x: auto"],
+    div[style*="overflow-x:auto"] {
+      margin: 0 -16px;
+      padding: 0 16px;
+      -webkit-overflow-scrolling: touch;
+    }
+  }
+</style>
+{% block extra_admin_head %}{% endblock %}
+{% endblock %}
+{% block content %}
+<main class="admin-main">
+  <div class="sec-head" style="text-align:left; margin-bottom:20px;">
+    <h2 style="margin-bottom:4px;">{% block admin_header_title %}<span data-i18n="admin_panel_title"></span>{% endblock %}</h2>
+    <p class="card-sub">{% block admin_header_sub %}<span data-i18n="admin_panel_sub"></span>{% endblock %}</p>
+  </div>
+
+  <div class="admin-nav">
+    <a href="{% url 'admin_dashboard' %}" class="btn {% if active_sub == 'home' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_dashboard"></a>
+    <a href="{% url 'admin_product_list' %}" class="btn {% if active_sub == 'products' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_products"></a>
+    <a href="{% url 'admin_category_list' %}" class="btn {% if active_sub == 'categories' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_categories"></a>
+    <a href="{% url 'admin_order_list' %}" class="btn {% if active_sub == 'orders' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_orders"></a>
+    <a href="{% url 'admin_banner_list' %}" class="btn {% if active_sub == 'banners' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_banners"></a>
+    <a href="{% url 'admin_bank_list' %}" class="btn {% if active_sub == 'banks' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_banks"></a>
+    <a href="{% url 'admin_member_list' %}" class="btn {% if active_sub == 'members' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_members"></a>
+    <a href="{% url 'admin_coupon_list' %}" class="btn {% if active_sub == 'coupons' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_coupons"></a>
+    <a href="{% url 'admin_settings_edit' %}" class="btn {% if active_sub == 'settings' %}btn-solid{% else %}btn-outline{% endif %}" data-i18n="admin_nav_settings"></a>
+  </div>
+
+  {% block admin_content %}{% endblock %}
+</main>
+{% endblock %}
+{% block extra_scripts %}
+<script>fillIcons(); applyI18n();</script>
+{% block extra_admin_scripts %}{% endblock %}
+{% endblock %}

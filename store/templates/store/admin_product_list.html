@@ -1,0 +1,85 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}จัดการสินค้า — NexByte Computer{% endblock %}
+{% block admin_header_title %}<span data-i18n="admin_prod_list_title">จัดการสินค้า</span>{% endblock %}
+{% block admin_header_sub %}<span data-i18n="admin_prod_list_sub">เพิ่ม แก้ไข ลบ รายชื่อสินค้าคงคลัง</span>{% endblock %}
+
+{% block admin_content %}
+<div class="admin-card">
+  <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
+    <form method="get" style="display:flex; gap:10px; flex:1; max-width:600px;">
+      <input type="text" name="q" value="{{ query }}" data-i18n-ph="ph_search_prod" placeholder="ค้นหาชื่อสินค้า รายละเอียด..." style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); flex:1;">
+      
+      <select name="category" onchange="this.form.submit()" style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); min-width:150px;">
+        <option value="" data-i18n="admin_all_categories">-- ทุกหมวดหมู่ --</option>
+        {% for c in categories %}
+        <option value="{{ c.slug }}" {% if selected_category == c.slug %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+      </select>
+      
+      <button type="submit" class="btn btn-outline" style="padding:10px 16px;"><span class="ic" data-ic="search"></span></button>
+    </form>
+
+    <a href="{% url 'admin_product_create' %}" class="btn btn-solid" style="display:inline-flex; align-items:center; gap:8px;">
+      <span class="ic" data-ic="plus"></span> <span data-i18n="admin_btn_add_product">เพิ่มสินค้าใหม่</span>
+    </a>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th data-i18n="admin_th_image" style="width:60px;">รูปภาพ</th>
+          <th data-i18n="admin_th_name">ชื่อสินค้า</th>
+          <th data-i18n="admin_th_category">หมวดหมู่</th>
+          <th data-i18n="admin_th_price">ราคา</th>
+          <th data-i18n="admin_th_stock" style="width:100px;">สินค้าคงเหลือ</th>
+          <th data-i18n="admin_th_actions" style="width:100px; text-align:center;">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in products %}
+        <tr>
+          <td>
+            {% if p.first_image %}
+            <img src="{{ p.first_image }}" style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--border);">
+            {% else %}
+            <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border-radius:6px; font-size:20px; border:1px solid var(--border);">
+              {{ p.icon|default:"💻" }}
+            </div>
+            {% endif %}
+          </td>
+          <td>
+            <div style="font-weight:600;"><a href="{% url 'admin_product_edit' p.pk %}" style="color:var(--text); text-decoration:none;">{{ p.name }}</a></div>
+            <div style="font-size:11px; color:var(--text-faint);">{% if p.brand %}{{ p.brand.name }}{% else %}-{% endif %}</div>
+          </td>
+          <td style="color:var(--text-dim);">{{ p.category.name }}</td>
+          <td>
+            <div style="font-weight:600; color:var(--violet-2);">{{ p.price|kip }}</div>
+            {% if p.old_price %}
+            <div style="font-size:11px; text-decoration:line-through; color:var(--text-faint);">{{ p.old_price|kip }}</div>
+            {% endif %}
+          </td>
+          <td>
+            {% if p.stock > 0 %}
+              <span style="font-weight:600;">{{ p.stock }}</span> <span data-i18n="admin_unit_pieces">ชิ้น</span>
+            {% else %}
+              <span class="badge badge-pending" style="background:rgba(239,68,68,0.15); color:#ef4444;" data-i18n="admin_badge_out">หมด</span>
+            {% endif %}
+          </td>
+          <td style="text-align:center;">
+            <div class="crud-actions" style="justify-content:center;">
+              <a href="{% url 'admin_product_edit' p.pk %}" title="แก้ไข"><span class="ic" data-ic="edit"></span></a>
+              <a href="{% url 'admin_product_delete' p.pk %}" class="delete-btn" title="ลบ"><span class="ic" data-ic="trash"></span></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td class="empty-row" colspan="6" data-i18n="admin_no_products">ไม่พบรายการสินค้า</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

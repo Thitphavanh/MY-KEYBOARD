@@ -1,0 +1,160 @@
+{% load static %}<!DOCTYPE html>
+<html lang="lo">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}NexByte Computer — ร้านอุปกรณ์ไอทีและคอมพิวเตอร์{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'style.css' %}">
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    corePlugins: {
+      preflight: false,
+    }
+  }
+</script>
+<style>
+  :root{
+    --violet:{{ site_settings.theme_primary }};
+    --violet-2:{{ site_settings.theme_secondary }};
+    --bg:{{ site_settings.theme_background }};
+    --text:{{ site_settings.theme_text }};
+    --panel:{{ site_settings.theme_card_bg }};
+    --btn:{{ site_settings.theme_button }};
+    --header-bg:{{ site_settings.theme_header_bg }}cc;
+    --header-bg-strong:{{ site_settings.theme_header_bg }}f2;
+    --footer-bg:{{ site_settings.theme_footer_bg }}8c;
+    --stat-icon:{{ site_settings.theme_stat_icon }};
+    --panel-3:{{ site_settings.theme_panel_deep }};
+    --tabbar-bg:{{ site_settings.theme_tabbar_bg }}eb;
+    --border:{{ site_settings.theme_border }}12;
+    --border-strong:color-mix(in srgb, {{ site_settings.theme_primary }} 22%, transparent);
+    --text-dim:color-mix(in srgb, {{ site_settings.theme_text }} 68%, {{ site_settings.theme_background }} 32%);
+    --text-dimmer:color-mix(in srgb, {{ site_settings.theme_text }} 52%, {{ site_settings.theme_background }} 48%);
+    --text-faint:color-mix(in srgb, {{ site_settings.theme_text }} 38%, {{ site_settings.theme_background }} 62%);
+    --radius-lg:{{ site_settings.theme_radius }};
+    --radius-md:calc({{ site_settings.theme_radius }} - 4px);
+    --radius-sm:calc({{ site_settings.theme_radius }} - 8px);
+  }
+  {% if site_settings.theme_bg_image_url or site_settings.theme_bg_image %}
+  body{
+    background-image:
+      radial-gradient(ellipse 900px 500px at 50% -150px, rgba(139,124,246,0.16), transparent 60%),
+      url('{{ site_settings.theme_bg_image_url|default:site_settings.theme_bg_image.url }}');
+    background-size:cover; background-position:center; background-attachment:fixed;
+  }
+  {% endif %}
+  {{ site_settings.custom_css|safe }}
+</style>
+{% block extra_head %}{% endblock %}
+</head>
+<body>
+
+{% include "navbar.html" %}
+
+<main>
+{% if messages %}
+  <div id="server-messages" style="display:none;">
+    {% for message in messages %}<div data-tag="{{ message.tags }}">{{ message }}</div>{% endfor %}
+  </div>
+{% endif %}
+{% block content %}{% endblock %}
+</main>
+
+{% include "footer.html" %}
+
+<script src="{% static 'icons.js' %}"></script>
+<script src="{% static 'i18n.js' %}"></script>
+<script src="{% static 'search.js' %}"></script>
+<script>
+  function fillIcons(root) {
+    (root || document).querySelectorAll('[data-ic]').forEach(function (el) {
+      el.innerHTML = icon(el.dataset.ic, el.classList.contains('sm') ? 'sm' : (el.classList.contains('chev') ? 'chev' : (el.classList.contains('chev-r') ? 'chev-r' : '')));
+    });
+  }
+  fillIcons();
+  applyI18n();
+  initSearchSuggest();
+
+  function showMegaCat(slug) {
+    document.querySelectorAll('.mega-cat-item').forEach(function (el) { el.classList.toggle('active', el.dataset.cat === slug); });
+    document.querySelectorAll('.mega-right-panel').forEach(function (el) {
+      var on = el.dataset.cat === slug;
+      el.classList.toggle('active', on);
+      el.style.display = on ? '' : 'none';
+    });
+  }
+
+  function toggleMobileMenu() {
+    document.getElementById('mobile-drawer').classList.toggle('open');
+    document.getElementById('drawer-backdrop').classList.toggle('open');
+    document.body.classList.toggle('no-scroll');
+  }
+  function toggleDrawerSubcat(slug) {
+    var list = document.getElementById('drawer-sub-' + slug);
+    var toggleBtn = list.previousElementSibling.querySelector('.drawer-cat-toggle');
+    var open = list.classList.toggle('open');
+    if (toggleBtn) toggleBtn.classList.toggle('open', open);
+  }
+  function toggleLangMenu(e) {
+    e.stopPropagation();
+    document.querySelectorAll('.lang-dropdown').forEach(function (dd) { dd.classList.toggle('show'); });
+  }
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.lang-switch')) {
+      document.querySelectorAll('.lang-dropdown').forEach(function (dd) { dd.classList.remove('show'); });
+    }
+  });
+  window.addEventListener('scroll', function () {
+    document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 8);
+  }, { passive: true });
+
+  function renderLangSwitches() {
+    var html = '<button type="button" class="lang-btn" onclick="toggleLangMenu(event)"><span class="ic" data-ic="globe"></span><span>' + LANG_NAMES[window.NB_LANG] + '</span><span class="ic chev" data-ic="chevronDown"></span></button>' +
+      '<div class="lang-dropdown">' + Object.keys(LANG_NAMES).map(function (l) {
+        return '<button type="button" class="' + (window.NB_LANG === l ? 'active' : '') + '" onclick="setLang(\'' + l + '\')">' + LANG_NAMES[l] + '</button>';
+      }).join('') + '</div>';
+    var navSwitch = document.getElementById('nav-lang-switch');
+    if (navSwitch) navSwitch.innerHTML = html;
+    var drawerSwitch = document.getElementById('drawer-lang-switch');
+    if (drawerSwitch) drawerSwitch.innerHTML = Object.keys(LANG_NAMES).map(function (l) {
+      return '<button type="button" class="' + (window.NB_LANG === l ? 'active' : '') + '" onclick="setLang(\'' + l + '\')">' + LANG_NAMES[l] + '</button>';
+    }).join('');
+  }
+  function onLangChange() { renderLangSwitches(); }
+  renderLangSwitches();
+
+  var __scrollRevealObserver = null;
+  function setupScrollReveal(selector) {
+    if (!('IntersectionObserver' in window)) {
+      document.querySelectorAll(selector).forEach(function (el) { el.classList.add('in-view'); });
+      return;
+    }
+    if (!__scrollRevealObserver) {
+      __scrollRevealObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) { entry.target.classList.toggle('in-view', entry.isIntersecting); });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+    }
+    document.querySelectorAll(selector).forEach(function (el) { __scrollRevealObserver.observe(el); });
+  }
+
+  function toast(msg) {
+    var toastEl = document.getElementById('nb-toast');
+    if (!toastEl) { toastEl = document.createElement('div'); toastEl.id = 'nb-toast'; document.body.appendChild(toastEl); }
+    toastEl.textContent = msg;
+    toastEl.className = 'show';
+    clearTimeout(window.__toastTimer);
+    window.__toastTimer = setTimeout(function () { toastEl.className = ''; }, 2200);
+  }
+  var serverMessages = document.getElementById('server-messages');
+  if (serverMessages) {
+    serverMessages.querySelectorAll('div').forEach(function (m, i) {
+      setTimeout(function () { toast(m.textContent); }, i * 2400);
+    });
+  }
+</script>
+{% block extra_scripts %}{% endblock %}
+</body>
+</html>

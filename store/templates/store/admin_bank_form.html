@@ -1,0 +1,37 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}{{ title }} — NexByte Computer{% endblock %}
+{% block admin_header_title %}{{ title }}{% endblock %}
+{% block admin_header_sub %}กรอกข้อมูลและรายละเอียดบัญชีผู้รับเงินโอนสำหรับการชำระเงินของลูกค้า{% endblock %}
+
+{% block admin_content %}
+<div class="admin-card" style="max-width:600px; margin:0 auto;">
+  <form method="post" enctype="multipart/form-data" class="backoffice-form">
+    {% csrf_token %}
+    
+    {% for field in form %}
+    <div class="field">
+      <label>{{ field.label }}</label>
+      
+      {% if field.name == 'qr' and bank and bank.qr %}
+      <div style="margin-bottom:10px;">
+        <img src="{{ bank.qr.url }}" style="max-width:120px; border-radius:6px; border:1px solid var(--border); display:block;">
+      </div>
+      {% endif %}
+      
+      {{ field }}
+      
+      {% if field.errors %}
+      <div style="color:#ef4444; font-size:12px; margin-top:4px;">{{ field.errors.0 }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:20px; margin-top:26px;">
+      <a href="{% url 'admin_bank_list' %}" class="btn btn-outline">ยกเลิก</a>
+      <button type="submit" class="btn btn-solid" style="padding:10px 24px;">บันทึกข้อมูล</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

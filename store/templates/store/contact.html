@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+{% block title %}ติดต่อเรา — NexByte Computer{% endblock %}
+{% block extra_head %}
+<style>
+  .contact-wrap{max-width:1000px; margin:40px auto 80px; padding:0 32px; display:grid; grid-template-columns:1fr 1.2fr; gap:32px; align-items:start;}
+  .contact-info-card{background:var(--panel); border:1px solid var(--border); border-radius:var(--radius-lg); padding:28px;}
+  .contact-info-card h3{font-size:16px; margin-bottom:18px;}
+  .contact-row{display:flex; gap:12px; font-size:13.5px; color:var(--text-dim); padding:10px 0; border-top:1px solid var(--border);}
+  .contact-row:first-of-type{border-top:none;}
+  .contact-row .ic{font-size:18px; flex:none;}
+  .contact-map{margin-top:18px; height:140px; border-radius:12px; background:linear-gradient(160deg,var(--panel-3),var(--panel-2)); display:flex; align-items:center; justify-content:center; font-size:36px; border:1px solid var(--border);}
+  .contact-cta-row{display:flex; flex-direction:column; gap:10px; margin-bottom:20px;}
+  .contact-cta{
+    display:flex; align-items:center; gap:14px; padding:14px 16px; border-radius:12px;
+    color:var(--text); font-weight:600; font-size:14px; background:var(--panel-2);
+    border:1px solid var(--border); transition:transform .15s, border-color .15s;
+  }
+  .contact-cta:hover{transform:translateY(-2px); border-color:var(--border-strong);}
+  .contact-cta .icon{width:22px;height:22px; flex:none;}
+  .contact-cta .sub{font-weight:400; font-size:12px; color:var(--text-faint); margin-top:2px;}
+  .contact-cta.wa .icon{color:#3ddc7a;}
+  .contact-cta.fb .icon{color:#5b9bff;}
+  @media (max-width:800px){ .contact-wrap{grid-template-columns:1fr;} }
+</style>
+{% endblock %}
+{% block content %}
+
+<div class="sec-head" style="margin-top:32px;">
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="nav_contact"></span></div>
+  <h2 data-i18n="contact_page_title"></h2>
+  <p data-i18n="contact_page_sub"></p>
+</div>
+
+<div class="contact-wrap">
+  <div class="contact-info-card">
+    <h3 data-i18n="contact_channels_title"></h3>
+    <div class="contact-cta-row">
+      <a href="https://wa.me/{{ site_settings.contact_wa }}" target="_blank" rel="noopener" class="contact-cta wa">
+        <span class="icon"><span class="ic" data-ic="whatsapp"></span></span>
+        <span><div data-i18n="wa_chat_title"></div><div class="sub" data-i18n="wa_chat_sub"></div></span>
+      </a>
+      <a href="{{ site_settings.contact_fb }}" target="_blank" rel="noopener" class="contact-cta fb">
+        <span class="icon"><span class="ic" data-ic="facebook"></span></span>
+        <span><div data-i18n="fb_chat_title"></div><div class="sub">Facebook</div></span>
+      </a>
+    </div>
+    <h3 data-i18n="contact_other_title"></h3>
+    <div class="contact-row"><span class="ic" data-ic="mapPin"></span><span>ເເຂວງສະຫວັນນະເຂດ ເມືອງໄກສອນ ບ້ານອຸດົມວິໄລ ສປປລາວ</span></div>
+    <div class="contact-row"><span class="ic" data-ic="phone"></span><span>20 97782487 (07:00–23:00)</span></div>
+    <div class="contact-row"><span class="ic" data-ic="mail"></span><span>gno358224@gmail.com</span></div>
+    <div class="contact-map"><span class="ic" data-ic="mapPin"></span></div>
+  </div>
+
+  <div class="form-card">
+    <h2 data-i18n="send_message_title"></h2>
+    <p class="sub" data-i18n="send_message_sub"></p>
+    <div class="form-msg" id="form-msg"></div>
+    <form onsubmit="return sendContact(event)">
+      <div class="form-grid">
+        <div class="field">
+          <label data-i18n="label_your_name"></label>
+          <input type="text" id="c-name" data-i18n-ph="ph_fullname">
+        </div>
+        <div class="field">
+          <label data-i18n="label_contact_info"></label>
+          <input type="text" id="c-contact" data-i18n-ph="ph_contact_info">
+        </div>
+        <div class="field full">
+          <label data-i18n="label_subject"></label>
+          <input type="text" id="c-subject" data-i18n-ph="ph_subject">
+        </div>
+        <div class="field full">
+          <label data-i18n="label_message"></label>
+          <textarea id="c-message" data-i18n-ph="ph_message"></textarea>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-solid btn-block"><span data-i18n="send_cta"></span><span class="ic" data-ic="arrowRight"></span></button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  fillIcons();
+  function sendContact(e) {
+    e.preventDefault();
+    const name = document.getElementById("c-name").value.trim();
+    const message = document.getElementById("c-message").value.trim();
+    const el = document.getElementById("form-msg");
+    if (!name || !message) {
+      el.textContent = t("send_error");
+      el.className = "form-msg show error";
+      return false;
+    }
+    el.textContent = t("send_success");
+    el.className = "form-msg show success";
+    e.target.reset();
+    return false;
+  }
+</script>
+{% endblock %}

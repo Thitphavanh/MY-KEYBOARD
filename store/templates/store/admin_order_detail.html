@@ -1,0 +1,155 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}คำสั่งซื้อ #{{ order.order_number }} — NexByte Computer{% endblock %}
+{% block admin_header_title %}รายละเอียดคำสั่งซื้อ #{{ order.order_number }}{% endblock %}
+{% block admin_header_sub %}ตรวจสอบหลักฐานการโอนและปรับปรุงสถานะการจัดส่ง{% endblock %}
+
+{% block admin_content %}
+<div style="display:grid; grid-template-columns:2fr 1.2fr; gap:24px;">
+  
+  <!-- Left Side: Order Items and Payment Slip -->
+  <div>
+    <!-- Items Card -->
+    <div class="admin-card">
+      <h3 style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+        <span class="ic" data-ic="grid"></span> รายการสินค้าที่สั่งซื้อ
+      </h3>
+      <table class="admin-table" style="margin-bottom:20px;">
+        <thead>
+          <tr>
+            <th>ชื่อสินค้า</th>
+            <th style="width:100px; text-align:right;">ราคาต่อชิ้น</th>
+            <th style="width:80px; text-align:center;">จำนวน</th>
+            <th style="width:120px; text-align:right;">ยอดรวม</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in order.items.all %}
+          <tr>
+            <td>
+              <div style="font-weight:600;">{{ item.product_name }}</div>
+            </td>
+            <td style="text-align:right;">{{ item.unit_price|kip }}</td>
+            <td style="text-align:center; font-weight:600;">{{ item.qty }}</td>
+            <td style="text-align:right; font-weight:600; color:var(--violet-2);">{{ item.line_total|kip }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+      <!-- Order Totals -->
+      <div style="border-top:1px solid var(--border); padding-top:15px; display:flex; flex-direction:column; align-items:flex-end; gap:8px; font-size:13.5px;">
+        <div style="display:flex; justify-content:space-between; width:250px;">
+          <span style="color:var(--text-dim);">ราคารวมสินค้า:</span>
+          <span style="font-weight:600;">{{ order.subtotal|kip }}</span>
+        </div>
+        {% if order.discount > 0 %}
+        <div style="display:flex; justify-content:space-between; width:250px; color:#ef4444;">
+          <span>ส่วนลด (คูปอง):</span>
+          <span>-{{ order.discount|kip }}</span>
+        </div>
+        {% endif %}
+        <div style="display:flex; justify-content:space-between; width:250px;">
+          <span style="color:var(--text-dim);">ค่าจัดส่ง ({{ order.get_carrier_display }}):</span>
+          <span style="font-weight:600;">{{ order.shipping_fee|kip }}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between; width:250px; font-size:16px; border-top:1px solid var(--border); padding-top:8px; margin-top:4px;">
+          <strong style="color:var(--text);">ยอดชำระสุทธิ:</strong>
+          <strong style="color:var(--violet-2);">{{ order.total|kip }}</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Slip -->
+    <div class="admin-card">
+      <h3 style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+        <span class="ic" data-ic="image"></span> สลิปหลักฐานการชำระเงิน
+      </h3>
+      {% if order.payment_slip %}
+      <div style="text-align:center; padding:10px; background:rgba(0,0,0,0.15); border-radius:10px; border:1px solid var(--border);">
+        <img src="{{ order.payment_slip.url }}" style="max-width:100%; max-height:500px; border-radius:6px; box-shadow:0 4px 12px rgba(0,0,0,0.5);">
+      </div>
+      {% else %}
+      <div class="empty-row" style="background:rgba(255,255,255,0.01); border-radius:8px; border:1px dashed var(--border);">
+        ยังไม่มีการแนบสลิปชำระเงิน
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Right Side: Order Status and Shipping Info -->
+  <div>
+    <!-- Status Control Card -->
+    <div class="admin-card">
+      <h3 style="margin-bottom:14px;">อัปเดตสถานะออเดอร์</h3>
+      <div style="margin-bottom:18px;">
+        <span style="font-size:12px; color:var(--text-faint);">สถานะปัจจุบัน:</span>
+        <div style="margin-top:6px;">
+          {% if order.status == 'pending' %}
+            <span class="badge badge-pending" style="font-size:13px; padding:6px 12px;">รอชำระเงิน</span>
+          {% elif order.status == 'preparing' %}
+            <span class="badge badge-preparing" style="font-size:13px; padding:6px 12px;">กำลังเตรียมสินค้า</span>
+          {% elif order.status == 'shipping' %}
+            <span class="badge badge-shipping" style="font-size:13px; padding:6px 12px;">กำลังจัดส่ง</span>
+          {% elif order.status == 'delivered' %}
+            <span class="badge badge-delivered" style="font-size:13px; padding:6px 12px;">จัดส่งสำเร็จ</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <form method="post" action="{% url 'admin_order_status_update' order.pk %}" class="backoffice-form" style="border-top:1px solid var(--border); padding-top:16px;">
+        {% csrf_token %}
+        <div class="field">
+          <label>เปลี่ยนสถานะใหม่</label>
+          <select name="status">
+            {% for code, name in status_choices %}
+            <option value="{{ code }}" {% if order.status == code %}selected{% endif %}>{{ name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-solid btn-block">อัปเดตสถานะ</button>
+      </form>
+    </div>
+
+    <!-- Customer Details Card -->
+    <div class="admin-card">
+      <h3 style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
+        <span class="ic" data-ic="user"></span> ข้อมูลผู้รับสินค้า
+      </h3>
+      <div style="font-size:13.5px; display:flex; flex-direction:column; gap:12px;">
+        <div>
+          <div style="font-size:11px; color:var(--text-faint);">ชื่อ-นามสกุล</div>
+          <div style="font-weight:600; margin-top:3px;">{{ order.shipping_name }}</div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-faint);">เบอร์โทรศัพท์</div>
+          <div style="font-weight:600; margin-top:3px; color:var(--violet-2);">{{ order.shipping_phone }}</div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-faint);">ที่อยู่จัดส่ง</div>
+          <div style="margin-top:3px; line-height:1.4;">
+            บ้าน {{ order.shipping_village }}, เมือง {{ order.shipping_city }}, แขวง {{ order.shipping_province }}
+          </div>
+        </div>
+        <div>
+          <div style="font-size:11px; color:var(--text-faint);">ช่องทางชำระเงิน</div>
+          <div style="font-weight:600; margin-top:3px;">{{ order.get_payment_method_display|default:"-" }}</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Panel -->
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px; padding:0 6px;">
+      <a href="{% url 'admin_order_list' %}" class="btn btn-outline" style="display:inline-flex; align-items:center; gap:6px;">
+        <span class="ic" data-ic="arrowLeft"></span> กลับหน้าหลัก
+      </a>
+      <a href="{% url 'admin_order_delete' order.pk %}" class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; display:inline-flex; align-items:center; gap:6px;">
+        <span class="ic" data-ic="trash"></span> ลบออเดอร์
+      </a>
+    </div>
+
+  </div>
+
+</div>
+{% endblock %}

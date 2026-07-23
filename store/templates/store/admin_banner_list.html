@@ -1,0 +1,65 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}<span data-i18n="admin_banner_list_title"></span> — NexByte Computer{% endblock %}
+{% block admin_header_title %}<span data-i18n="admin_banner_list_title"></span>{% endblock %}
+{% block admin_header_sub %}<span data-i18n="admin_banner_list_sub"></span>{% endblock %}
+
+{% block admin_content %}
+<div style="display:grid; grid-template-columns:2fr 1fr; gap:24px;">
+  
+  <!-- Left Column: Banner List -->
+  <div class="admin-card">
+    <h3 style="margin-bottom:18px;" data-i18n="admin_all_banners_title"></h3>
+    
+    <div style="display:flex; flex-direction:column; gap:16px;">
+      {% for b in banners %}
+      <div class="admin-card" style="padding:16px; margin-bottom:0; display:flex; align-items:center; justify-content:space-between; gap:20px; background:rgba(255,255,255,0.01);">
+        <div style="flex:1; max-width:400px; border-radius:8px; overflow:hidden; border:1px solid var(--border);">
+          <img src="{{ b.image.url }}" style="width:100%; display:block; height:120px; object-fit:cover;">
+        </div>
+        
+        <div style="display:flex; flex-direction:column; gap:8px; align-items:flex-end;">
+          <div style="font-size:12.5px; color:var(--text-dim);"><span data-i18n="admin_label_order"></span>: <strong>{{ b.order }}</strong></div>
+          
+          <form method="post" action="{% url 'admin_banner_delete' b.pk %}" style="margin:0;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
+              <span class="ic" data-ic="trash"></span> <span data-i18n="admin_btn_delete_banner"></span>
+            </button>
+          </form>
+        </div>
+      </div>
+      {% empty %}
+      <div class="empty-row" style="border:1px dashed var(--border); border-radius:8px; text-align:center; padding:30px; color:var(--text-faint);">
+        ຍັງບໍ່ມີແບນເນີເປີດສະແດງຜົນ
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Right Column: Add Banner Form -->
+  <div class="admin-card">
+    <h3 style="margin-bottom:18px;" data-i18n="admin_btn_add_banner"></h3>
+    
+    <form method="post" enctype="multipart/form-data" class="backoffice-form">
+      {% csrf_token %}
+      
+      {% for field in form %}
+      <div class="field">
+        <label>
+          {% if field.name == 'image' %}<span data-i18n="admin_label_banner_image"></span>{% elif field.name == 'order' %}<span data-i18n="admin_label_display_order"></span>{% else %}{{ field.label }}{% endif %}
+        </label>
+        {{ field }}
+        {% if field.errors %}
+        <div style="color:#ef4444; font-size:12px; margin-top:4px;">{{ field.errors.0 }}</div>
+        {% endif %}
+      </div>
+      {% endfor %}
+      
+      <button type="submit" class="btn btn-solid btn-block" style="margin-top:16px;" data-i18n="admin_btn_upload_banner"></button>
+    </form>
+  </div>
+
+</div>
+{% endblock %}

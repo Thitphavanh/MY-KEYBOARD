@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}สินค้าที่ถูกใจ — NexByte Computer{% endblock %}
+{% block content %}
+
+<div class="sec-head" style="margin-top:32px;">
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="wishlist_label"></span></div>
+  <h2 data-i18n="wishlist_page_title"></h2>
+  {% if products %}<p>{{ products|length }} <span data-i18n="wishlist_items_suffix"></span></p>{% endif %}
+</div>
+
+{% if products %}
+<div class="product-grid">
+  {% for p in products %}{% include "store/_product_card.html" %}{% endfor %}
+</div>
+{% else %}
+<div class="empty-state">
+  <div class="ic-lg"><span class="ic" data-ic="heart"></span></div>
+  <h3 data-i18n="wishlist_empty_title"></h3>
+  <p data-i18n="wishlist_empty_desc"></p>
+  <a href="{% url 'home' %}" class="btn btn-solid" style="margin-top:16px;"><span data-i18n="hero_cta_shop"></span><span class="ic" data-ic="arrowRight"></span></a>
+</div>
+{% endif %}
+
+{% endblock %}
+{% block extra_scripts %}
+<script>fillIcons();</script>
+{% endblock %}

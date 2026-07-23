@@ -1,0 +1,108 @@
+{% extends "store/admin_base.html" %}
+{% block admin_header_title %}<span data-i18n="admin_nav_coupons"></span>{% endblock %}
+{% block admin_header_sub %}ຈັດການໂຄ້ດສ່ວນຫຼຸດ ສິດການໃຊ້ງານ ແລະ ວັນໝົດອາຍຸ{% endblock %}
+
+{% block admin_content %}
+{% if messages %}
+  {% for m in messages %}
+    <div class="form-msg show {% if m.tags == 'error' %}error{% else %}success{% endif %}" style="margin-bottom: 20px;">
+      {{ m }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; align-items: start;">
+  <!-- Coupons List -->
+  <div class="admin-card" style="padding: 20px;">
+    <h3 style="font-size: 15px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">ໂຄ້ດສ່ວນຫຼຸດທັງໝົດ</h3>
+    <div style="overflow-x: auto;">
+      <table class="admin-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13px;">
+        <thead>
+          <tr style="border-bottom: 2px solid var(--border); color: var(--text-dim);">
+            <th style="padding: 10px;" data-i18n="admin_coupon_code"></th>
+            <th style="padding: 10px;" data-i18n="label_subject"></th>
+            <th style="padding: 10px; text-align: center;" data-i18n="admin_coupon_percent"></th>
+            <th style="padding: 10px; text-align: center;" data-i18n="admin_coupon_uses"></th>
+            <th style="padding: 10px;" data-i18n="admin_coupon_valid"></th>
+            <th style="padding: 10px; text-align: right;" data-i18n="admin_th_actions"></th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for cp in coupons %}
+          <tr style="border-bottom: 1px solid var(--border); transition: background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+            <td style="padding: 12px 10px; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: var(--violet-2);">{{ cp.code }}</td>
+            <td style="padding: 12px 10px; color: var(--text-dim);">{{ cp.label }}</td>
+            <td style="padding: 12px 10px; text-align: center; font-weight: 700; color: var(--green);">{{ cp.percent_off }}%</td>
+            <td style="padding: 12px 10px; text-align: center;">
+              {{ cp.uses_count }} / {% if cp.max_uses %}{{ cp.max_uses }}{% else %}∞{% endif %}
+            </td>
+            <td style="padding: 12px 10px; font-size: 11.5px; color: var(--text-faint);">
+              {% if cp.valid_until %}
+                {{ cp.valid_until|date:"d M Y H:i" }}
+              {% else %}
+                No Limit
+              {% endif %}
+            </td>
+            <td style="padding: 12px 10px; text-align: right;">
+              <form method="post" action="{% url 'admin_coupon_delete' cp.pk %}" style="display: inline;" onsubmit="return confirm('ແທ້ຈິງແລ້ວບໍ່ທີ່ຕ້ອງການລຶບໂຄ້ດສ່ວນຫຼຸດນີ້?')">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-outline" style="padding: 5px 10px; font-size: 11.5px; border-color: rgba(239,68,68,0.25); color: #ef4444;" data-i18n="admin_btn_delete"></button>
+              </form>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="6" style="padding: 30px; text-align: center; color: var(--text-faint);">ຍັງບໍ່ມີໂຄ້ດສ່ວນຫຼຸດ</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Add Coupon Form -->
+  <div class="admin-card" style="padding: 20px;">
+    <h3 style="font-size: 15px; margin-bottom: 16px; border-bottom: 1px solid var(--border); padding-bottom: 8px;">ເພີ່ມໂຄ້ດໃໝ່</h3>
+    <form method="post">
+      {% csrf_token %}
+      
+      <div class="field">
+        <label>{{ form.code.label }}</label>
+        {{ form.code }}
+        {% if form.code.errors %}<div class="field-error" style="display:block;">{{ form.code.errors.0 }}</div>{% endif %}
+      </div>
+      
+      <div class="field">
+        <label>{{ form.label.label }}</label>
+        {{ form.label }}
+        {% if form.label.errors %}<div class="field-error" style="display:block;">{{ form.label.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label>{{ form.percent_off.label }}</label>
+        {{ form.percent_off }}
+        {% if form.percent_off.errors %}<div class="field-error" style="display:block;">{{ form.percent_off.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label>{{ form.max_uses.label }}</label>
+        {{ form.max_uses }}
+        {% if form.max_uses.errors %}<div class="field-error" style="display:block;">{{ form.max_uses.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field">
+        <label>{{ form.valid_until.label }}</label>
+        {{ form.valid_until }}
+        {% if form.valid_until.errors %}<div class="field-error" style="display:block;">{{ form.valid_until.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="field" style="display:flex; align-items:center; gap:8px; margin-top:14px; margin-bottom:20px;">
+        {{ form.active }}
+        <label for="id_active" style="margin-bottom:0; cursor:pointer;">{{ form.active.label }}</label>
+      </div>
+
+      <button type="submit" class="btn btn-solid btn-block" style="padding: 10px;">ເພີ່ມໂຄ້ດສ່ວນຫຼຸດ</button>
+    </form>
+  </div>
+</div>
+{%

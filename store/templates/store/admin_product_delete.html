@@ -1,0 +1,25 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}ຢືນຢັນການລຶບສິນຄ້າ{% endblock %}
+{% block admin_header_title %}ຢືນຢັນການລຶບສິນຄ້າ{% endblock %}
+{% block admin_header_sub %}ການລຶບສິນຄ້າບໍ່ສາມາດຍ້ອນຄືນໄດ້{% endblock %}
+
+{% block admin_content %}
+<div class="admin-card" style="text-align:center; padding:40px 20px;">
+  <div style="width:60px; height:60px; border-radius:50%; background:rgba(239,68,68,0.15); color:#ef4444; display:inline-flex; align-items:center; justify-content:center; margin-bottom:20px; font-size:24px;">
+    <span class="ic" data-ic="trash"></span>
+  </div>
+  
+  <h3 style="font-size:18px; margin-bottom:12px;">ທ່ານຕ້ອງການລຶບສິນຄ້ານີ້ແມ່ນຫຼືບໍ່?</h3>
+  <p style="color:var(--text-dim); font-size:14px; margin-bottom:30px; max-width:500px; margin-left:auto; margin-right:auto;">
+    ທ່ານກຳລັງຈະລຶບສິນຄ້າ<strong>"{{ product.name }}"</strong> ອອກຈາກລະບົບຢ່າງຖາວອນ ຂໍ້ມູນຮູບພາບ ແລະ ປະຫວັດຈະຫາຍໄປ
+  </p>
+
+  <form method="post" style="display:inline-flex; gap:12px; justify-content:center;">
+    {% csrf_token %}
+    <a href="{% url 'admin_product_list' %}" class="btn btn-outline">ຍົກເລີກ</a>
+    <button type="submit" class="btn btn-solid" style="background:#ef4444; color:#fff; border-color:#ef4444; padding:10px 28px;">ຢືນຢັນລຶບຖາວອນ</button>
+  </form>
+</div>
+{% endblock %}

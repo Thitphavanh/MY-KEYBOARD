@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}เข้าสู่ระบบ — NexByte Computer{% endblock %}
+{% block content %}
+
+<div class="form-wrap" style="margin-top:56px;">
+  <div class="form-card">
+    <div class="auth-tabs">
+      <span class="active" data-i18n="login_tab"></span>
+    </div>
+
+    {% if error %}
+    <div class="form-msg show error">{{ error }}</div>
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <input type="hidden" name="next" value="{{ next }}">
+      <div class="field">
+        <label data-i18n="label_email"></label>
+        <input type="text" name="email" data-i18n-ph="ph_email" required>
+      </div>
+      <div class="field">
+        <label data-i18n="label_password"></label>
+        <input type="password" name="password" data-i18n-ph="ph_password" required>
+      </div>
+      <button type="submit" class="btn btn-solid btn-block"><span data-i18n="login_cta"></span><span class="ic" data-ic="arrowRight"></span></button>
+      <p class="form-footer-link"><span data-i18n="no_account_text"></span> <a href="{% url 'register' %}{% if next %}?next={{ next }}{% endif %}" data-i18n="register_here"></a></p>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>fillIcons();</script>
+{% endblock %}

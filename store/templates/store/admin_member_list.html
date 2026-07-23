@@ -1,0 +1,93 @@
+{% extends "store/admin_base.html" %}
+{% block admin_header_title %}<span data-i18n="admin_nav_members"></span>{% endblock %}
+{% block admin_header_sub %}ຈັດການສະມາຊິກ ແລະ ປ່ຽນແປງສິດເຂົ້າເຖິງລະບົບ
+
+{% block admin_content %}
+{% if messages %}
+  {% for m in messages %}
+    <div class="form-msg show {% if m.tags == 'error' %}error{% else %}success{% endif %}" style="margin-bottom: 20px;">
+      {{ m }}
+    </div>
+  {% endfor %}
+{% endif %}
+
+<div class="admin-card" style="padding: 24px;">
+  <form method="get" style="display:flex; gap:10px; max-width:420px; margin-bottom:20px;">
+    <input type="text" name="q" value="{{ query }}" data-i18n-ph="ph_search_member" placeholder="ค้นหาอีเมล ชื่อสมาชิก..." style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); flex:1;">
+    <button type="submit" class="btn btn-outline" style="padding:10px 16px;"><span class="ic" data-ic="search"></span></button>
+  </form>
+  <div style="overflow-x: auto;">
+    <table class="admin-table" style="width: 100%; border-collapse: collapse; text-align: left; font-size: 13.5px;">
+      <thead>
+        <tr style="border-bottom: 2px solid var(--border); color: var(--text-dim);">
+          <th style="padding: 12px 10px;" data-i18n="admin_th_email"></th>
+          <th style="padding: 12px 10px;" data-i18n="label_fullname"></th>
+          <th style="padding: 12px 10px;" data-i18n="admin_th_role"></th>
+          <th style="padding: 12px 10px;" data-i18n="admin_th_status"></th>
+          <th style="padding: 12px 10px;" data-i18n="admin_th_date_joined"></th>
+          <th style="padding: 12px 10px; text-align: right;" data-i18n="admin_th_actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if not members %}
+        <tr><td colspan="6" class="empty-row" data-i18n="admin_no_members_found">ไม่พบสมาชิกที่ตรงกับการค้นหา</td></tr>
+        {% endif %}
+        {% for member in members %}
+        <tr style="border-bottom: 1px solid var(--border); transition: background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+          <td style="padding: 14px 10px; font-weight: 600;">
+            {{ member.username }}
+            {% if member.email and member.email != member.username %}
+              <div style="font-size: 11px; color: var(--text-faint); font-weight: normal; margin-top: 2px;">{{ member.email }}</div>
+            {% endif %}
+          </td>
+          <td style="padding: 14px 10px; color: var(--text-dim);">{{ member.first_name|default:"—" }}</td>
+          <td style="padding: 14px 10px;">
+            {% if member == request.user %}
+              <span class="status-badge p1" style="font-size: 11px;">Admin (You)</span>
+            {% else %}
+              <form method="post" action="{% url 'admin_member_role_update' member.pk %}" style="display: inline-block;">
+                {% csrf_token %}
+                <select name="role" onchange="this.form.submit()" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); border-radius: 6px; padding: 4px 8px; color: var(--text); font-size: 12px; cursor: pointer; outline: none;">
+                  <option value="member" {% if not member.is_staff %}selected{% endif %}>Member</option>
+                  <option value="admin" {% if member.is_staff %}selected{% endif %}>Admin</option>
+                </select>
+              </form>
+            {% endif %}
+          </td>
+          <td style="padding: 14px 10px;">
+            {% if member.is_active %}
+              <span class="status-badge p3" style="font-size: 10.5px;">Active</span>
+            {% else %}
+              <span class="status-badge p0" style="font-size: 10.5px; background: rgba(239,68,68,0.15); color: #ef4444;">Blocked</span>
+            {% endif %}
+          </td>
+          <td style="padding: 14px 10px; color: var(--text-faint); font-size: 12.5px;">{{ member.date_joined|date:"d M Y H:i" }}</td>
+          <td style="padding: 14px 10px; text-align: right;">
+            {% if member != request.user %}
+              <div style="display: flex; gap: 8px; justify-content: flex-end; align-items: center;">
+                <form method="post" action="{% url 'admin_member_status_update' member.pk %}" style="display: inline;">
+                  {% csrf_token %}
+                  {% if member.is_active %}
+                    <input type="hidden" name="status" value="block">
+                    <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-color: rgba(239,68,68,0.3); color: #ef4444;" data-i18n="admin_btn_block"></button>
+                  {% else %}
+                    <input type="hidden" name="status" value="unblock">
+                    <button type="submit" class="btn btn-solid" style="padding: 6px 12px; font-size: 12px; background: var(--green); border-color: var(--green); color: #000;" data-i18n="admin_btn_unblock"></button>
+                  {% endif %}
+                </form>
+                <form method="post" action="{% url 'admin_member_delete' member.pk %}" style="display: inline;" onsubmit="return confirm('ແທ້ຈິງແລ້ວບໍ່ທີ່ຕ້ອງການລຶບສະມາຊິກນີ້?')">
+                  {% csrf_token %}
+                  <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-color: rgba(255,255,255,0.15);" data-i18n="admin_btn_delete"></button>
+                </form>
+              </div>
+            {% else %}
+              <span style="font-size: 12px; color: var(--text-faint);">Self</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% load store_extras %}
+<div class="product-card">
+  <a href="{% url 'product_detail' p.pk %}" class="product-thumb-link">
+    <div class="product-thumb">
+      {% if p.first_image %}<img src="{{ p.first_image }}" alt="" style="width:100%;height:100%;object-fit:cover;">{% else %}{{ p.icon }}{% endif %}
+    </div>
+  </a>
+  <form method="post" action="{% url 'wishlist_toggle' p.pk %}" style="display:contents;">
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+    <button type="submit" class="wish-btn {% if p.pk in wishlist_ids %}active{% endif %}"><span class="ic" data-ic="{% if p.pk in wishlist_ids %}heartFill{% else %}heart{% endif %}"></span></button>
+  </form>
+  {% if user.is_authenticated and user.is_admin %}
+  <a href="{% url 'admin:store_product_change' p.pk %}" class="admin-quick-edit" title="แก้ไขสินค้า (แอดมิน)"><span class="ic sm" data-ic="edit"></span></a>
+  {% endif %}
+  <div class="product-body">
+    <a href="{% url 'product_detail' p.pk %}"><div class="product-name">{{ p.name }}</div></a>
+    <div class="product-price-row">
+      <div class="product-price">{{ p.price|kip }}</div>
+      {% if p.old_price %}<div class="product-oldprice">{{ p.old_price|kip }}</div>{% endif %}
+    </div>
+    {% if p.stock <= 0 %}
+      <span class="product-stock out" data-i18n="out_of_stock"></span>
+    {% endif %}
+    <div class="product-actions">
+      <form method="post" action="{% url 'cart_add' p.pk %}" style="display:contents;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-ghost" {% if p.stock <= 0 %}disabled{% endif %}><span class="ic sm" data-ic="cart"></span><span data-i18n="add_to_cart"></span></button>
+      </form>
+      <a href="{% url 'product_detail' p.pk %}" class="btn btn-solid" data-i18n="view_product"></a>
+    </div>
+  </div>
+</div>

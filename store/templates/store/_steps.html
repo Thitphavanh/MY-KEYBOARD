@@ -1,0 +1,9 @@
+<div class="steps" id="steps">
+  <div class="step {% if active > 0 %}done{% elif active == 0 %}active{% endif %}"><span class="num">{% if active > 0 %}<span class="ic tiny" data-ic="check"></span>{% else %}1{% endif %}</span><span data-i18n="step_cart"></span></div>
+  <div class="step-line"></div>
+  <div class="step {% if active > 1 %}done{% elif active == 1 %}active{% endif %}"><span class="num">{% if active > 1 %}<span class="ic tiny" data-ic="check"></span>{% else %}2{% endif %}</span><span data-i18n="step_shipping"></span></div>
+  <div class="step-line"></div>
+  <div class="step {% if active > 2 %}done{% elif active == 2 %}active{% endif %}"><span class="num">{% if active > 2 %}<span class="ic tiny" data-ic="check"></span>{% else %}3{% endif %}</span><span data-i18n="step_payment"></span></div>
+  <div class="step-line"></div>
+  <div class="step {% if active == 3 %}active{% endif %}"><span class="num">4</span><span data-i18n="step_success"></span></div>
+</div>

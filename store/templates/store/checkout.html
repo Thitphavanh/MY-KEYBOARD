@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block title %}ที่อยู่จัดส่ง — NexByte Computer{% endblock %}
+{% block content %}
+
+<div class="sec-head" style="margin-top:32px; margin-bottom:8px;">
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="step_shipping"></span></div>
+  <h2 data-i18n="checkout_page_title"></h2>
+</div>
+
+{% include "store/_steps.html" with active=1 %}
+
+<div class="form-wrap">
+  <div class="form-card">
+    <h2 data-i18n="checkout_form_title"></h2>
+    <p class="sub" data-i18n="checkout_form_sub"></p>
+
+    <div class="summary-mini">
+      {% for row in items %}
+      <div class="row"><span>{{ row.product.name }} x{{ row.item.qty }}</span><span>{{ row.line_total|kip }}</span></div>
+      {% endfor %}
+      {% if discount %}<div class="row"><span data-i18n="used_coupon_label"></span><span>− {{ discount|kip }}</span></div>{% endif %}
+      <div class="row total"><span data-i18n="cart_total_label"></span><span>{{ total|kip }}</span></div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="field full {% if form.shipping_name.errors %}error{% endif %}">
+          <label data-i18n="label_customer_name"></label>
+          {{ form.shipping_name }}
+          {% if form.shipping_name.errors %}<div class="field-error">{{ form.shipping_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field full {% if form.shipping_phone.errors %}error{% endif %}">
+          <label data-i18n="label_phone"></label>
+          {{ form.shipping_phone }}
+          {% if form.shipping_phone.errors %}<div class="field-error">{{ form.shipping_phone.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field {% if form.shipping_province.errors %}error{% endif %}">
+          <label data-i18n="label_province"></label>
+          {{ form.shipping_province }}
+          {% if form.shipping_province.errors %}<div class="field-error">{{ form.shipping_province.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field {% if form.shipping_city.errors %}error{% endif %}">
+          <label data-i18n="label_city"></label>
+          {{ form.shipping_city }}
+          {% if form.shipping_city.errors %}<div class="field-error">{{ form.shipping_city.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field full {% if form.shipping_village.errors %}error{% endif %}">
+          <label data-i18n="label_address"></label>
+          {{ form.shipping_village }}
+          {% if form.shipping_village.errors %}<div class="field-error">{{ form.shipping_village.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+
+      <label style="font-size:12px; color:var(--text-dim); display:block; margin:6px 0 10px;" data-i18n="label_carrier"></label>
+      <div class="option-cards" id="carrier-cards">
+        {% for value, label in form.carrier.field.choices %}
+        <label class="option-card {% if form.carrier.value == value %}selected{% endif %}">
+          <input type="radio" name="carrier" value="{{ value }}" {% if form.carrier.value == value %}checked{% endif %}>
+          <div class="ic" data-ic="{% if value == 'anousith' %}package{% else %}truck{% endif %}"></div>
+          <div class="body"><div class="title">{{ label }}</div></div>
+          <div class="fee">{{ carrier_fees|get_item:value|kip }}</div>
+        </label>
+        {% endfor %}
+      </div>
+      {% if form.carrier.errors %}<div class="field-error" style="margin:-10px 0 16px;">{{ form.carrier.errors.0 }}</div>{% endif %}
+
+      <button type="submit" class="btn btn-solid btn-block"><span data-i18n="checkout_submit_cta"></span><span class="ic" data-ic="arrowRight"></span></button>
+      <a href="{% url 'cart' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="back_to_cart"></a>
+    </form>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  fillIcons();
+  document.querySelectorAll('#carrier-cards .option-card').forEach(function (card) {
+    card.addEventListener('click', function () {
+      document.querySelectorAll('#carrier-cards .option-card').forEach(function (c) { c.classList.remove('selected'); });
+      card.classList.add('selected');
+      card.querySelector('input').checked = true;
+    });
+  });
+</script>
+{% endblock %}

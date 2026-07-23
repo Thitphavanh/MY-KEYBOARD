@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block title %}ตะกร้าสินค้า — NexByte Computer{% endblock %}
+{% block content %}
+
+<div class="sec-head" style="margin-top:32px; margin-bottom:8px;">
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="cart_label"></span></div>
+  <h2 data-i18n="cart_review_title"></h2>
+</div>
+
+{% include "store/_steps.html" with active=0 %}
+
+<div class="cart-wrap" id="cart-wrap">
+  {% if not items %}
+  <div class="cart-list" style="grid-column:1/-1;">
+    <div class="cart-empty">
+      <div class="ic-lg"><span class="ic" data-ic="cart"></span></div>
+      <h3 style="color:var(--text); margin-bottom:8px;" data-i18n="cart_empty_title"></h3>
+      <p style="margin-bottom:20px;" data-i18n="cart_empty_desc"></p>
+      <a href="{% url 'home' %}" class="btn btn-solid"><span data-i18n="hero_cta_shop"></span><span class="ic" data-ic="arrowRight"></span></a>
+    </div>
+  </div>
+  {% else %}
+  <div class="cart-list">
+    {% for row in items %}
+    <div class="cart-item">
+      <a href="{% url 'product_detail' row.product.pk %}" class="thumb">
+        {% if row.product.first_image %}<img src="{{ row.product.first_image }}" alt="" style="width:100%;height:100%;object-fit:cover;">{% else %}{{ row.product.icon }}{% endif %}
+      </a>
+      <div class="info">
+        <a href="{% url 'product_detail' row.product.pk %}"><div class="name">{{ row.product.name }}</div></a>
+        <div class="unit">{{ row.product.price|kip }}</div>
+        <form method="post" action="{% url 'cart_update' row.product.pk %}" style="margin-top:8px;">
+          {% csrf_token %}
+          <div class="qty-stepper">
+            <button type="submit" name="qty" value="{{ row.item.qty|add:"-1" }}">−</button>
+            <input type="text" value="{{ row.item.qty }}" readonly>
+            <button type="submit" name="qty" value="{{ row.item.qty|add:"1" }}">+</button>
+          </div>
+        </form>
+      </div>
+      <div class="line-total">{{ row.line_total|kip }}</div>
+      <form method="post" action="{% url 'cart_remove' row.product.pk %}">
+        {% csrf_token %}
+        <button type="submit" class="remove"><span class="ic sm" data-ic="close"></span></button>
+      </form>
+    </div>
+    {% endfor %}
+  </div>
+  <div class="summary-card">
+    <h3 data-i18n="cart_summary_title"></h3>
+    <div class="summary-row"><span><span data-i18n="cart_items_label"></span> ({{ cart.count }})</span><span>{{ subtotal|kip }}</span></div>
+    {% if cart.coupon %}
+    <div class="summary-row"><span class="discount"><span data-i18n="used_coupon_label"></span> ({{ cart.coupon.code }})</span><span class="discount">− {{ discount|kip }}</span></div>
+    {% endif %}
+    <div class="summary-row total"><span data-i18n="cart_total_label"></span><span>{{ total|kip }}</span></div>
+
+    {% if cart.coupon %}
+    <div class="coupon-applied">
+      <span><span class="ic sm" data-ic="check"></span> <span data-i18n="used_coupon_label"></span> "{{ cart.coupon.code }}" — {{ cart.coupon.label }}</span>
+      <form method="post" action="{% url 'cart_remove_coupon' %}" style="display:contents;">
+        {% csrf_token %}
+        <button type="submit" data-i18n="coupon_cancel"></button>
+      </form>
+    </div>
+    {% else %}
+    <form method="post" action="{% url 'cart_apply_coupon' %}" class="coupon-row">
+      {% csrf_token %}
+      <input type="text" name="code" data-i18n-ph="coupon_placeholder">
+      <button type="submit" class="btn btn-ghost btn-sm" data-i18n="coupon_use_cta"></button>
+    </form>
+    <div class="coupon-hint" data-i18n="coupon_hint"></div>
+    {% endif %}
+
+    <a href="{% url 'checkout' %}" class="btn btn-solid btn-block"><span data-i18n="cart_checkout_cta"></span><span class="ic" data-ic="arrowRight"></span></a>
+    <a href="{% url 'home' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="cart_continue_shopping"></a>
+  </div>
+  {% endif %}
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>fillIcons();</script>
+{% endblock %}

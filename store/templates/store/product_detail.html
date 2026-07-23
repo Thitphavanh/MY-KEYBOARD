@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block title %}{{ product.name }} — NexByte Computer{% endblock %}
+{% block content %}
+<div class="breadcrumb">
+  <a href="{% url 'home' %}" data-i18n="nav_home"></a> / <a href="{% url 'home' %}?cat={{ product.category.slug }}">{{ product.category.name }}</a> / <span>{{ product.name }}</span>
+</div>
+
+<div class="detail-wrap">
+  <div>
+    <div class="detail-gallery" id="detail-gallery" style="position: relative;">
+      {% with images=product.images.all %}
+      {% if images %}
+        <img src="{{ images.0.image.url }}" alt="{{ product.name }}" id="gallery-img" onclick="openLightbox()" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in; transition: opacity 0.15s ease;">
+        {% if images.count > 1 %}
+          <button type="button" onclick="navigateGallery(-1, event)" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; z-index:2;"><span class="ic" data-ic="chevronLeft"></span></button>
+          <button type="button" onclick="navigateGallery(1, event)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; z-index:2;"><span class="ic" data-ic="chevronRight"></span></button>
+        {% endif %}
+      {% else %}
+        {{ product.icon }}
+      {% endif %}
+      {% endwith %}
+    </div>
+    <div class="detail-thumbs">
+      {% for img in product.images.all %}
+      <button class="thumb-btn {% if forloop.first %}active{% endif %}" onclick="setActiveImg(this, '{{ img.image.url }}', {{ forloop.counter0 }})"><img src="{{ img.image.url }}" alt=""></button>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="detail-info">
+    <div class="product-cat">{{ product.category.name }} · {{ product.brand.name|default:"" }}</div>
+    <h1>{{ product.name }}</h1>
+    <div class="detail-price-box">
+      <span class="price">{{ product.price|kip }}</span>
+      {% if product.old_price %}<span class="oldprice">{{ product.old_price|kip }}</span>{% endif %}
+      <div style="margin-top:8px;">
+        {% if product.stock <= 0 %}<span class="product-stock out" data-i18n="out_of_stock"></span>{% endif %}
+      </div>
+    </div>
+    <p class="desc">{{ product.desc }}</p>
+    <ul class="spec-list">
+      {% for s in product.specs %}
+      <li><b>{{ s|spec_label }}:</b><span>{{ s|spec_value }}</span></li>
+      {% endfor %}
+    </ul>
+    <div class="qty-row">
+      <span class="qty-label" data-i18n="qty_label"></span>
+      <div class="qty-stepper">
+        <button type="button" onclick="changeQty(-1)">−</button>
+        <input type="text" id="qty-input" value="1" readonly>
+        <button type="button" onclick="changeQty(1)">+</button>
+      </div>
+    </div>
+    <div class="detail-actions">
+      <form method="post" action="{% url 'wishlist_toggle' product.pk %}" style="display:contents;">
+        {% csrf_token %}
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="wish-toggle btn btn-ghost {% if in_wishlist %}active{% endif %}"><span class="ic" data-ic="{% if in_wishlist %}heartFill{% else %}heart{% endif %}"></span></button>
+      </form>
+      <form method="post" action="{% url 'cart_add' product.pk %}" style="display:contents;" id="add-cart-form">
+        {% csrf_token %}
+        <input type="hidden" name="qty" id="add-cart-qty" value="1">
+        <input type="hidden" name="next" value="{{ request.get_full_path }}">
+        <button type="submit" class="btn btn-ghost" {% if product.stock <= 0 %}disabled{% endif %}><span class="ic sm" data-ic="cart"></span><span data-i18n="add_to_cart"></span></button>
+      </form>
+      <form method="post" action="{% url 'cart_add' product.pk %}" style="display:contents;" id="buy-now-form">
+        {% csrf_token %}
+        <input type="hidden" name="qty" id="buy-now-qty" value="1">
+        <input type="hidden" name="next" value="{% url 'cart' %}">
+        <button type="submit" class="btn btn-solid" {% if product.stock <= 0 %}disabled{% endif %}><span data-i18n="buy_now"></span><span class="ic" data-ic="arrowRight"></span></button>
+      </form>
+    </div>
+    {% if user.is_authenticated and user.is_admin %}
+    <a href="{% url 'admin:store_product_change' product.pk %}" class="btn btn-ghost admin-edit-btn"><span class="ic sm" data-ic="edit"></span>แก้ไขสินค้านี้ (แอดมิน)</a>
+    {% endif %}
+  </div>
+</div>
+
+<!-- Lightbox Modal -->
+<div id="gallery-lightbox" onclick="closeLightbox()" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(10,9,19,0.92); align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s ease;">
+  <span style="position:absolute; top:24px; right:24px; color:#fff; font-size:36px; font-weight:bold; cursor:pointer; user-select:none;">&times;</span>
+  <img id="lightbox-img" style="max-width:90%; max-height:90%; border-radius:10px; box-shadow:0 12px 40px rgba(0,0,0,0.8); object-fit:contain;">
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  fillIcons();
+  var maxStock = {{ product.stock }};
+  
+  function changeQty(delta) {
+    var input = document.getElementById('qty-input');
+    var v = parseInt(input.value) + delta;
+    if (v < 1) v = 1;
+    if (v > maxStock) v = maxStock;
+    input.value = v;
+    document.getElementById('add-cart-qty').value = v;
+    document.getElementById('buy-now-qty').value = v;
+  }
+
+  var galleryUrls = [
+    {% for img in product.images.all %}
+    "{{ img.image.url }}",
+    {% endfor %}
+  ];
+  var currentGalleryIdx = 0;
+
+  function setActiveImg(btn, url, index) {
+    var imgEl = document.getElementById('gallery-img');
+    if (!imgEl) return;
+    imgEl.style.opacity = 0.3;
+    setTimeout(function() {
+      imgEl.src = url;
+      imgEl.style.opacity = 1;
+    }, 100);
+    
+    document.querySelectorAll('.thumb-btn').forEach(function (b) { b.classList.remove('active'); });
+    if (btn) {
+      btn.classList.add('active');
+    } else {
+      var thumbs = document.querySelectorAll('.thumb-btn');
+      if (thumbs[index]) thumbs[index].classList.add('active');
+    }
+    currentGalleryIdx = index;
+  }
+
+  function navigateGallery(direction, event) {
+    if (event) event.stopPropagation();
+    if (galleryUrls.length <= 1) return;
+    var nextIdx = currentGalleryIdx + direction;
+    if (nextIdx < 0) nextIdx = galleryUrls.length - 1;
+    if (nextIdx >= galleryUrls.length) nextIdx = 0;
+    setActiveImg(null, galleryUrls[nextIdx], nextIdx);
+  }
+
+  function openLightbox() {
+    var imgEl = document.getElementById('gallery-img');
+    if (!imgEl) return;
+    var lightbox = document.getElementById('gallery-lightbox');
+    var lightboxImg = document.getElementById('lightbox-img');
+    lightboxImg.src = imgEl.src;
+    lightbox.style.display = 'flex';
+    setTimeout(function() {
+      lightbox.style.opacity = 1;
+    }, 10);
+  }
+
+  function closeLightbox() {
+    var lightbox = document.getElementById('gallery-lightbox');
+    lightbox.style.opacity = 0;
+    setTimeout(function() {
+      lightbox.style.display = 'none';
+    }, 200);
+  }
+</script>
+{% endblock %}

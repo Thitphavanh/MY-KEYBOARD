@@ -1,0 +1,160 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}{{ title }} — NexByte Computer{% endblock %}
+{% block admin_header_title %}{{ title }}{% endblock %}
+{% block admin_header_sub %}กรอกข้อมูลสินค้าและจัดการรูปภาพประกอบ{% endblock %}
+
+{% block admin_content %}
+<div class="admin-card">
+  <form method="post" enctype="multipart/form-data" class="backoffice-form">
+    {% csrf_token %}
+    
+    {% if form.errors %}
+    <div style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.25); padding:16px; border-radius:8px; margin-bottom:20px; font-size:13px;">
+      <strong>กรุณาแก้ไขข้อผิดพลาดต่อไปนี้:</strong>
+      <ul style="margin-top:6px; margin-left:20px;">
+        {% for field, errors in form.errors.items %}
+        <li>{{ field }}: {{ errors.0 }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <div style="display:grid; grid-template-columns:2fr 1fr; gap:26px;">
+      
+      <!-- Left Column: Primary Fields -->
+      <div>
+        <div class="field">
+          <label>ชื่อสินค้า *</label>
+          <input type="text" name="name" value="{{ form.name.value|default:'' }}" required placeholder="เช่น ASUS ROG Zephyrus G14">
+        </div>
+        
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="field">
+            <label>แบรนด์</label>
+            {{ form.brand }}
+          </div>
+          <div class="field">
+            <label>หมวดหมู่หลัก *</label>
+            {{ form.category }}
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="field">
+            <label>ราคาขายจริง (กีบ ₭) *</label>
+            <input type="number" name="price" value="{{ form.price.value|default:'' }}" required placeholder="เช่น 15000000">
+          </div>
+          <div class="field">
+            <label>ราคาเก่าก่อนลด (กีบ ₭)</label>
+            <input type="number" name="old_price" value="{{ form.old_price.value|default:'' }}" placeholder="ถ้ามี เช่น 18000000">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>รายละเอียดสินค้า</label>
+          <textarea name="desc" rows="6" placeholder="คำอธิบาย รายละเอียดคุณสมบัติสินค้า...">{{ form.desc.value|default:'' }}</textarea>
+        </div>
+
+        <div class="field">
+          <label>ข้อมูลสเปกเครื่อง (ใส่หัวข้อแยกทีละบรรทัด)</label>
+          <textarea name="specs_raw" rows="6" placeholder="เช่น&#10;CPU: Intel Core i9-14900K&#10;GPU: RTX 4090 24GB&#10;RAM: 32GB DDR5">{{ form.specs_raw.value|default:'' }}</textarea>
+          <p style="font-size:11px; color:var(--text-faint); margin-top:4px;">* ใส่ชื่อหัวข้อและรายละเอียดคั่นด้วยเครื่องหมาย colon (:) เช่น "RAM: 16GB"</p>
+        </div>
+      </div>
+
+      <!-- Right Column: Settings, Flags, Images -->
+      <div>
+        <div class="field">
+          <label>จำนวนในคลังสินค้า *</label>
+          <input type="number" name="stock" value="{{ form.stock.value|default:0 }}" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="field">
+            <label>Emoji ไอคอน</label>
+            <input type="text" name="icon" value="{{ form.icon.value|default:'💻' }}" placeholder="💻">
+          </div>
+          <div class="field">
+            <label>ป้ายกำกับสินค้า</label>
+            <input type="text" name="tag" value="{{ form.tag.value|default:'' }}" placeholder="เช่น Hot, Sale">
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-bottom:18px; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:12.5px; margin-bottom:12px; color:var(--text-dim);">ป้ายสถานะสินค้า</h4>
+          <div class="field" style="display:flex; align-items:center; margin-bottom:10px;">
+            <input type="checkbox" name="featured" id="id_featured" {% if form.featured.value %}checked{% endif %}>
+            <label for="id_featured" style="margin-bottom:0; cursor:pointer;">แสดงแนะนำหน้าแรก</label>
+          </div>
+          <div class="field" style="display:flex; align-items:center; margin-bottom:10px;">
+            <input type="checkbox" name="best_seller" id="id_best_seller" {% if form.best_seller.value %}checked{% endif %}>
+            <label for="id_best_seller" style="margin-bottom:0; cursor:pointer;">สินค้าขายดี (Best Seller)</label>
+          </div>
+          <div class="field" style="display:flex; align-items:center; margin-bottom:0;">
+            <input type="checkbox" name="is_new" id="id_is_new" {% if form.is_new.value %}checked{% endif %}>
+            <label for="id_is_new" style="margin-bottom:0; cursor:pointer;">สินค้าเข้าใหม่ (New Arrival)</label>
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-bottom:0; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:12.5px; margin-bottom:12px; color:var(--text-dim);">รูปภาพสินค้า</h4>
+          
+          {% if product and product.images.all %}
+          <div class="img-grid">
+            {% for img in product.images.all %}
+            <div class="img-card">
+              <img src="{{ img.image.url }}">
+              <div class="del-chk">
+                <input type="checkbox" name="delete_images" value="{{ img.id }}" id="del_img_{{ img.id }}" style="margin-right:0;">
+                <label for="del_img_{{ img.id }}" style="display:none;"></label>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+          <p style="font-size:10.5px; color:#ef4444; margin-bottom:12px;">* ติ๊กถูกที่มุมรูปภาพเพื่อลบภาพนั้น</p>
+          {% endif %}
+
+          <div class="field" id="image-upload-container">
+            <label>อัปโหลดรูปภาพใหม่</label>
+            <div class="image-input-row" style="display:flex; gap:10px; margin-bottom:8px;">
+              <input type="file" name="new_images" multiple accept="image/*" style="font-size:12.5px; color:var(--text-dim); flex:1;">
+            </div>
+          </div>
+          <button type="button" class="btn btn-outline" onclick="addImageRow()" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px; margin-top:2px;">
+            <span class="ic sm" data-ic="plus"></span> เพิ่มช่องอัปโหลดรูปภาพ / ເພີ່ມຊ່ອງອັບໂຫລດຮູບພາບ
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:20px; margin-top:26px;">
+      <a href="{% url 'admin_product_list' %}" class="btn btn-outline">ยกเลิก</a>
+      <button type="submit" class="btn btn-solid" style="padding:10px 24px;">บันทึกข้อมูลสินค้า</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_admin_scripts %}
+<script>
+  function addImageRow() {
+    const container = document.getElementById('image-upload-container');
+    const row = document.createElement('div');
+    row.className = 'image-input-row';
+    row.style.display = 'flex';
+    row.style.gap = '10px';
+    row.style.marginBottom = '8px';
+    row.innerHTML = `
+      <input type="file" name="new_images" accept="image/*" style="font-size:12.5px; color:var(--text-dim); flex:1;">
+      <button type="button" class="btn btn-outline" onclick="removeImageRow(this)" style="padding:6px 12px; border-color:#ef4444; color:#ef4444; font-size:12.5px; height:44px;">ລຶບ</button>
+    `;
+    container.appendChild(row);
+  }
+  function removeImageRow(btn) {
+    btn.closest('.image-input-row').remove();
+  }
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block title %}ตรวจสอบสถานะสินค้า — NexByte Computer{% endblock %}
+{% block content %}
+
+<div class="sec-head" style="margin-top:32px;">
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="nav_orders"></span></div>
+  <h2 data-i18n="orders_page_title"></h2>
+  <p data-i18n="orders_page_sub"></p>
+</div>
+
+<div class="form-wrap" style="max-width:720px;">
+  <form method="get" class="order-search-form">
+    <input type="text" name="q" value="{{ query }}" data-i18n-ph="ph_orders_search" placeholder="ป้อนหมายเลขคำสั่งซื้อ หรือเบอร์โทร..." autocomplete="off">
+    <button type="submit" class="btn btn-solid"><span class="ic sm" data-ic="search"></span><span data-i18n="search_cta"></span></button>
+  </form>
+
+  <div id="results">
+    {% if orders is None %}
+    <div class="empty-state" style="margin:20px auto;">
+      <div class="ic-lg"><span class="ic" data-ic="search"></span></div>
+      <h3 data-i18n="empty_search_prompt"></h3>
+    </div>
+    {% elif not orders %}
+    <div class="empty-state" style="margin:20px auto;">
+      <div class="ic-lg"><span class="ic" data-ic="truck"></span></div>
+      <h3 data-i18n="{% if searched %}empty_no_match{% else %}empty_no_history{% endif %}"></h3>
+    </div>
+    {% else %}
+    {% for o in orders %}
+    <div class="order-card">
+      <div class="top">
+        <div>
+          <div class="oid">#{{ o.order_number }}</div>
+          <div class="date">{{ o.created_at }}</div>
+        </div>
+        <span class="status-badge">{{ o.get_status_display }}</span>
+      </div>
+      <div class="order-items">
+        {% for it in o.items.all %}
+        <div style="display:flex; justify-content:space-between; padding:4px 0;"><span>{{ it.product_name }} x{{ it.qty }}</span><span>{{ it.line_total|kip }}</span></div>
+        {% endfor %}
+        <div style="display:flex; justify-content:space-between; padding-top:10px; margin-top:6px; border-top:1px solid var(--border); font-weight:700; color:var(--text);">
+          <span data-i18n="order_total_label"></span><span>{{ o.total|kip }}</span>
+        </div>
+        <div style="margin-top:10px; font-size:11.5px; color:var(--text-faint);">
+          <span data-i18n="ship_to_label"></span>: {{ o.shipping_name }} · {{ o.shipping_phone }} · {{ o.get_carrier_display }}
+        </div>
+        {% if o.payment_method %}
+        <div style="margin-top:4px; font-size:11.5px; color:var(--text-faint);">
+          <span data-i18n="paid_via_label"></span>: {{ o.get_payment_method_display }}
+        </div>
+        {% endif %}
+        {% if o.payment_slip %}
+        <a href="{{ o.payment_slip.url }}" target="_blank" class="order-slip-link"><img src="{{ o.payment_slip.url }}" alt=""><span><span class="ic sm" data-ic="upload"></span><span data-i18n="view_slip_cta"></span></span></a>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<style>
+  .order-search-form{display:flex; gap:10px; margin-bottom:22px;}
+  .order-search-form input{
+    flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:999px;
+    padding:12px 18px; font-size:13.5px; color:var(--text); outline:none;
+  }
+  .order-search-form input:focus{border-color:var(--border-strong);}
+  .order-search-form .btn{padding:12px 22px; display:inline-flex; align-items:center; gap:8px; white-space:nowrap;}
+  @media (max-width:520px){
+    .order-search-form{flex-direction:column;}
+    .order-search-form .btn{justify-content:center;}
+  }
+</style>
+<script>fillIcons();</script>
+{% endblock %}

@@ -1,0 +1,61 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}<span data-i18n="admin_bank_list_title"></span> — NexByte Computer{% endblock %}
+{% block admin_header_title %}<span data-i18n="admin_bank_list_title"></span>{% endblock %}
+{% block admin_header_sub %}<span data-i18n="admin_bank_list_sub"></span>{% endblock %}
+
+{% block admin_content %}
+<div class="admin-card">
+  <div style="display:flex; justify-content:flex-end; margin-bottom:20px;">
+    <a href="{% url 'admin_bank_create' %}" class="btn btn-solid" style="display:inline-flex; align-items:center; gap:8px;">
+      <span class="ic" data-ic="plus"></span> <span data-i18n="admin_btn_add_bank"></span>
+    </a>
+  </div>
+
+  <div style="overflow-x:auto;">
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:70px; text-align:center;">QR Code</th>
+          <th data-i18n="admin_th_bank_name"></th>
+          <th data-i18n="admin_th_account_name"></th>
+          <th data-i18n="admin_th_account_number"></th>
+          <th data-i18n="admin_th_branch"></th>
+          <th style="width:80px; text-align:center;" data-i18n="admin_th_order"></th>
+          <th style="width:100px; text-align:center;" data-i18n="admin_th_actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for b in banks %}
+        <tr style="border-bottom: 1px solid var(--border); transition: background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">
+          <td style="text-align:center;">
+            {% if b.qr %}
+            <img src="{{ b.qr.url }}" style="width:40px; height:40px; object-fit:cover; border-radius:4px; border:1px solid var(--border);">
+            {% else %}
+            <span style="font-size:11px; color:var(--text-faint);">-</span>
+            {% endif %}
+          </td>
+          <td>
+            <div style="font-weight:600;"><a href="{% url 'admin_bank_edit' b.pk %}" style="color:var(--text); text-decoration:none;">{{ b.name }}</a></div>
+            <div style="font-size:11px; color:var(--text-faint);">{{ b.sub|default:"-" }}</div>
+          </td>
+          <td>{{ b.account_name }}</td>
+          <td class="mono" style="font-weight:600;">{{ b.account_number }}</td>
+          <td>{{ b.branch|default:"-" }}</td>
+          <td style="text-align:center;">{{ b.order }}</td>
+          <td style="text-align:center;">
+            <div class="crud-actions" style="justify-content:center;">
+              <a href="{% url 'admin_bank_edit' b.pk %}" data-i18n-title="admin_btn_save"><span class="ic" data-ic="edit"></span></a>
+              <a href="{% url 'admin_bank_delete' b.pk %}" class="delete-btn" data-i18n-title="admin_btn_delete"><span class="ic" data-ic="trash"></span></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td class="empty-row" colspan="7" data-i18n="admin_no_banks"></td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

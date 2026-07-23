@@ -1,0 +1,93 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}จัดการหมวดหมู่ — NexByte Computer{% endblock %}
+{% block admin_header_title %}จัดการหมวดหมู่สินค้า{% endblock %}
+{% block admin_header_sub %}จัดการหมวดหมู่หลักและหมวดหมู่ย่อยสำหรับคัดกรองสินค้า{% endblock %}
+
+{% block admin_content %}
+<div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
+  
+  <!-- Left Side: Categories -->
+  <div class="admin-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <h3 style="margin-bottom:0;">หมวดหมู่หลัก</h3>
+      <a href="{% url 'admin_category_create' %}" class="btn btn-solid" style="padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
+        <span class="ic" data-ic="plus"></span> เพิ่มหมวดหมู่
+      </a>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th style="width:40px; text-align:center;">ไอคอน</th>
+          <th>หมวดหมู่</th>
+          <th style="width:80px; text-align:center;">ลำดับ</th>
+          <th style="width:80px; text-align:center;">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for c in categories %}
+        <tr>
+          <td style="text-align:center; font-size:16px;">{{ c.icon }}</td>
+          <td>
+            <div style="font-weight:600;"><a href="{% url 'admin_category_edit' c.slug %}" style="color:var(--text); text-decoration:none;">{{ c.name }}</a></div>
+            <div style="font-size:10.5px; color:var(--text-faint);">ID: {{ c.slug }}</div>
+          </td>
+          <td style="text-align:center;">{{ c.order }}</td>
+          <td style="text-align:center;">
+            <div class="crud-actions" style="justify-content:center;">
+              <a href="{% url 'admin_category_edit' c.slug %}" title="แก้ไข"><span class="ic" data-ic="edit"></span></a>
+              <a href="{% url 'admin_category_delete' c.slug %}" class="delete-btn" title="ลบ"><span class="ic" data-ic="trash"></span></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td class="empty-row" colspan="4">ยังไม่มีหมวดหมู่หลัก</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Right Side: Subcategories -->
+  <div class="admin-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
+      <h3 style="margin-bottom:0;">หมวดหมู่ย่อย</h3>
+      <a href="{% url 'admin_subcategory_create' %}" class="btn btn-solid" style="padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
+        <span class="ic" data-ic="plus"></span> เพิ่มหมวดหมู่ย่อย
+      </a>
+    </div>
+
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>หมวดหมู่หลัก</th>
+          <th>ชื่อหมวดหมู่ย่อย</th>
+          <th style="width:80px; text-align:center;">ลำดับ</th>
+          <th style="width:80px; text-align:center;">จัดการ</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for s in subcategories %}
+        <tr>
+          <td style="color:var(--text-faint);">{{ s.category.name }}</td>
+          <td>
+            <div style="font-weight:600;"><a href="{% url 'admin_subcategory_edit' s.pk %}" style="color:var(--text); text-decoration:none;">{{ s.name }}</a></div>
+          </td>
+          <td style="text-align:center;">{{ s.order }}</td>
+          <td style="text-align:center;">
+            <div class="crud-actions" style="justify-content:center;">
+              <a href="{% url 'admin_subcategory_edit' s.pk %}" title="แก้ไข"><span class="ic" data-ic="edit"></span></a>
+              <a href="{% url 'admin_subcategory_delete' s.pk %}" class="delete-btn" title="ลบ"><span class="ic" data-ic="trash"></span></a>
+            </div>
+          </td>
+        </tr>
+        {% empty %}
+        <tr><td class="empty-row" colspan="4">ยังไม่มีหมวดหมู่ย่อย</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</div>
+{% endblock %}

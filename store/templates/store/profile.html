@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}โปรไฟล์ของฉัน — NexByte Computer{% endblock %}
+{% block content %}
+
+<div class="form-wrap" style="margin-top:56px;">
+  <div class="form-card">
+    <h2 data-i18n="profile_title"></h2>
+    <p class="sub" data-i18n="profile_sub"></p>
+
+    {% if messages %}
+    {% for message in messages %}<div class="form-msg show success">{{ message }}</div>{% endfor %}
+    {% endif %}
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-grid">
+        <div class="field full {% if form.first_name.errors %}error{% endif %}">
+          <label data-i18n="label_customer_name"></label>
+          {{ form.first_name }}
+          {% if form.first_name.errors %}<div class="field-error">{{ form.first_name.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field">
+          <label data-i18n="label_email_readonly"></label>
+          <input type="email" value="{{ user.email }}" disabled style="opacity:.6;">
+        </div>
+        <div class="field {% if form.phone.errors %}error{% endif %}">
+          <label data-i18n="label_phone"></label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<div class="field-error">{{ form.phone.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field {% if form.province.errors %}error{% endif %}">
+          <label data-i18n="label_province"></label>
+          {{ form.province }}
+          {% if form.province.errors %}<div class="field-error">{{ form.province.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field {% if form.city.errors %}error{% endif %}">
+          <label data-i18n="label_city"></label>
+          {{ form.city }}
+          {% if form.city.errors %}<div class="field-error">{{ form.city.errors.0 }}</div>{% endif %}
+        </div>
+        <div class="field full {% if form.address.errors %}error{% endif %}">
+          <label data-i18n="label_address"></label>
+          {{ form.address }}
+          {% if form.address.errors %}<div class="field-error">{{ form.address.errors.0 }}</div>{% endif %}
+        </div>
+      </div>
+      <button type="submit" class="btn btn-solid btn-block" data-i18n="save_cta"></button>
+    </form>
+
+    <div style="display:flex; gap:10px; margin-top:14px;">
+      <a href="{% url 'orders' %}" class="btn btn-ghost btn-block" data-i18n="my_orders_cta"></a>
+      <form method="post" action="{% url 'logout' %}" style="display:contents;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-danger btn-block" data-i18n="logout_cta"></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

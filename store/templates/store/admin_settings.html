@@ -1,0 +1,265 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}ຕັ້ງຄ່າຮ້ານຄ້າ
+{% block admin_header_title %}ຕັ້ງຄ່າຮ້ານຄ້າ
+{% block admin_header_sub %}ປັບແຕ່ງຊື່ຮ້ານ, ໂລໂກ້, ຊ່ອງທາງການຕິດຕໍ່, ແລະ ໂທນສີຂອງເວັບໄຊ
+
+{% block admin_content %}
+<div class="admin-card">
+  <form method="post" enctype="multipart/form-data" class="backoffice-form" id="settings-form">
+    {% csrf_token %}
+    
+    {% if form.errors %}
+    <div style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.25); padding:16px; border-radius:8px; margin-bottom:20px; font-size:13px;">
+      <strong>ກະລຸນາແກ້ໄຂຂໍ້ມູນທີ່ບໍ່ຖືກຕ້ອງ</strong>
+    </div>
+    {% endif %}
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:26px;">
+      
+      <!-- Left Side: Metadata and Stats -->
+      <div>
+        <div class="admin-card" style="padding:16px; margin-bottom:20px; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="user"></span> ຂໍ້ມູນຮ້ານຄ້າທົ່ວໄປ
+          </h4>
+          <div class="field">
+            <label>ຊື່ຮ້ານຄ້າ</label>
+            <input type="text" name="store_name" value="{{ form.store_name.value|default:'' }}" required>
+          </div>
+          <div class="field">
+            <label>ໂລໂກ້ຮ້ານຄ້າ</label>
+            {% if settings.logo_url %}
+            <div style="margin-bottom:10px;">
+              <img src="{{ settings.logo_url }}" style="max-height:40px; display:block; border:1px solid var(--border); border-radius:4px; padding:4px; background:rgba(255,255,255,0.02);">
+            </div>
+            {% elif settings.logo %}
+            <div style="margin-bottom:10px;">
+              <img src="{{ settings.logo.url }}" style="max-height:40px; display:block; border:1px solid var(--border); border-radius:4px; padding:4px; background:rgba(255,255,255,0.02);">
+            </div>
+            {% endif %}
+            <input type="file" name="logo" accept="image/*" style="font-size:12px; margin-bottom:8px;">
+            <input type="url" name="logo_url" value="{{ form.logo_url.value|default:'' }}" placeholder="ຫຼືໃສ່ລິ້ງຮູບ" style="font-size:12px;">
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-bottom:20px; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="eye"></span> ຊ່ອງທາງການຕິດຕໍ່ກັບ
+          </h4>
+          <div class="field">
+            <label>ລິ້ງ Facebook Page</label>
+            <input type="url" name="contact_fb" value="{{ form.contact_fb.value|default:'' }}">
+          </div>
+          <div class="field">
+            <label>ເບີ WhatsApp</label>
+            <input type="text" name="contact_wa" value="{{ form.contact_wa.value|default:'' }}">
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-bottom:0; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="chart"></span> ປັບແຕ່ງລະບົບຕົວເລກສະຖິຕິໜ້າຮ້ານ (Stats)
+          </h4>
+          <div class="field" style="display:flex; align-items:center; margin-bottom:14px;">
+            <input type="checkbox" name="stats_enabled" id="id_stats_enabled" {% if form.stats_enabled.value %}checked{% endif %}>
+            <label for="id_stats_enabled" style="margin-bottom:0; cursor:pointer;">ເປີດສະແດງກ່ອງສະຖິຕິເທິງໜ້າທຳອິດ</label>
+          </div>
+          
+          <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px; margin-bottom:12px;">
+            <div><label style="font-size:11px; color:var(--text-faint);">ຕົວເລືອກສະຖິຕິ</label></div>
+            <div><label style="font-size:11px; color:var(--text-faint);">ຄ່າຫຼອກສະຖິຕິ (ຖ້າມີ)</label></div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px; margin-bottom:10px;">
+            <div>{{ form.stat_metric_1 }}</div>
+            <div><input type="number" name="stat_override_1" value="{{ form.stat_override_1.value|default:'' }}" placeholder="ใช้ค่าจริง"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px; margin-bottom:10px;">
+            <div>{{ form.stat_metric_2 }}</div>
+            <div><input type="number" name="stat_override_2" value="{{ form.stat_override_2.value|default:'' }}" placeholder="ใช้ค่าจริง"></div>
+          </div>
+          <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px;">
+            <div>{{ form.stat_metric_3 }}</div>
+            <div><input type="number" name="stat_override_3" value="{{ form.stat_override_3.value|default:'' }}" placeholder="ใช้ค่าจริง"></div>
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-top:20px; margin-bottom:0; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="edit"></span> ບ່ອນປັບຍອດຂາຍລວມ
+          </h4>
+          <p style="font-size:12px; color:var(--text-faint); margin-bottom:12px;">
+            ຕົວເລກນີ້ຈະຖືກບວກເຂົ້າກັບຍອດຂາຍລວມທີ່ຄິດໄລ່ຈິງ — ເມື່ອລຶບຄຳສັ່ງຊື້ ຍອດຂອງມັນຈະຖືກເພີ່ມມາໃສ່ບ່ອນນີ້ໂດຍອັດຕະໂນມັດ ເພື່ອບໍ່ໃຫ້ຍອດຂາຍລວມຫຼຸດລົງ, ຫຼືທ່ານແກ້ຕົວເລກນີ້ດ້ວຍມືກໍໄດ້
+           
+          </p>
+          <div class="field">
+            <input type="number" name="sales_adjustment" value="{{ form.sales_adjustment.value|default:0 }}">
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Side: Themes and Styles -->
+      <div>
+        <div class="admin-card" style="padding:16px; margin-bottom:20px; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="palette"></span> ຮູບແບບສຳເລັດຮູບ
+          </h4>
+          <div id="theme-preset-row" style="display:grid; grid-template-columns:repeat(auto-fill, minmax(90px, 1fr)); gap:10px;"></div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-bottom:0; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="image"></span> ຊຸດສີແລະຮູບແບບເວັບໄຊ (Custom Themes)
+          </h4>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+            <div class="field">
+              <label>{{ form.theme_primary.label }}</label>
+              <input type="color" name="theme_primary" value="{{ form.theme_primary.value|default:'#8b7cf6' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+            <div class="field">
+              <label>{{ form.theme_secondary.label }}</label>
+              <input type="color" name="theme_secondary" value="{{ form.theme_secondary.value|default:'#a78bfa' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+            <div class="field">
+              <label>{{ form.theme_background.label }}</label>
+              <input type="color" name="theme_background" value="{{ form.theme_background.value|default:'#0a0913' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+            <div class="field">
+              <label>{{ form.theme_text.label }}</label>
+              <input type="color" name="theme_text" value="{{ form.theme_text.value|default:'#f3f1fa' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+            <div class="field">
+              <label>{{ form.theme_card_bg.label }}</label>
+              <input type="color" name="theme_card_bg" value="{{ form.theme_card_bg.value|default:'#12101f' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+            <div class="field">
+              <label>{{ form.theme_button.label }}</label>
+              <input type="color" name="theme_button" value="{{ form.theme_button.value|default:'#9686f9' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+            <div class="field">
+              <label>{{ form.theme_border.label }}</label>
+              <input type="color" name="theme_border" value="{{ form.theme_border.value|default:'#ffffff' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+            <div class="field">
+              <label>{{ form.theme_header_bg.label }}</label>
+              <input type="color" name="theme_header_bg" value="{{ form.theme_header_bg.value|default:'#0a0913' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:10px;">
+            <div class="field">
+              <label>{{ form.theme_footer_bg.label }}</label>
+              <input type="color" name="theme_footer_bg" value="{{ form.theme_footer_bg.value|default:'#0a0913' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+            <div class="field">
+              <label>{{ form.theme_stat_icon.label }}</label>
+              <input type="color" name="theme_stat_icon" value="{{ form.theme_stat_icon.value|default:'#8b7cf6' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+          </div>
+
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px;">
+            <div class="field">
+              <label>{{ form.theme_panel_deep.label }}</label>
+              <input type="color" name="theme_panel_deep" value="{{ form.theme_panel_deep.value|default:'#1c1832' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+            <div class="field">
+              <label>{{ form.theme_tabbar_bg.label }}</label>
+              <input type="color" name="theme_tabbar_bg" value="{{ form.theme_tabbar_bg.value|default:'#171429' }}" style="height:44px; padding:4px; cursor:pointer;">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>ຄວາມໂຄ້ງຂອງຂອບກ່ອງແລະປຸ່ມ</label>
+            <input type="text" name="theme_radius" value="{{ form.theme_radius.value|default:'12px' }}">
+          </div>
+
+          <div class="field">
+            <label>{{ form.theme_bg_image.label }}</label>
+            {% if settings.theme_bg_image_url %}
+            <div style="margin-bottom:10px;">
+              <img src="{{ settings.theme_bg_image_url }}" style="max-height:80px; border-radius:6px; border:1px solid var(--border);">
+            </div>
+            {% elif settings.theme_bg_image %}
+            <div style="margin-bottom:10px;">
+              <img src="{{ settings.theme_bg_image.url }}" style="max-height:80px; border-radius:6px; border:1px solid var(--border);">
+            </div>
+            {% endif %}
+            <input type="file" name="theme_bg_image" accept="image/*" style="font-size:12px; margin-bottom:8px;">
+            <input type="url" name="theme_bg_image_url" value="{{ form.theme_bg_image_url.value|default:'' }}" placeholder="ຫຼືໃສ່ລິ້ງຮູບ" style="font-size:12px;">
+          </div>
+
+          <div class="field">
+            <label>ໂຄ້ດ CSS ຕົກແຕ່ງເພີ່ມເຕີມ</label>
+            <textarea name="custom_css" placeholder="/* เช่น .product-card { box-shadow: 0 4px 10px rgba(0,0,0,0.5); } */" style="font-family: monospace; font-size: 13.5px; height: 120px; width: 100%; resize: vertical;">{{ form.custom_css.value|default:'' }}</textarea>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:20px; margin-top:26px;">
+      <button type="submit" class="btn btn-solid" style="padding:10px 28px;">ບັນທຶກການຕັ້ງຄ່າ</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
+{% block extra_admin_scripts %}
+<script>
+  var THEME_PRESETS = [
+    { key: "violet", label: "NexByte", theme_primary: "#8b7cf6", theme_secondary: "#a78bfa", theme_background: "#0a0913", theme_text: "#f3f1fa", theme_card_bg: "#12101f", theme_button: "#9686f9", theme_border: "#ffffff", theme_header_bg: "#0a0913", theme_footer_bg: "#0a0913", theme_stat_icon: "#8b7cf6", theme_panel_deep: "#1c1832", theme_tabbar_bg: "#171429", theme_radius: "20px" },
+    { key: "blue", label: "Game Blue", theme_primary: "#2f6fed", theme_secondary: "#5b9bff", theme_background: "#060b18", theme_text: "#eef4ff", theme_card_bg: "#0d1526", theme_button: "#2f6fed", theme_border: "#ffffff", theme_header_bg: "#060b18", theme_footer_bg: "#060b18", theme_stat_icon: "#2f6fed", theme_panel_deep: "#16233d", theme_tabbar_bg: "#0f1c30", theme_radius: "16px" },
+    { key: "crimson", label: "Crimson", theme_primary: "#ef4444", theme_secondary: "#f87171", theme_background: "#0d0507", theme_text: "#fbeaea", theme_card_bg: "#180a0c", theme_button: "#ef4444", theme_border: "#ffffff", theme_header_bg: "#0d0507", theme_footer_bg: "#0d0507", theme_stat_icon: "#ef4444", theme_panel_deep: "#241014", theme_tabbar_bg: "#1a0c0f", theme_radius: "8px" },
+    { key: "emerald", label: "Emerald", theme_primary: "#10b981", theme_secondary: "#34d399", theme_background: "#061410", theme_text: "#eafff6", theme_card_bg: "#0c1f19", theme_button: "#10b981", theme_border: "#ffffff", theme_header_bg: "#061410", theme_footer_bg: "#061410", theme_stat_icon: "#10b981", theme_panel_deep: "#15291f", theme_tabbar_bg: "#0f2018", theme_radius: "16px" },
+    { key: "amber", label: "Amber", theme_primary: "#f59e0b", theme_secondary: "#fbbf24", theme_background: "#170f04", theme_text: "#fff6e6", theme_card_bg: "#24190a", theme_button: "#f59e0b", theme_border: "#ffffff", theme_header_bg: "#170f04", theme_footer_bg: "#170f04", theme_stat_icon: "#f59e0b", theme_panel_deep: "#2e2010", theme_tabbar_bg: "#241a0c", theme_radius: "14px" },
+    { key: "light", label: "Light Store", theme_primary: "#e11d2e", theme_secondary: "#f43f5e", theme_background: "#f7f8fa", theme_text: "#16181d", theme_card_bg: "#ffffff", theme_button: "#e11d2e", theme_border: "#0f1115", theme_header_bg: "#ffffff", theme_footer_bg: "#ffffff", theme_stat_icon: "#e11d2e", theme_panel_deep: "#eef0f3", theme_tabbar_bg: "#ffffff", theme_radius: "14px" }
+  ];
+  var THEME_FIELDS = ["theme_primary", "theme_secondary", "theme_background", "theme_text", "theme_card_bg", "theme_button", "theme_border", "theme_header_bg", "theme_footer_bg", "theme_stat_icon", "theme_panel_deep", "theme_tabbar_bg", "theme_radius"];
+
+  function applyThemePreset(key) {
+    var preset = THEME_PRESETS.filter(function (p) { return p.key === key; })[0];
+    if (!preset) return;
+    THEME_FIELDS.forEach(function (field) {
+      var input = document.querySelector('[name="' + field + '"]');
+      if (input) input.value = preset[field];
+    });
+    document.querySelectorAll('#theme-preset-row .preset-chip').forEach(function (chip) {
+      chip.classList.toggle('active', chip.dataset.key === key);
+      if (chip.dataset.key === key) chip.classList.add('saving');
+    });
+    var formEl = document.getElementById('settings-form');
+    if (formEl) formEl.requestSubmit();
+  }
+
+  (function renderThemePresets() {
+    var row = document.getElementById('theme-preset-row');
+    if (!row) return;
+    row.innerHTML = THEME_PRESETS.map(function (p) {
+      return '<button type="button" class="preset-chip" data-key="' + p.key + '" onclick="applyThemePreset(\'' + p.key + '\')" ' +
+        'style="border:1px solid var(--border); border-radius:10px; padding:8px; cursor:pointer; background:' + p.theme_background + ';">' +
+        '<span style="display:flex; gap:4px; margin-bottom:6px;">' +
+        '<span style="width:14px; height:14px; border-radius:50%; background:' + p.theme_primary + ';"></span>' +
+        '<span style="width:14px; height:14px; border-radius:50%; background:' + p.theme_secondary + ';"></span>' +
+        '<span style="width:14px; height:14px; border-radius:50%; background:' + p.theme_card_bg + '; border:1px solid rgba(255,255,255,0.2);"></span>' +
+        '</span>' +
+        '<span style="font-size:11px; color:' + p.theme_text + ';">' + p.label + '</span>' +
+        '</button>';
+    }).join('');
+  })();
+</script>
+<style>
+  .preset-chip.active{ box-shadow:0 0 0 2px var(--violet); }
+  .preset-chip.saving{ opacity:0.55; pointer-events:none; }
+</style>
+{% endblock %}

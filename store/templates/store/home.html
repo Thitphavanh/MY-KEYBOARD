@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block content %}
+
+<div class="hero-banner">
+  <div class="hero-carousel" id="hero-carousel">
+    <div class="hero-slides" id="hero-slides">
+      {% for b in banners %}
+      <div class="hero-slide {% if forloop.first %}active{% endif %}" data-i="{{ forloop.counter0 }}">
+        <a href="#products"><img src="{{ b.image.url }}" alt="" class="hero-banner-img"></a>
+      </div>
+      {% endfor %}
+    </div>
+    {% if banners|length > 1 %}
+    <button class="hero-arrow prev" type="button" onclick="heroGo(-1)" aria-label="prev"></button>
+    <button class="hero-arrow next" type="button" onclick="heroGo(1)" aria-label="next"></button>
+    <div class="hero-dots" id="hero-dots">
+      {% for b in banners %}<button type="button" class="{% if forloop.first %}active{% endif %}" onclick="heroGoTo({{ forloop.counter0 }})"></button>{% endfor %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if stats %}
+<section style="padding:56px 0 20px;">
+  <div class="store-stats">
+    {% for s in stats %}
+    <div class="stat-box">
+      <div class="stat-text">
+        <div class="stat-lb">{{ s.label }}</div>
+        <div class="stat-val">{% if s.is_currency %}{{ s.value|kip }}{% else %}{{ s.value|floatformat:0 }}{% endif %}</div>
+      </div>
+      <div class="stat-ic"><span class="ic" data-ic="{{ s.icon }}"></span></div>
+    </div>
+    {% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if best_sellers %}
+<section id="best-sellers" style="padding:36px 0 20px;">
+  <div class="sec-head">
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="best_sellers_eyebrow"></span></div>
+    <h2 data-i18n="best_sellers_title"></h2>
+  </div>
+  <div class="product-grid">
+    {% for p in best_sellers %}{% include "store/_product_card.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+{% if new_arrivals %}
+<section id="new-arrivals" style="padding:16px 0 20px;">
+  <div class="sec-head">
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="new_arrivals_eyebrow"></span></div>
+    <h2 data-i18n="new_arrivals_title"></h2>
+  </div>
+  <div class="product-grid">
+    {% for p in new_arrivals %}{% include "store/_product_card.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
+<section id="products" style="padding:56px 0 80px;">
+  <div class="toolbar">
+    <div class="count" id="result-count" data-count="{{ result_count }}" data-search="{{ search_term }}">{{ result_count }} รายการ</div>
+    <form method="get" id="sort-form">
+      {% if active_cat != "all" %}<input type="hidden" name="cat" value="{{ active_cat }}">{% endif %}
+      {% if search_term %}<input type="hidden" name="search" value="{{ search_term }}">{% endif %}
+      <select name="sort" id="sort-select" onchange="document.getElementById('sort-form').submit()">
+        <option value="default" {% if sort == "default" %}selected{% endif %}>···</option>
+        <option value="price-asc" {% if sort == "price-asc" %}selected{% endif %}>₭ ↑</option>
+        <option value="price-desc" {% if sort == "price-desc" %}selected{% endif %}>₭ ↓</option>
+        <option value="rating" {% if sort == "rating" %}selected{% endif %}>★</option>
+      </select>
+    </form>
+  </div>
+  {% if products %}
+  <div class="product-grid">
+    {% for p in products %}{% include "store/_product_card.html" %}{% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="ic-lg"><span class="ic" data-ic="search"></span></div>
+    <h3 data-i18n="no_results"></h3>
+  </div>
+  {% endif %}
+</section>
+
+<section class="why-us-section" style="padding:20px 0 60px;">
+  <h2 class="why-us-title-main" data-i18n="why_us_title"></h2>
+  <div class="why-us-grid">
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="truck"></span></div><div class="why-us-card-title" data-i18n="why_us_convenient_title"></div><div class="why-us-desc" data-i18n="why_us_convenient_desc"></div></div>
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="shield"></span></div><div class="why-us-card-title" data-i18n="why_us_secure_title"></div><div class="why-us-desc" data-i18n="why_us_secure_desc"></div></div>
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="headset"></span></div><div class="why-us-card-title" data-i18n="why_us_service_title"></div><div class="why-us-desc" data-i18n="why_us_service_desc"></div></div>
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="check"></span></div><div class="why-us-card-title" data-i18n="why_us_warranty_title"></div><div class="why-us-desc" data-i18n="why_us_warranty_desc"></div></div>
+  </div>
+</section>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>
+  fillIcons();
+  var heroIndex = 0;
+  var heroSlideEls = document.querySelectorAll('.hero-slide');
+  var heroSlideCount = heroSlideEls.length;
+  var heroTimer = null;
+  var heroSlidesEl = document.getElementById('hero-slides');
+
+  function resizeHeroSlides() {
+    if (!heroSlidesEl) return;
+    var activeImg = heroSlidesEl.querySelector('.hero-slide.active .hero-banner-img');
+    if (!activeImg || !activeImg.naturalWidth) return;
+    var ratio = activeImg.naturalHeight / activeImg.naturalWidth;
+    heroSlidesEl.style.height = Math.round(heroSlidesEl.offsetWidth * ratio) + 'px';
+  }
+  heroSlideEls.forEach(function (slide) {
+    var img = slide.querySelector('.hero-banner-img');
+    if (img) {
+      if (img.complete) resizeHeroSlides();
+      img.addEventListener('load', resizeHeroSlides);
+    }
+  });
+  window.addEventListener('resize', resizeHeroSlides);
+
+  function heroGoTo(i) {
+    heroIndex = (i + heroSlideCount) % heroSlideCount;
+    document.querySelectorAll('.hero-slide').forEach(function (el, idx) { el.classList.toggle('active', idx === heroIndex); });
+    document.querySelectorAll('.hero-dots button').forEach(function (el, idx) { el.classList.toggle('active', idx === heroIndex); });
+    resizeHeroSlides();
+    resetHeroTimer();
+  }
+  function heroGo(delta) { heroGoTo(heroIndex + delta); }
+  function resetHeroTimer() {
+    clearInterval(heroTimer);
+    if (heroSlideCount > 1) heroTimer = setInterval(function () { heroGo(1); }, 6000);
+  }
+  resetHeroTimer();
+  var carouselEl = document.getElementById('hero-carousel');
+  if (carouselEl) {
+    carouselEl.addEventListener('mouseenter', function () { clearInterval(heroTimer); });
+    carouselEl.addEventListener('mouseleave', resetHeroTimer);
+  }
+  setupScrollReveal('.product-card');
+
+  var countEl = document.getElementById('result-count');
+  function renderResultCount() {
+    var n = countEl.dataset.count;
+    var search = countEl.dataset.search;
+    countEl.textContent = t('results_count_label').replace('{n}', n) + (search ? ' · "' + search + '"' : '');
+  }
+  renderResultCount();
+  var _origOnLangChange = onLangChange;
+  onLangChange = function () { _origOnLangChange(); renderResultCount(); };
+</script>
+{% endblock %}
