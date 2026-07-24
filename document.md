@@ -31,12 +31,12 @@ Viewed profile.html:1-42
 1. **เข้าโฟลเดอร์โปรเจกต์:**
 
    ```cmd
-   cd /d "C:\Users\gno35\OneDrive\MY KEYBOARD"
+   cd "C:\Users\gno35\OneDrive\MY KEYBOARD"
    ```
 2. **เปิดใช้งาน Virtual Environment (.venv):**
 
    ```cmd
-   .venv\Scripts\activate.bat
+   .venv\Scripts\activate
    ```
 3. **รันเซิร์ฟเวอร์ Django:**
 
@@ -77,6 +77,7 @@ Viewed profile.html:1-42
    python manage.py changepassword <ชื่อผู้ใช้งาน>
    ```
    *ตัวอย่างการเปลี่ยนรหัสผ่านของบัญชี `admin`:*
+
    ```powershell
    python manage.py changepassword admin
    ```

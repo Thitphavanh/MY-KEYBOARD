@@ -1,0 +1,29 @@
+{% extends "store/admin_base.html" %}
+{% load store_extras %}
+
+{% block admin_title %}{{ title }} — NexByte Computer{% endblock %}
+{% block admin_header_title %}{{ title }}{% endblock %}
+{% block admin_header_sub %}กรอกรายละเอียดของแบรนด์ในแบบฟอร์มด้านล่าง{% endblock %}
+
+{% block admin_content %}
+<div class="admin-card" style="max-width:600px; margin:0 auto;">
+  <form method="post" class="backoffice-form">
+    {% csrf_token %}
+
+    {% for field in form %}
+    <div class="field">
+      <label>{{ field.label }}</label>
+      {{ field }}
+      {% if field.errors %}
+      <div style="color:#ef4444; font-size:12px; margin-top:4px; font-weight:600;">{{ field.errors.0 }}</div>
+      {% endif %}
+    </div>
+    {% endfor %}
+
+    <div style="display:flex; gap:12px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:20px; margin-top:26px;">
+      <a href="{% url 'admin_brand_list' %}" class="btn btn-outline">ยกเลิก</a>
+      <button type="submit" class="btn btn-solid" style="padding:10px 24px;">บันทึกข้อมูล</button>
+    </div>
+  </form>
+</div>
+{% endblock %}

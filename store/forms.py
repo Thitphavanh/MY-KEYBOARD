@@ -21,6 +21,11 @@ class RegisterForm(UserCreationForm):
     phone = forms.CharField(label="ເບີໂທ", max_length=30)
     email = forms.EmailField(label="ອີເມວ")
 
+    error_messages = {
+        **UserCreationForm.error_messages,
+        "password_mismatch": "ລະຫັດຜ່ານທັງສອງບໍ່ກົງກັນ",
+    }
+
     class Meta:
         model = User
         fields = ["name", "phone", "email", "password1", "password2"]
@@ -68,12 +73,13 @@ class CheckoutForm(forms.ModelForm):
 
     class Meta:
         model = Order
-        fields = ["shipping_name", "shipping_phone", "shipping_province", "shipping_city", "shipping_village", "carrier"]
+        fields = ["shipping_name", "shipping_phone", "shipping_province", "shipping_city", "shipping_village", "shipping_branch", "carrier"]
         labels = {
             "shipping_name": "ຊື່ລູກຄ້າ",
             "shipping_phone": "ເບີໂທ",
             "shipping_city": "ເມືອງ",
             "shipping_village": "ບ້ານ",
+            "shipping_branch": "ສາຂາ",
             "carrier": "ບໍລິສັດຈັດສົ່ງ",
         }
         widgets = {"carrier": forms.RadioSelect}
@@ -84,6 +90,12 @@ class PaymentForm(forms.ModelForm):
         model = Order
         fields = ["payment_method", "payment_slip"]
         labels = {"payment_method": "ຊ່ອງທາງການຊຳລະເງິນ", "payment_slip": "ແນບສະລິບໂອນເງິນ"}
+
+    def clean_payment_slip(self):
+        payment_slip = self.cleaned_data.get("payment_slip")
+        if not payment_slip:
+            raise forms.ValidationError("ກະລຸນາແນບສະລິບໂອນເງິນກ່ອນຢືນຢັນຄຳສັ່ງຊື້")
+        return payment_slip
 
 
 class ProductForm(forms.ModelForm):
@@ -99,29 +111,35 @@ class ProductForm(forms.ModelForm):
             "name",
             "brand",
             "category",
+            "subcategory",
             "price",
             "old_price",
             "stock",
+            "is_preorder",
             "icon",
             "tag",
             "desc",
             "featured",
             "best_seller",
             "is_new",
+            "source_link",
         ]
         labels = {
             "name": "ชื่อสินค้า",
             "brand": "แบรนด์",
             "category": "หมวดหมู่",
+            "subcategory": "ໝວດຍ່ອຍ",
             "price": "ราคา (กีบ ₭)",
             "old_price": "ราคาเก่า/ราคาก่อนลด (กีบ ₭)",
             "stock": "จำนวนสินค้าคงเหลือ",
+            "is_preorder": "ເປີດຂາຍແບບພຣີອໍເດີ້ (ສັ່ງໄດ້ເຖິງແມ່ນສິນຄ້າໝົດ)",
             "icon": "Emoji ไอคอน (เมื่อไม่มีรูปภาพ)",
             "tag": "ป้ายกำกับ (เช่น Hot, Sale)",
             "desc": "รายละเอียดสินค้า",
             "featured": "แนะนำบนหน้าแรก",
             "best_seller": "สินค้าขายดี",
             "is_new": "สินค้าใหม่",
+            "source_link": "ລິ້ງແຫຼ່ງສິນຄ້າ (ບ່ອນສັ່ງເອົາມາຂາຍ) — ເຫັນສະເພາະໜ້າແອັດມິນ",
         }
 
     def __init__(self, *args, **kwargs):
@@ -168,6 +186,19 @@ class SubCategoryForm(forms.ModelForm):
         }
 
 
+class BrandForm(forms.ModelForm):
+    class Meta:
+        model = Brand
+        fields = ["name", "categories"]
+        widgets = {
+            "categories": forms.CheckboxSelectMultiple,
+        }
+        labels = {
+            "name": "ชื่อแบรนด์",
+            "categories": "ใช้กับหมวดหมู่สินค้า",
+        }
+
+
 class BannerForm(forms.ModelForm):
     class Meta:
         model = Banner
@@ -202,6 +233,7 @@ class SiteSettingsForm(forms.ModelForm):
             "logo_url",
             "contact_fb",
             "contact_wa",
+            "admin_notify_email",
             "stats_enabled",
             "stat_metric_1",
             "stat_metric_2",
@@ -226,6 +258,13 @@ class SiteSettingsForm(forms.ModelForm):
             "theme_bg_image_url",
             "theme_radius",
             "custom_css",
+            "popup_ad_enabled",
+            "popup_ad_image",
+            "popup_ad_link",
+            "carrier_anousith_logo",
+            "carrier_rungaroon_logo",
+            "payment_ldb_logo",
+            "payment_bcel_logo",
         ]
         labels = {
             "store_name": "ชื่อร้านค้า",
@@ -233,6 +272,7 @@ class SiteSettingsForm(forms.ModelForm):
             "logo_url": "หรือใส่ลิงก์รูปโลโก้แทน",
             "contact_fb": "ลิงก์ Facebook Page",
             "contact_wa": "เบอร์ WhatsApp (เช่น 85620XXXXXXXX)",
+            "admin_notify_email": "ອີເມວຮັບແຈ້ງເຕືອນອໍເດີ້ໃໝ່",
             "stats_enabled": "เปิดแสดงตัวเลขสถิติ",
             "stat_metric_1": "สถิติช่องที่ 1",
             "stat_metric_2": "สถิติช่องที่ 2",
@@ -257,6 +297,13 @@ class SiteSettingsForm(forms.ModelForm):
             "theme_bg_image_url": "ຫຼືໃສ່ລິ້ງຮູບພື້ນຫຼັງແທນ",
             "theme_radius": "ความโค้งของขอบการ์ด/ปุ่ม (เช่น 12px, 20px, 0px)",
             "custom_css": "โค้ด CSS เพิ่มเติมสำหรับตกแต่ง (Custom CSS Overrides)",
+            "popup_ad_enabled": "ເປີດໃຊ້ປັອບອັບໂຄສະນາ",
+            "popup_ad_image": "ຮູບໂຄສະນາປັອບອັບ",
+            "popup_ad_link": "ລິ້ງເມື່ອກົດໃສ່ຮູບ (ເວັ້ນວ່າງໄດ້ຖ້າບໍ່ຕ້ອງການ)",
+            "carrier_anousith_logo": "ໂລໂກ້ Anousith Logistics",
+            "carrier_rungaroon_logo": "ໂລໂກ້ ຮຸ່ງອະລຸນ ຂົນສົ່ງ",
+            "payment_ldb_logo": "ໂລໂກ້ LDB Bank",
+            "payment_bcel_logo": "ໂລໂກ້ BCEL Bank",
         }
 
 

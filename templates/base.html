@@ -6,7 +6,7 @@
 <title>{% block title %}NexByte Computer — ร้านอุปกรณ์ไอทีและคอมพิวเตอร์{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'style.css' %}">
+<link rel="stylesheet" href="{% static 'style.css' %}?v=19">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -24,6 +24,7 @@
     --panel:{{ site_settings.theme_card_bg }};
     --panel-2:color-mix(in srgb, {{ site_settings.theme_card_bg }} 45%, {{ site_settings.theme_panel_deep }} 55%);
     --btn:{{ site_settings.theme_button }};
+    --btn-dim:color-mix(in srgb, {{ site_settings.theme_button }} 78%, black 22%);
     --header-bg:{{ site_settings.theme_header_bg }}cc;
     --header-bg-strong:{{ site_settings.theme_header_bg }}f2;
     --footer-bg:{{ site_settings.theme_footer_bg }}8c;
@@ -53,6 +54,29 @@
 </head>
 <body>
 
+{% if site_settings.popup_ad_enabled and site_settings.popup_ad_image %}
+<div id="ad-popup-overlay" class="ad-popup-overlay">
+  <div class="ad-popup-box">
+    <button type="button" class="ad-popup-close" onclick="closeAdPopup()" aria-label="Close"><span class="ic" data-ic="close"></span></button>
+    {% if site_settings.popup_ad_link %}
+    <a href="{{ site_settings.popup_ad_link }}" target="_blank" rel="noopener">
+      <img src="{{ site_settings.popup_ad_image.url }}" alt="" class="ad-popup-img">
+    </a>
+    {% else %}
+    <img src="{{ site_settings.popup_ad_image.url }}" alt="" class="ad-popup-img">
+    {% endif %}
+    <label class="ad-popup-skip">
+      <input type="checkbox" id="ad-popup-skip-checkbox">
+      ບໍ່ຕ້ອງແຈ້ງເຕືອນອີກ 24 ຊົ່ວໂມງ
+    </label>
+  </div>
+</div>
+{% endif %}
+
+<div id="img-lightbox" class="img-lightbox-overlay">
+  <img id="img-lightbox-img" src="" alt="">
+</div>
+
 {% include "navbar.html" %}
 
 <main>
@@ -66,8 +90,8 @@
 
 {% include "footer.html" %}
 
-<script src="{% static 'icons.js' %}"></script>
-<script src="{% static 'i18n.js' %}"></script>
+<script src="{% static 'icons.js' %}?v=2"></script>
+<script src="{% static 'i18n.js' %}?v=4"></script>
 <script src="{% static 'search.js' %}"></script>
 <script>
   function fillIcons(root) {
@@ -155,6 +179,73 @@
       setTimeout(function () { toast(m.textContent); }, i * 2400);
     });
   }
+
+  (function () {
+    var overlay = document.getElementById('ad-popup-overlay');
+    if (!overlay) return;
+    var until = localStorage.getItem('ad_popup_hide_until');
+    if (until && Date.now() < parseInt(until, 10)) return;
+    overlay.classList.add('show');
+    window.closeAdPopup = function () {
+      var skip = document.getElementById('ad-popup-skip-checkbox');
+      if (skip && skip.checked) {
+        localStorage.setItem('ad_popup_hide_until', Date.now() + 24 * 60 * 60 * 1000);
+      }
+      overlay.classList.remove('show');
+    };
+    overlay.addEventListener('click', function (e) {
+      if (e.target === overlay) window.closeAdPopup();
+    });
+  })();
+
+  (function () {
+    var lightbox = document.getElementById('img-lightbox');
+    var lightboxImg = document.getElementById('img-lightbox-img');
+    if (!lightbox) return;
+    document.addEventListener('click', function (e) {
+      var trigger = e.target.closest('[data-lightbox]');
+      if (!trigger) return;
+      e.preventDefault();
+      e.stopPropagation();
+      lightboxImg.src = trigger.getAttribute('data-lightbox');
+      lightbox.classList.add('show');
+    }, true);
+    lightbox.addEventListener('click', function () {
+      lightbox.classList.remove('show');
+    });
+  })();
+
+  function updateCartBadge(count) {
+    ['nav-cart-badge', 'tab-cart-badge'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (!el) return;
+      el.textContent = count;
+      el.style.display = count > 0 ? '' : 'none';
+    });
+  }
+
+  document.addEventListener('submit', function (e) {
+    var form = e.target.closest('.ajax-cart-form');
+    if (!form) return;
+    e.preventDefault();
+    var btn = form.querySelector('button[type=submit]');
+    if (btn) btn.disabled = true;
+    var csrftoken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+    fetch(form.action, {
+      method: 'POST',
+      headers: { 'X-Requested-With': 'XMLHttpRequest', 'X-CSRFToken': csrftoken },
+      body: new FormData(form)
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      if (data.success) {
+        toast(data.message);
+        updateCartBadge(data.cart_count);
+      }
+    }).catch(function () {
+      form.submit();
+    }).finally(function () {
+      if (btn) btn.disabled = false;
+    });
+  });
 </script>
 {% block extra_scripts %}{% endblock %}
 </body>

@@ -9,33 +9,75 @@
 
 <section id="products" style="padding:24px 0 80px;">
   <div class="sec-head">
-    {% if category.subcategories.all %}
+    {% if selected_subcategory %}
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span>{{ selected_subcategory.name }}</div>
+    {% elif category.subcategories.all %}
     <div class="eyebrow" style="justify-content:center;"><span class="dot"></span>{% for s in category.subcategories.all %}{{ s.name }}{% if not forloop.last %} · {% endif %}{% endfor %}</div>
     {% endif %}
     <h2>{{ category.name }}</h2>
   </div>
-  <div class="toolbar">
-    <div class="count" id="result-count" data-count="{{ result_count }}" data-search="{{ search_term }}">{{ result_count }} รายการ</div>
-    <form method="get" id="sort-form">
-      {% if search_term %}<input type="hidden" name="search" value="{{ search_term }}">{% endif %}
-      <select name="sort" id="sort-select" onchange="document.getElementById('sort-form').submit()">
-        <option value="default" {% if sort == "default" %}selected{% endif %}>···</option>
-        <option value="price-asc" {% if sort == "price-asc" %}selected{% endif %}>₭ ↑</option>
-        <option value="price-desc" {% if sort == "price-desc" %}selected{% endif %}>₭ ↓</option>
-        <option value="rating" {% if sort == "rating" %}selected{% endif %}>★</option>
-      </select>
-    </form>
-  </div>
-  {% if products %}
-  <div class="product-grid">
-    {% for p in products %}{% include "store/_product_card.html" %}{% endfor %}
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <div class="ic-lg"><span class="ic" data-ic="search"></span></div>
-    <h3 data-i18n="no_results"></h3>
-  </div>
-  {% endif %}
+
+  <form method="get" id="filter-form" class="cat-container">
+    {% if search_term %}<input type="hidden" name="search" value="{{ search_term }}">{% endif %}
+    {% if selected_subcategory %}<input type="hidden" name="sub" value="{{ selected_subcategory.pk }}">{% endif %}
+
+    <div class="cat-layout">
+      <aside class="filter-sidebar">
+        {% if price_max > price_min %}
+        <div class="filter-block">
+          <div class="filter-block-title" data-i18n="price_range_label">ຊ່ວງລາຄາ</div>
+          <div class="price-inputs">
+            <input type="number" name="min_price" id="price-min-input" value="{{ selected_min }}" min="{{ price_min }}" max="{{ price_max }}">
+            <span>-</span>
+            <input type="number" name="max_price" id="price-max-input" value="{{ selected_max }}" min="{{ price_min }}" max="{{ price_max }}">
+          </div>
+          <div class="dual-slider">
+            <div class="track-bg"></div>
+            <div class="track-fill" id="price-track-fill"></div>
+            <input type="range" id="price-min-range" min="{{ price_min }}" max="{{ price_max }}" value="{{ selected_min }}">
+            <input type="range" id="price-max-range" min="{{ price_min }}" max="{{ price_max }}" value="{{ selected_max }}">
+          </div>
+        </div>
+        {% endif %}
+
+        {% if brands %}
+        <div class="filter-block">
+          <div class="filter-block-title">Brand</div>
+          <div class="brand-check-list">
+            {% for b in brands %}
+            <label class="brand-check-item">
+              <input type="checkbox" name="brand" value="{{ b.pk }}" {% if b.pk|stringformat:"s" in selected_brand_ids %}checked{% endif %} onchange="document.getElementById('filter-form').submit()">
+              <span>{{ b.name }}</span>
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        {% endif %}
+      </aside>
+
+      <div class="cat-main">
+        <div class="toolbar">
+          <div class="count" id="result-count" data-count="{{ result_count }}" data-search="{{ search_term }}">{{ result_count }} รายการ</div>
+          <select name="sort" id="sort-select" onchange="document.getElementById('filter-form').submit()">
+            <option value="default" {% if sort == "default" %}selected{% endif %}>···</option>
+            <option value="price-asc" {% if sort == "price-asc" %}selected{% endif %}>₭ ↑</option>
+            <option value="price-desc" {% if sort == "price-desc" %}selected{% endif %}>₭ ↓</option>
+            <option value="rating" {% if sort == "rating" %}selected{% endif %}>★</option>
+          </select>
+        </div>
+        {% if products %}
+        <div class="product-grid">
+          {% for p in products %}{% include "store/_product_card.html" %}{% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+          <div class="ic-lg"><span class="ic" data-ic="search"></span></div>
+          <h3 data-i18n="no_results"></h3>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </form>
 </section>
 
 {% endblock %}
@@ -53,5 +95,48 @@
   renderResultCount();
   var _origOnLangChange = onLangChange;
   onLangChange = function () { _origOnLangChange(); renderResultCount(); };
+
+  (function () {
+    var minRange = document.getElementById('price-min-range');
+    var maxRange = document.getElementById('price-max-range');
+    if (!minRange || !maxRange) return;
+    var minInput = document.getElementById('price-min-input');
+    var maxInput = document.getElementById('price-max-input');
+    var fill = document.getElementById('price-track-fill');
+    var form = document.getElementById('filter-form');
+
+    function updateFill() {
+      var lo = +minRange.min, hi = +minRange.max, span = (hi - lo) || 1;
+      var pctLo = ((+minRange.value - lo) / span) * 100;
+      var pctHi = ((+maxRange.value - lo) / span) * 100;
+      fill.style.left = pctLo + '%';
+      fill.style.right = (100 - pctHi) + '%';
+    }
+
+    function fromRange() {
+      if (+minRange.value > +maxRange.value) minRange.value = maxRange.value;
+      minInput.value = minRange.value;
+      maxInput.value = maxRange.value;
+      updateFill();
+    }
+    function fromInput() {
+      var lo = +minRange.min, hi = +minRange.max;
+      var v1 = Math.min(Math.max(+minInput.value || lo, lo), hi);
+      var v2 = Math.min(Math.max(+maxInput.value || hi, lo), hi);
+      if (v1 > v2) v1 = v2;
+      minRange.value = v1;
+      maxRange.value = v2;
+      updateFill();
+    }
+
+    minRange.addEventListener('input', fromRange);
+    maxRange.addEventListener('input', fromRange);
+    minRange.addEventListener('change', function () { form.submit(); });
+    maxRange.addEventListener('change', function () { form.submit(); });
+    minInput.addEventListener('change', function () { fromInput(); form.submit(); });
+    maxInput.addEventListener('change', function () { fromInput(); form.submit(); });
+
+    updateFill();
+  })();
 </script>
 {% endblock %}

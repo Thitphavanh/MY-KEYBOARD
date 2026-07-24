@@ -41,6 +41,20 @@
           </div>
         </div>
 
+        <div class="field">
+          <label>ໝວດຍ່ອຍ</label>
+          <div class="subcat-combo" id="subcat-combo">
+            <input type="text" id="subcat-search" placeholder="ພິມຄົ້ນຫາ ຫຼື ເລືອກໝວດຍ່ອຍ..." autocomplete="off" value="{{ form.instance.subcategory.name|default:'' }}">
+            <input type="hidden" name="subcategory" id="id_subcategory_value" value="{{ form.subcategory.value|default:'' }}">
+            <div class="subcat-dropdown" id="subcat-dropdown">
+              {% for s in subcategories %}
+              <div class="subcat-option" data-id="{{ s.pk }}" data-category="{{ s.category_id }}">{{ s.name }}</div>
+              {% endfor %}
+              <div class="subcat-option subcat-add" id="subcat-add-btn">+ ເພີ່ມໝວດຍ່ອຍໃໝ່...</div>
+            </div>
+          </div>
+        </div>
+
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div class="field">
             <label>ราคาขายจริง (กีบ ₭) *</label>
@@ -62,6 +76,12 @@
           <textarea name="specs_raw" rows="6" placeholder="เช่น&#10;CPU: Intel Core i9-14900K&#10;GPU: RTX 4090 24GB&#10;RAM: 32GB DDR5">{{ form.specs_raw.value|default:'' }}</textarea>
           <p style="font-size:11px; color:var(--text-faint); margin-top:4px;">* ใส่ชื่อหัวข้อและรายละเอียดคั่นด้วยเครื่องหมาย colon (:) เช่น "RAM: 16GB"</p>
         </div>
+
+        <div class="field">
+          <label>ລິ້ງແຫຼ່ງສິນຄ້າ (ບ່ອນສັ່ງເອົາມາຂາຍ)</label>
+          <input type="url" name="source_link" value="{{ form.source_link.value|default:'' }}" placeholder="https://...">
+          <p style="font-size:11px; color:var(--text-faint); margin-top:4px;">* ສຳລັບອ້າງອີງພາຍໃນເທົ່ານັ້ນ — ລູກຄ້າໜ້າຮ້ານຈະບໍ່ເຫັນລິ້ງນີ້, ຈະເຫັນສະເພາະໜ້າແອັດມິນ ແລະ ໜ້າລາຍລະອຽດຄຳສັ່ງຊື້</p>
+        </div>
       </div>
 
       <!-- Right Column: Settings, Flags, Images -->
@@ -69,6 +89,11 @@
         <div class="field">
           <label>จำนวนในคลังสินค้า *</label>
           <input type="number" name="stock" value="{{ form.stock.value|default:0 }}" required>
+        </div>
+
+        <div class="field" style="display:flex; align-items:center; margin-bottom:16px;">
+          <input type="checkbox" name="is_preorder" id="id_is_preorder" {% if form.is_preorder.value %}checked{% endif %}>
+          <label for="id_is_preorder" style="margin-bottom:0; cursor:pointer;">ເປີດຂາຍແບບພຣີອໍເດີ້ (ສັ່ງໄດ້ເຖິງແມ່ນສິນຄ້າໝົດ)</label>
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
@@ -156,5 +181,84 @@
   function removeImageRow(btn) {
     btn.closest('.image-input-row').remove();
   }
+
+  (function () {
+    var combo = document.getElementById('subcat-combo');
+    if (!combo) return;
+    var categorySelect = document.getElementById('id_category');
+    var searchInput = document.getElementById('subcat-search');
+    var hiddenInput = document.getElementById('id_subcategory_value');
+    var dropdown = document.getElementById('subcat-dropdown');
+    var addBtn = document.getElementById('subcat-add-btn');
+
+    function filterOptions() {
+      var cat = categorySelect ? categorySelect.value : '';
+      var q = searchInput.value.trim().toLowerCase();
+      dropdown.querySelectorAll('.subcat-option:not(.subcat-add)').forEach(function (opt) {
+        var matchesCat = !cat || opt.dataset.category === cat;
+        var matchesQ = !q || opt.textContent.toLowerCase().indexOf(q) !== -1;
+        opt.style.display = (matchesCat && matchesQ) ? '' : 'none';
+      });
+    }
+
+    function selectSubcategory(id, name) {
+      hiddenInput.value = id;
+      searchInput.value = name;
+      dropdown.classList.remove('open');
+    }
+
+    dropdown.addEventListener('mousedown', function (e) {
+      var opt = e.target.closest('.subcat-option:not(.subcat-add)');
+      if (!opt) return;
+      e.preventDefault();
+      selectSubcategory(opt.dataset.id, opt.textContent);
+    });
+
+    searchInput.addEventListener('focus', function () { dropdown.classList.add('open'); filterOptions(); });
+    searchInput.addEventListener('input', function () {
+      hiddenInput.value = '';
+      dropdown.classList.add('open');
+      filterOptions();
+    });
+    document.addEventListener('click', function (e) {
+      if (!combo.contains(e.target)) dropdown.classList.remove('open');
+    });
+    if (categorySelect) {
+      categorySelect.addEventListener('change', function () {
+        hiddenInput.value = '';
+        searchInput.value = '';
+        filterOptions();
+      });
+    }
+
+    addBtn.addEventListener('mousedown', function (e) {
+      e.preventDefault();
+      var name = window.prompt('ຊື່ໝວດຍ່ອຍໃໝ່:');
+      if (!name || !name.trim()) return;
+      var catVal = categorySelect ? categorySelect.value : '';
+      if (!catVal) { alert('ກະລຸນາເລືອກໝວດຫຼັກກ່ອນ'); return; }
+      var csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+      var body = new URLSearchParams();
+      body.set('category', catVal);
+      body.set('name', name.trim());
+      fetch('{% url "admin_subcategory_quick_create" %}', {
+        method: 'POST',
+        headers: { 'X-CSRFToken': csrftoken, 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: body.toString()
+      }).then(function (r) { return r.json(); }).then(function (data) {
+        if (data.error) { alert(data.error); return; }
+        var opt = document.createElement('div');
+        opt.className = 'subcat-option';
+        opt.dataset.id = data.id;
+        opt.dataset.category = data.category;
+        opt.textContent = data.name;
+        dropdown.insertBefore(opt, addBtn);
+        selectSubcategory(data.id, data.name);
+        filterOptions();
+      }).catch(function () { alert('ເກີດຂໍ້ຜິດພາດ, ລອງໃໝ່ອີກຄັ້ງ'); });
+    });
+
+    filterOptions();
+  })();
 </script>
 {% endblock %}

@@ -45,6 +45,8 @@ const ICON_PATHS = {
   image: `<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="8.5" cy="9.5" r="1.5"/><path d="M21 15l-5-5-4 4-3-3-6 6"/>`,
   plus: `<path d="M12 4v16M4 12h16"/>`,
   trash: `<path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M6 7l1 13a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-13"/><path d="M10 11v6M14 11v6"/>`,
+  desk: `<path d="M3 8h18"/><path d="M5 8v10M19 8v10"/><path d="M3 14h18"/>`,
+  stool: `<rect x="5" y="6" width="14" height="4" rx="1.5"/><path d="M7 10v9M17 10v9"/>`,
 };
 
 /* brand / filled icons (fill=currentColor instead of stroke) */

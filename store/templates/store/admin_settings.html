@@ -56,6 +56,10 @@
             <label>ເບີ WhatsApp</label>
             <input type="text" name="contact_wa" value="{{ form.contact_wa.value|default:'' }}">
           </div>
+          <div class="field">
+            <label>ອີເມວຮັບແຈ້ງເຕືອນອໍເດີ້ໃໝ່ (ເວັ້ນວ່າງ = ບໍ່ສົ່ງແຈ້ງເຕືອນ)</label>
+            <input type="email" name="admin_notify_email" value="{{ form.admin_notify_email.value|default:'' }}" placeholder="you@example.com">
+          </div>
         </div>
 
         <div class="admin-card" style="padding:16px; margin-bottom:0; background:rgba(255,255,255,0.01);">
@@ -96,6 +100,65 @@
           </p>
           <div class="field">
             <input type="number" name="sales_adjustment" value="{{ form.sales_adjustment.value|default:0 }}">
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-top:20px; margin-bottom:0; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="image"></span> ປັອບອັບໂຄສະນາ
+          </h4>
+          <div class="field" style="display:flex; align-items:center; margin-bottom:14px;">
+            <input type="checkbox" name="popup_ad_enabled" id="id_popup_ad_enabled" {% if form.popup_ad_enabled.value %}checked{% endif %}>
+            <label for="id_popup_ad_enabled" style="margin-bottom:0; cursor:pointer;">ເປີດໃຊ້ປັອບອັບໂຄສະນາ (ສະແດງໃຫ້ລູກຄ້າເຫັນເມື່ອເປີດເວັບ)</label>
+          </div>
+          <div class="field">
+            <label>ຮູບໂຄສະນາ</label>
+            {% if settings.popup_ad_image %}
+            <div style="margin-bottom:10px;">
+              <img src="{{ settings.popup_ad_image.url }}" style="max-height:120px; display:block; border:1px solid var(--border); border-radius:6px;">
+            </div>
+            {% endif %}
+            <input type="file" name="popup_ad_image" accept="image/*" style="font-size:12px;">
+          </div>
+          <div class="field">
+            <label>ລິ້ງເມື່ອກົດໃສ່ຮູບ (ບໍ່ບັງຄັບ)</label>
+            <input type="url" name="popup_ad_link" value="{{ form.popup_ad_link.value|default:'' }}" placeholder="https://...">
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:16px; margin-top:20px; margin-bottom:0; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:13px; margin-bottom:12px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic" data-ic="image"></span> ໂລໂກ້ບໍລິສັດຂົນສົ່ງ ແລະ ທະນາຄານ
+          </h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px;">
+            <div class="field">
+              <label>Anousith Logistics</label>
+              {% if settings.carrier_anousith_logo %}
+              <div style="margin-bottom:8px;"><img src="{{ settings.carrier_anousith_logo.url }}" style="max-height:44px; display:block; border:1px solid var(--border); border-radius:6px; padding:4px;"></div>
+              {% endif %}
+              <input type="file" name="carrier_anousith_logo" accept="image/*" style="font-size:11.5px;">
+            </div>
+            <div class="field">
+              <label>ຮຸ່ງອະລຸນ ຂົນສົ່ງ</label>
+              {% if settings.carrier_rungaroon_logo %}
+              <div style="margin-bottom:8px;"><img src="{{ settings.carrier_rungaroon_logo.url }}" style="max-height:44px; display:block; border:1px solid var(--border); border-radius:6px; padding:4px;"></div>
+              {% endif %}
+              <input type="file" name="carrier_rungaroon_logo" accept="image/*" style="font-size:11.5px;">
+            </div>
+            <div class="field">
+              <label>LDB Bank</label>
+              {% if settings.payment_ldb_logo %}
+              <div style="margin-bottom:8px;"><img src="{{ settings.payment_ldb_logo.url }}" style="max-height:44px; display:block; border:1px solid var(--border); border-radius:6px; padding:4px;"></div>
+              {% endif %}
+              <input type="file" name="payment_ldb_logo" accept="image/*" style="font-size:11.5px;">
+            </div>
+            <div class="field">
+              <label>BCEL Bank</label>
+              {% if settings.payment_bcel_logo %}
+              <div style="margin-bottom:8px;"><img src="{{ settings.payment_bcel_logo.url }}" style="max-height:44px; display:block; border:1px solid var(--border); border-radius:6px; padding:4px;"></div>
+              {% endif %}
+              <input type="file" name="payment_bcel_logo" accept="image/*" style="font-size:11.5px;">
+            </div>
           </div>
         </div>
       </div>

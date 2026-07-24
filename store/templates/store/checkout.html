@@ -51,6 +51,11 @@
           {{ form.shipping_village }}
           {% if form.shipping_village.errors %}<div class="field-error">{{ form.shipping_village.errors.0 }}</div>{% endif %}
         </div>
+        <div class="field full {% if form.shipping_branch.errors %}error{% endif %}">
+          <label data-i18n="label_branch"></label>
+          {{ form.shipping_branch }}
+          {% if form.shipping_branch.errors %}<div class="field-error">{{ form.shipping_branch.errors.0 }}</div>{% endif %}
+        </div>
       </div>
 
       <label style="font-size:12px; color:var(--text-dim); display:block; margin:6px 0 10px;" data-i18n="label_carrier"></label>
@@ -58,9 +63,14 @@
         {% for value, label in form.carrier.field.choices %}
         <label class="option-card {% if form.carrier.value == value %}selected{% endif %}">
           <input type="radio" name="carrier" value="{{ value }}" {% if form.carrier.value == value %}checked{% endif %}>
+          {% if value == 'anousith' and site_settings.carrier_anousith_logo %}
+          <div class="ic logo-ic"><img src="{{ site_settings.carrier_anousith_logo.url }}" alt=""></div>
+          {% elif value == 'rungaroon' and site_settings.carrier_rungaroon_logo %}
+          <div class="ic logo-ic"><img src="{{ site_settings.carrier_rungaroon_logo.url }}" alt=""></div>
+          {% else %}
           <div class="ic" data-ic="{% if value == 'anousith' %}package{% else %}truck{% endif %}"></div>
+          {% endif %}
           <div class="body"><div class="title">{{ label }}</div></div>
-          <div class="fee">{{ carrier_fees|get_item:value|kip }}</div>
         </label>
         {% endfor %}
       </div>

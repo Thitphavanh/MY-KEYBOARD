@@ -2,17 +2,21 @@ from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, views as auth_views
 from django.contrib.auth.decorators import login_required
-from django.db.models import Q, Sum
+from django.core.mail import send_mail
+from django.db.models import Max, Min, Q, Sum
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
+from django.template.loader import render_to_string
+from django.urls import reverse
 from django.utils import timezone
+from django.utils.html import strip_tags
 
 from .cartutils import get_cart, get_wishlist, merge_session_cart_into_user
 from .forms import CheckoutForm, PaymentForm, ProfileForm, RegisterForm
 from .models import (
-    BankAccount, Banner, CARRIER_FEES, Coupon, Order, OrderItem, OrderStatus,
+    BankAccount, Banner, Brand, CARRIER_FEES, Coupon, Order, OrderItem, OrderStatus,
     Product, SiteSettings, User, Category, SubCategory, ProductImage,
 )
 
@@ -98,17 +102,43 @@ def home(request):
         "sort": sort,
         "wishlist_ids": wishlist_ids,
     }
-    return render(request, "store/home.html", context)
+    return render(request, "store/index.html", context)
 
 
 def category_detail(request, slug):
     category = get_object_or_404(Category, slug=slug)
     search_term = request.GET.get("search", "").strip()
     sort = request.GET.get("sort", "default")
+    brand_ids = [b for b in request.GET.getlist("brand") if b.strip()]
 
-    products = Product.objects.select_related("category", "brand").prefetch_related("images").filter(category=category)
+    sub_param = request.GET.get("sub", "").strip()
+    selected_subcategory = None
+    if sub_param.isdigit():
+        selected_subcategory = category.subcategories.filter(pk=sub_param).first()
+
+    all_products = Product.objects.select_related("category", "brand").prefetch_related("images").filter(category=category)
+
+    price_bounds = all_products.aggregate(lo=Min("price"), hi=Max("price"))
+    price_min = price_bounds["lo"] or 0
+    price_max = price_bounds["hi"] or 0
+
+    min_price_param = request.GET.get("min_price", "").strip()
+    max_price_param = request.GET.get("max_price", "").strip()
+    selected_min = int(min_price_param) if min_price_param.isdigit() else price_min
+    selected_max = int(max_price_param) if max_price_param.isdigit() else price_max
+
+    products = all_products
     if search_term:
         products = products.filter(Q(name__icontains=search_term) | Q(brand__name__icontains=search_term))
+
+    brands = Brand.objects.filter(products__category=category).distinct()
+    if brand_ids:
+        products = products.filter(brand_id__in=brand_ids)
+
+    if min_price_param.isdigit():
+        products = products.filter(price__gte=selected_min)
+    if max_price_param.isdigit():
+        products = products.filter(price__lte=selected_max)
 
     if sort == "price-asc":
         products = products.order_by("price")
@@ -125,6 +155,13 @@ def category_detail(request, slug):
         "result_count": products.count(),
         "search_term": search_term,
         "sort": sort,
+        "brands": brands,
+        "selected_brand_ids": brand_ids,
+        "selected_subcategory": selected_subcategory,
+        "price_min": price_min,
+        "price_max": price_max,
+        "selected_min": selected_min,
+        "selected_max": selected_max,
         "wishlist_ids": wishlist_ids,
     }
     return render(request, "store/category.html", context)
@@ -172,6 +209,7 @@ def cart_view(request):
 
 
 def cart_add(request, pk):
+    is_ajax = request.headers.get("X-Requested-With") == "XMLHttpRequest"
     if request.method == "POST":
         product = get_object_or_404(Product, pk=pk)
         qty = max(int(request.POST.get("qty", 1) or 1), 1)
@@ -180,7 +218,10 @@ def cart_add(request, pk):
         if not created:
             item.qty += qty
             item.save()
-        messages.success(request, f"ເພີ່ມ {product.name} ລົງກະຕ່າແລ້ວ")
+        message = f"ເພີ່ມ {product.name} ລົງກະຕ່າແລ້ວ"
+        if is_ajax:
+            return JsonResponse({"success": True, "message": message, "cart_count": cart.count()})
+        messages.success(request, message)
     return redirect(request.POST.get("next") or "cart")
 
 
@@ -314,6 +355,43 @@ def checkout_view(request):
     return render(request, "store/checkout.html", context)
 
 
+def _notify_admin_new_order(order, request=None):
+    settings_obj = SiteSettings.load()
+    to_email = settings_obj.admin_notify_email
+    if not to_email:
+        return
+
+    def abs_url(path):
+        return request.build_absolute_uri(path) if request is not None else path
+
+    items_data = []
+    for item in order.items.all():
+        product_url = abs_url(item.product.get_absolute_url()) if item.product else None
+        image_url = abs_url(item.product.first_image) if item.product and item.product.first_image else None
+        items_data.append({"item": item, "product_url": product_url, "image_url": image_url})
+
+    context = {
+        "order": order,
+        "items_data": items_data,
+        "admin_url": abs_url(reverse("admin_order_detail", args=[order.pk])),
+        "store_name": settings_obj.store_name,
+    }
+    html_message = render_to_string("store/email/order_notification.html", context)
+    plain_message = strip_tags(html_message)
+
+    try:
+        send_mail(
+            subject=f"[{settings_obj.store_name}] ອໍເດີ້ໃໝ່ #{order.order_number}",
+            message=plain_message,
+            from_email=None,
+            recipient_list=[to_email],
+            html_message=html_message,
+            fail_silently=True,
+        )
+    except Exception:
+        pass
+
+
 @login_required
 def payment_view(request):
     order_id = request.session.get("pending_order_id")
@@ -328,8 +406,9 @@ def payment_view(request):
             order.status = OrderStatus.PREPARING
             order.save()
             del request.session["pending_order_id"]
+            _notify_admin_new_order(order, request=request)
             messages.success(request, "ສົ່ງຂໍ້ມູນການຊຳລະເງິນແລ້ວ ຂອບໃຈທີ່ໃຊ້ບໍລິການ")
-            return redirect("orders")
+            return redirect("order_detail", pk=order.pk)
     else:
         form = PaymentForm(instance=order)
 
@@ -353,6 +432,21 @@ def orders_view(request):
         orders = Order.objects.filter(user=request.user).prefetch_related("items")
 
     return render(request, "store/orders.html", {"orders": orders, "query": query, "searched": searched})
+
+
+def order_detail_view(request, pk):
+    order = get_object_or_404(Order.objects.prefetch_related("items"), pk=pk)
+    is_owner = request.user.is_authenticated and order.user_id == request.user.id
+    is_admin = request.user.is_authenticated and request.user.is_admin
+    if not (is_owner or is_admin):
+        return redirect("orders")
+    return render(request, "store/order_detail.html", {"order": order})
+
+
+class NexbytePasswordResetView(auth_views.PasswordResetView):
+    def form_valid(self, form):
+        self.extra_email_context = {"site_settings": SiteSettings.load()}
+        return super().form_valid(form)
 
 
 def login_view(request):
@@ -464,7 +558,7 @@ def admin_dashboard(request):
 # CUSTOM BACKOFFICE CRUD VIEW FUNCTIONS
 # ==============================================================================
 
-from .forms import ProductForm, CategoryForm, SubCategoryForm, BannerForm, BankAccountForm, SiteSettingsForm, CouponForm
+from .forms import ProductForm, CategoryForm, SubCategoryForm, BrandForm, BannerForm, BankAccountForm, SiteSettingsForm, CouponForm
 
 # Helper decorator for checking staff
 def staff_required(view_func):
@@ -518,6 +612,7 @@ def admin_product_create(request):
         "form": form,
         "title": "ເພີ່ມສິນຄ້າໃໝ່",
         "active_sub": "products",
+        "subcategories": SubCategory.objects.select_related("category").all(),
     }
     return render(request, "store/admin_product_form.html", context)
 
@@ -546,6 +641,7 @@ def admin_product_edit(request, pk):
         "product": product,
         "title": "ແກ້ໄຂສິນຄ້າ",
         "active_sub": "products",
+        "subcategories": SubCategory.objects.select_related("category").all(),
     }
     return render(request, "store/admin_product_form.html", context)
 
@@ -622,6 +718,20 @@ def admin_subcategory_create(request):
     return render(request, "store/admin_category_form.html", {"form": form, "title": "ເພີ່ມໝວດໝູ່ຍ່ອຍ", "active_sub": "categories"})
 
 @staff_required
+def admin_subcategory_quick_create(request):
+    if request.method != "POST":
+        return JsonResponse({"error": "Invalid method"}, status=405)
+    category_slug = request.POST.get("category", "").strip()
+    name = request.POST.get("name", "").strip()
+    if not category_slug or not name:
+        return JsonResponse({"error": "ກະລຸນາເລືອກໝວດຫຼັກ ແລະ ໃສ່ຊື່ໝວດຍ່ອຍ"}, status=400)
+    category = Category.objects.filter(slug=category_slug).first()
+    if not category:
+        return JsonResponse({"error": "ບໍ່ພົບໝວດຫຼັກ"}, status=400)
+    subcategory = SubCategory.objects.create(category=category, name=name)
+    return JsonResponse({"id": subcategory.pk, "name": subcategory.name, "category": category.slug})
+
+@staff_required
 def admin_subcategory_edit(request, pk):
     subcategory = get_object_or_404(SubCategory, pk=pk)
     if request.method == "POST":
@@ -642,6 +752,52 @@ def admin_subcategory_delete(request, pk):
         messages.success(request, "ລຶບໝວດໝູ່ຍ່ອຍສຳເລັດແລ້ວ")
         return redirect("admin_category_list")
     return render(request, "store/admin_subcategory_delete.html", {"subcategory": subcategory, "active_sub": "categories"})
+
+
+# ----------------- BRAND CRUD -----------------
+
+@staff_required
+def admin_brand_list(request):
+    brands = Brand.objects.prefetch_related("categories").all()
+    context = {
+        "brands": brands,
+        "active_sub": "brands",
+    }
+    return render(request, "store/admin_brand_list.html", context)
+
+@staff_required
+def admin_brand_create(request):
+    if request.method == "POST":
+        form = BrandForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "ເພີ່ມແບຣນສຳເລັດແລ້ວ")
+            return redirect("admin_brand_list")
+    else:
+        form = BrandForm()
+    return render(request, "store/admin_brand_form.html", {"form": form, "title": "ເພີ່ມແບຣນ", "active_sub": "brands"})
+
+@staff_required
+def admin_brand_edit(request, pk):
+    brand = get_object_or_404(Brand, pk=pk)
+    if request.method == "POST":
+        form = BrandForm(request.POST, instance=brand)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "ແກ້ໄຂແບຣນສຳເລັດແລ້ວ")
+            return redirect("admin_brand_list")
+    else:
+        form = BrandForm(instance=brand)
+    return render(request, "store/admin_brand_form.html", {"form": form, "brand": brand, "title": "ແກ້ໄຂແບຣນ", "active_sub": "brands"})
+
+@staff_required
+def admin_brand_delete(request, pk):
+    brand = get_object_or_404(Brand, pk=pk)
+    if request.method == "POST":
+        brand.delete()
+        messages.success(request, "ລຶບແບຣນສຳເລັດແລ້ວ")
+        return redirect("admin_brand_list")
+    return render(request, "store/admin_brand_delete.html", {"brand": brand, "active_sub": "brands"})
 
 
 # ----------------- ORDER CRUD -----------------
@@ -691,6 +847,9 @@ def admin_order_status_update(request, pk):
 @staff_required
 def admin_order_delete(request, pk):
     order = get_object_or_404(Order, pk=pk)
+    if order.status != OrderStatus.DELIVERED:
+        messages.error(request, "ລຶບໄດ້ສະເພາະຄຳສັ່ງຊື້ທີ່ 'ຈັດສົ່ງສຳເລັດ' ເທົ່ານັ້ນ")
+        return redirect("admin_order_list")
     if request.method == "POST":
         order.delete()
         messages.success(request, "ລຶບຄຳສັ່ງຊື້ສຳເລັດແລ້ວ")

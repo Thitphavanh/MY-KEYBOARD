@@ -44,7 +44,7 @@
               {% endif %}
             </td>
             <td style="padding: 12px 10px; text-align: right;">
-              <form method="post" action="{% url 'admin_coupon_delete' cp.pk %}" style="display: inline;" onsubmit="return confirm('ແທ້ຈິງແລ້ວບໍ່ທີ່ຕ້ອງການລຶບໂຄ້ດສ່ວນຫຼຸດນີ້?')">
+              <form method="post" action="{% url 'admin_coupon_delete' cp.pk %}" style="display: inline;" onsubmit="return adminConfirmDelete('ແທ້ຈິງແລ້ວບໍ່ທີ່ຕ້ອງການລຶບໂຄ້ດສ່ວນຫຼຸດນີ້?')">
                 {% csrf_token %}
                 <button type="submit" class="btn btn-outline" style="padding: 5px 10px; font-size: 11.5px; border-color: rgba(239,68,68,0.25); color: #ef4444;" data-i18n="admin_btn_delete"></button>
               </form>

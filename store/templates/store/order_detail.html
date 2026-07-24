@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load store_extras %}
+{% block title %}#{{ order.order_number }} — NexByte Computer{% endblock %}
+{% block content %}
+
+<div class="sec-head" style="margin-top:32px;">
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="nav_orders"></span></div>
+  <h2>#{{ order.order_number }}</h2>
+</div>
+
+<div class="form-wrap" style="max-width:640px;">
+  <div class="form-card">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <div class="date" style="font-size:13px;">{{ order.created_at }}</div>
+      <span class="status-badge {% if order.status == 'pending' %}p0{% elif order.status == 'preparing' %}p1{% elif order.status == 'shipping' %}p2{% elif order.status == 'delivered' %}p3{% endif %}" style="font-size:13px; padding:7px 16px;">{{ order.get_status_display }}</span>
+    </div>
+
+    <div class="order-track">
+      <div class="pt on"><div class="dot"></div><div class="bar"></div><span data-i18n="order_status_pending"></span></div>
+      <div class="pt {% if order.status == 'preparing' or order.status == 'shipping' or order.status == 'delivered' %}on{% endif %}"><div class="dot"></div><div class="bar"></div><span data-i18n="order_status_preparing"></span></div>
+      <div class="pt {% if order.status == 'shipping' or order.status == 'delivered' %}on{% endif %}"><div class="dot"></div><div class="bar"></div><span data-i18n="order_status_shipping"></span></div>
+      <div class="pt {% if order.status == 'delivered' %}on{% endif %}"><div class="dot"></div><div class="bar"></div><span data-i18n="order_status_delivered"></span></div>
+    </div>
+
+    <div class="order-items" style="margin-top:18px;">
+      {% for it in order.items.all %}
+      <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:14px;"><span>{{ it.product_name }} x{{ it.qty }}</span><span>{{ it.line_total|kip }}</span></div>
+      {% endfor %}
+      <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:14px;"><span data-i18n="shipping_fee_label"></span><span>{{ order.shipping_fee|kip }}</span></div>
+      {% if order.discount %}
+      <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:14px;"><span data-i18n="used_coupon_label"></span><span>− {{ order.discount|kip }}</span></div>
+      {% endif %}
+      <div style="display:flex; justify-content:space-between; padding-top:14px; margin-top:8px; border-top:1px solid var(--border); font-weight:700; color:var(--text); font-size:19px;">
+        <span data-i18n="order_total_label"></span><span>{{ order.total|kip }}</span>
+      </div>
+    </div>
+
+    <div style="font-size:13.5px; color:var(--text-dim); margin-top:20px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:10px; padding:16px;">
+      <div><b style="color:var(--text)"><span data-i18n="ship_to_label"></span></b> {{ order.shipping_name }} · {{ order.shipping_phone }}</div>
+      <div style="margin-top:4px;">{{ order.shipping_village }}, {{ order.shipping_city }}, {{ order.shipping_province }}</div>
+      {% if order.shipping_branch %}<div style="margin-top:4px;"><span data-i18n="label_branch"></span>: {{ order.shipping_branch }}</div>{% endif %}
+      <div style="margin-top:4px;"><span data-i18n="carrier_label"></span>: {{ order.get_carrier_display }}</div>
+      {% if order.payment_method %}<div style="margin-top:4px;"><span data-i18n="paid_via_label"></span>: {{ order.get_payment_method_display }}</div>{% endif %}
+    </div>
+
+    {% if order.payment_slip %}
+    <a href="{{ order.payment_slip.url }}" data-lightbox="{{ order.payment_slip.url }}" class="order-slip-link" style="margin-top:16px;"><img src="{{ order.payment_slip.url }}" alt=""><span><span class="ic sm" data-ic="upload"></span><span data-i18n="view_slip_cta"></span></span></a>
+    {% endif %}
+
+    <a href="{% url 'orders' %}" class="btn btn-ghost btn-block" style="margin-top:22px;" data-i18n="nav_orders"></a>
+  </div>
+</div>
+
+{% endblock %}
+{% block extra_scripts %}
+<script>fillIcons();</script>
+{% endblock %}

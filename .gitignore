@@ -1,0 +1,11 @@
+# Secrets — never commit real credentials
+nexbyte/settings/local_settings.py
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+
+# Django
+media/
+staticfiles/

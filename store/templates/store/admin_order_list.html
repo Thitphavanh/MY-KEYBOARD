@@ -62,7 +62,9 @@
           <td style="text-align:center;">
             <div class="crud-actions" style="justify-content:center;">
               <a href="{% url 'admin_order_detail' o.pk %}" title="ดูรายละเอียด"><span class="ic" data-ic="eye"></span></a>
+              {% if o.status == 'delivered' %}
               <a href="{% url 'admin_order_delete' o.pk %}" class="delete-btn" title="ลบออเดอร์"><span class="ic" data-ic="trash"></span></a>
+              {% endif %}
             </div>
           </td>
         </tr>

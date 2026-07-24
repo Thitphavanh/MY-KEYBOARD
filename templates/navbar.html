@@ -14,9 +14,9 @@
           <div class="mega-menu-inner">
             <div class="mega-left">
               {% for c in nav_categories %}
-              <div class="mega-cat-item {% if forloop.first %}active{% endif %}" data-cat="{{ c.slug }}" onmouseenter="showMegaCat('{{ c.slug }}')">
+              <a href="{% url 'category_detail' c.slug %}" class="mega-cat-item {% if forloop.first %}active{% endif %}" data-cat="{{ c.slug }}" onmouseenter="showMegaCat('{{ c.slug }}')">
                 <span class="ic" data-ic="{{ c.icon }}"></span><span data-cat-name="{{ c.slug }}">{{ c.name }}</span><span class="ic chev-r" data-ic="chevronRight"></span>
-              </div>
+              </a>
               {% endfor %}
             </div>
             <div class="mega-right" id="mega-right">
@@ -27,7 +27,7 @@
                   <a href="{% url 'category_detail' c.slug %}" data-i18n="view_all"><span class="ic" data-ic="arrowRight"></span></a>
                 </div>
                 <div class="mega-sub-grid">
-                  {% for s in c.subcategories.all %}<a href="{% url 'category_detail' c.slug %}" class="mega-sub-item" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}
+                  {% for s in c.subcategories.all %}<a href="{% url 'category_detail' c.slug %}?sub={{ s.pk }}" class="mega-sub-item" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}
                 </div>
                 <div class="mega-brands">
                   {% for b in nav_brands %}<span class="brand-chip">{{ b.name }}</span>{% endfor %}
@@ -52,7 +52,7 @@
       <a href="{% url 'admin_dashboard' %}" class="icon-btn" title="ไปหน้าแอดมิน"><span class="ic" data-ic="chart"></span></a>
       {% endif %}
       <a href="{% url 'wishlist' %}" class="icon-btn" title=""><span class="ic" data-ic="heart"></span><span class="badge" {% if not wishlist_count %}style="display:none"{% endif %}>{{ wishlist_count }}</span></a>
-      <a href="{% url 'cart' %}" class="icon-btn" title=""><span class="ic" data-ic="cart"></span><span class="badge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span></a>
+      <a href="{% url 'cart' %}" class="icon-btn" title=""><span class="ic" data-ic="cart"></span><span class="badge" id="nav-cart-badge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span></a>
       <a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}" class="icon-btn account-btn" title="">
         <span class="ic" data-ic="user"></span><span class="acc-label">{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}<span data-i18n="account_login"></span>{% endif %}</span>
       </a>
@@ -97,7 +97,7 @@
       </div>
       {% if c.subcategories.all %}
       <div class="drawer-subcat-list" id="drawer-sub-{{ c.slug }}">
-        <div>{% for s in c.subcategories.all %}<a href="{% url 'category_detail' c.slug %}" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}</div>
+        <div>{% for s in c.subcategories.all %}<a href="{% url 'category_detail' c.slug %}?sub={{ s.pk }}" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}</div>
       </div>
       {% endif %}
     </div>
@@ -114,7 +114,7 @@
     <span class="tab-ic"><span class="ic" data-ic="grid"></span></span><span class="tab-label" data-i18n="nav_categories"></span>
   </a>
   <a href="{% url 'cart' %}" class="tab-item tab-elevated {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
-    <span class="tab-ic"><span class="ic" data-ic="cart"></span>{% if cart_count %}<span class="tab-badge">{{ cart_count }}</span>{% endif %}</span><span class="tab-label" data-i18n="cart_label"></span>
+    <span class="tab-ic"><span class="ic" data-ic="cart"></span><span class="tab-badge" id="tab-cart-badge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span></span><span class="tab-label" data-i18n="cart_label"></span>
   </a>
   <a href="{% url 'wishlist' %}" class="tab-item {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
     <span class="tab-ic"><span class="ic" data-ic="heart"></span>{% if wishlist_count %}<span class="tab-badge">{{ wishlist_count }}</span>{% endif %}</span><span class="tab-label" data-i18n="wishlist_label"></span>

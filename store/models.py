@@ -1,4 +1,5 @@
 from django.contrib.auth.models import AbstractUser
+from django.core.validators import URLValidator
 from django.db import models
 from django.db.models.signals import pre_delete
 from django.dispatch import receiver
@@ -23,6 +24,7 @@ class User(AbstractUser):
 
 class Brand(models.Model):
     name = models.CharField(max_length=100, unique=True)
+    categories = models.ManyToManyField("Category", blank=True, related_name="brands")
 
     class Meta:
         ordering = ["name"]
@@ -62,11 +64,13 @@ class Product(models.Model):
     name = models.CharField(max_length=200)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name="products")
     category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="products")
+    subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="products")
     price = models.PositiveIntegerField(help_text="ราคาเป็นกีบ (₭)")
     old_price = models.PositiveIntegerField(null=True, blank=True)
     rating = models.DecimalField(max_digits=2, decimal_places=1, default=0)
     reviews_count = models.PositiveIntegerField(default=0)
     stock = models.PositiveIntegerField(default=0)
+    is_preorder = models.BooleanField(default=False, help_text="ເປີດຂາຍແບບພຣີອໍເດີ້ (ລູກຄ້າສັ່ງຊື້ໄດ້ເຖິງແມ່ນສິນຄ້າໝົດຄັງ)")
     icon = models.CharField(max_length=10, default="💻", help_text="Emoji fallback when no image is set")
     tag = models.CharField(max_length=40, blank=True)
     desc = models.TextField(blank=True)
@@ -74,6 +78,7 @@ class Product(models.Model):
     featured = models.BooleanField(default=True, help_text="Show on homepage + all categories, not just its own category")
     best_seller = models.BooleanField(default=False)
     is_new = models.BooleanField(default=False)
+    source_link = models.TextField(blank=True, default="", validators=[URLValidator()], help_text="ລິ້ງແຫຼ່ງສິນຄ້າ (ບ່ອນສັ່ງເອົາມາຂາຍ) — ເຫັນສະເພາະໜ້າແອັດມິນ, ລູກຄ້າບໍ່ເຫັນ")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -142,6 +147,7 @@ class SiteSettings(models.Model):
 
     contact_fb = models.URLField(blank=True, default="https://facebook.com/nexbytecomputer")
     contact_wa = models.CharField(max_length=30, blank=True, default="8562055551234")
+    admin_notify_email = models.EmailField(blank=True, default="", help_text="ອີເມວຮັບແຈ້ງເຕືອນເມື່ອມີອໍເດີ້ໃໝ່ເຂົ້າມາ (ເວັ້ນວ່າງ = ບໍ່ສົ່ງແຈ້ງເຕືອນ)")
 
     stats_enabled = models.BooleanField(default=True)
     stat_metric_1 = models.CharField(max_length=20, choices=StatMetric.choices, default=StatMetric.MEMBERS)
@@ -172,6 +178,15 @@ class SiteSettings(models.Model):
     logo_url = models.URLField(blank=True, default="", help_text="ໃສ່ລິ້ງຮູບແທນການອັບໂຫຼດໄຟລ໌ (ຖ້າໃສ່ ຈະໃຊ້ລິ້ງນີ້ແທນ)")
     theme_radius = models.CharField(max_length=20, default="12px")
     custom_css = models.TextField(blank=True, default="")
+
+    popup_ad_enabled = models.BooleanField(default=False)
+    popup_ad_image = models.ImageField(upload_to="site/", blank=True, null=True)
+    popup_ad_link = models.URLField(blank=True, default="", help_text="ລິ້ງເມື່ອກົດໃສ່ຮູບ (ເວັ້ນວ່າງໄດ້ຖ້າບໍ່ຕ້ອງການ)")
+
+    carrier_anousith_logo = models.ImageField(upload_to="site/", blank=True, null=True)
+    carrier_rungaroon_logo = models.ImageField(upload_to="site/", blank=True, null=True)
+    payment_ldb_logo = models.ImageField(upload_to="site/", blank=True, null=True)
+    payment_bcel_logo = models.ImageField(upload_to="site/", blank=True, null=True)
 
     class Meta:
         verbose_name_plural = "site settings"
@@ -248,10 +263,10 @@ class Wishlist(models.Model):
 
 
 class OrderStatus(models.TextChoices):
-    PENDING = "pending", "รอชำระเงิน"
-    PREPARING = "preparing", "กำลังเตรียมสินค้า"
-    SHIPPING = "shipping", "กำลังจัดส่ง"
-    DELIVERED = "delivered", "จัดส่งสำเร็จ"
+    PENDING = "pending", "ລໍຖ້າຊຳລະເງິນ"
+    PREPARING = "preparing", "ກຳລັງກຽມສິນຄ້າ"
+    SHIPPING = "shipping", "ກຳລັງຈັດສົ່ງ"
+    DELIVERED = "delivered", "ຈັດສົ່ງສຳເລັດ"
 
 
 class Carrier(models.TextChoices):
@@ -273,7 +288,7 @@ LAO_PROVINCES = [
 
 class PaymentMethod(models.TextChoices):
     LDB = "ldb", "LDB Bank"
-    ONE = "one", "One Bank"
+    ONE = "one", "BCEL Bank"
 
 
 class Order(models.Model):
@@ -285,6 +300,7 @@ class Order(models.Model):
     shipping_province = models.CharField("ແຂວງ", max_length=120)
     shipping_city = models.CharField("ເມືອງ", max_length=120)
     shipping_village = models.CharField("ບ້ານ", max_length=150)
+    shipping_branch = models.CharField("ສາຂາ", max_length=150, blank=False, default="")
     carrier = models.CharField(max_length=20, choices=Carrier.choices, default=Carrier.ANOUSITH)
 
     payment_method = models.CharField(max_length=20, choices=PaymentMethod.choices, blank=True)

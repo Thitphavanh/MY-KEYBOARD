@@ -16,7 +16,12 @@
     ທ່ານກຳລັງຈະລຶບຄຳສັ່ງຊື້<strong>#{{ order.order_number }}</strong> ຂອງລູກຄ້າ<strong>"{{ order.shipping_name }}"</strong> ຢ່າງຖາວອນ
   </p>
 
-  <form method="post" style="display:inline-flex; gap:12px; justify-content:center;">
+  <label style="display:flex; align-items:center; gap:8px; justify-content:center; margin-bottom:22px; font-size:13px; color:var(--text-dim); cursor:pointer;">
+    <input type="checkbox" id="skip-confirm-checkbox" style="width:16px; height:16px; accent-color:var(--btn); cursor:pointer;">
+    ບໍ່ຕ້ອງແຈ້ງເຕືອນຢືນຢັນອີກ 24 ຊົ່ວໂມງ
+  </label>
+
+  <form method="post" id="delete-confirm-form" style="display:inline-flex; gap:12px; justify-content:center;">
     {% csrf_token %}
     <a href="{% url 'admin_order_detail' order.pk %}" class="btn btn-outline">ຍົກເລີກ</a>
     <button type="submit" class="btn btn-solid" style="background:#ef4444; color:#fff; border-color:#ef4444; padding:10px 28px;">ຢືນຢັນລຶບຖາວອນ</button>

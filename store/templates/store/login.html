@@ -23,6 +23,7 @@
         <label data-i18n="label_password"></label>
         <input type="password" name="password" data-i18n-ph="ph_password" required>
       </div>
+      <p class="form-footer-link" style="margin: -4px 0 18px; text-align:right;"><a href="{% url 'password_reset' %}" data-i18n="forgot_password"></a></p>
       <button type="submit" class="btn btn-solid btn-block"><span data-i18n="login_cta"></span><span class="ic" data-ic="arrowRight"></span></button>
       <p class="form-footer-link"><span data-i18n="no_account_text"></span> <a href="{% url 'register' %}{% if next %}?next={{ next }}{% endif %}" data-i18n="register_here"></a></p>
     </form>

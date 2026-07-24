@@ -1,0 +1,44 @@
+{% load store_extras %}
+<div style="font-family:Arial,Helvetica,sans-serif; max-width:560px; margin:0 auto; padding:24px; background:#f4f5f7;">
+  <div style="background:#ffffff; border-radius:12px; padding:28px; border:1px solid #e6e8ec;">
+    <div style="font-size:12px; font-weight:700; letter-spacing:.5px; color:#2f6fed; text-transform:uppercase; margin-bottom:6px;">{{ store_name }}</div>
+    <h2 style="margin:0 0 4px; color:#111827; font-size:20px;">🛒 ມີຄຳສັ່ງຊື້ໃໝ່ #{{ order.order_number }}</h2>
+    <p style="color:#6b7280; font-size:13px; margin:0 0 22px;">{{ order.created_at }}</p>
+
+    <table style="width:100%; border-collapse:collapse; font-size:14px; color:#111827;">
+      {% for row in items_data %}
+      <tr>
+        <td style="padding:8px 0; border-bottom:1px solid #eef0f3; width:52px;">
+          {% if row.product_url %}<a href="{{ row.product_url }}">{% endif %}
+          {% if row.image_url %}
+          <img src="{{ row.image_url }}" width="44" height="44" alt="" style="width:44px; height:44px; object-fit:cover; border-radius:8px; border:1px solid #eef0f3; display:block;">
+          {% else %}
+          <div style="width:44px; height:44px; border-radius:8px; background:#f7f8fa; border:1px solid #eef0f3;"></div>
+          {% endif %}
+          {% if row.product_url %}</a>{% endif %}
+        </td>
+        <td style="padding:8px 0 8px 12px; border-bottom:1px solid #eef0f3;">
+          {% if row.product_url %}<a href="{{ row.product_url }}" style="color:#2f6fed; text-decoration:none; font-weight:600;">{{ row.item.product_name }}</a>{% else %}{{ row.item.product_name }}{% endif %}
+          <div style="color:#6b7280; font-size:12px; margin-top:2px;">× {{ row.item.qty }}</div>
+        </td>
+        <td style="padding:8px 0; border-bottom:1px solid #eef0f3; text-align:right; white-space:nowrap; vertical-align:top;">{{ row.item.line_total|kip }}</td>
+      </tr>
+      {% endfor %}
+      <tr>
+        <td colspan="2" style="padding:12px 0 0; font-weight:700; font-size:15px;">ຍອດລວມ</td>
+        <td style="padding:12px 0 0; font-weight:700; font-size:15px; text-align:right;">{{ order.total|kip }}</td>
+      </tr>
+    </table>
+
+    <div style="margin-top:22px; padding:16px; background:#f7f8fa; border-radius:10px; font-size:13px; color:#374151; line-height:1.6;">
+      <div><b style="color:#111827;">ລູກຄ້າ:</b> {{ order.shipping_name }} · {{ order.shipping_phone }}</div>
+      <div>{{ order.shipping_village }}, {{ order.shipping_city }}, {{ order.shipping_province }}</div>
+      {% if order.shipping_branch %}<div><b style="color:#111827;">ສາຂາ:</b> {{ order.shipping_branch }}</div>{% endif %}
+      <div><b style="color:#111827;">ຈັດສົ່ງ:</b> {{ order.get_carrier_display }}</div>
+      {% if order.payment_method %}<div><b style="color:#111827;">ຊຳລະ:</b> {{ order.get_payment_method_display }}</div>{% endif %}
+    </div>
+
+    <a href="{{ admin_url }}" style="display:block; text-align:center; margin-top:24px; padding:14px 24px; background:#2f6fed; color:#ffffff; text-decoration:none; border-radius:10px; font-weight:700; font-size:14px;">ເບິ່ງລາຍລະອຽດ ແລະ ຈັດການອໍເດີ້</a>
+  </div>
+  <p style="text-align:center; color:#9ca3af; font-size:11px; margin-top:16px;">ອີເມວອັດຕະໂນມັດຈາກລະບົບ {{ store_name }}</p>
+</div>

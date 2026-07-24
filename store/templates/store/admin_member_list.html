@@ -75,7 +75,7 @@
                     <button type="submit" class="btn btn-solid" style="padding: 6px 12px; font-size: 12px; background: var(--green); border-color: var(--green); color: #000;" data-i18n="admin_btn_unblock"></button>
                   {% endif %}
                 </form>
-                <form method="post" action="{% url 'admin_member_delete' member.pk %}" style="display: inline;" onsubmit="return confirm('ແທ້ຈິງແລ້ວບໍ່ທີ່ຕ້ອງການລຶບສະມາຊິກນີ້?')">
+                <form method="post" action="{% url 'admin_member_delete' member.pk %}" style="display: inline;" onsubmit="return adminConfirmDelete('ແທ້ຈິງແລ້ວບໍ່ທີ່ຕ້ອງການລຶບສະມາຊິກນີ້?')">
                   {% csrf_token %}
                   <button type="submit" class="btn btn-outline" style="padding: 6px 12px; font-size: 12px; border-color: rgba(255,255,255,0.15);" data-i18n="admin_btn_delete"></button>
                 </form>

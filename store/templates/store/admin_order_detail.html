@@ -29,6 +29,11 @@
           <tr>
             <td>
               <div style="font-weight:600;">{{ item.product_name }}</div>
+              {% if item.product.source_link %}
+              <a href="{{ item.product.source_link }}" target="_blank" rel="noopener" style="font-size:11px; color:var(--violet-2); display:inline-flex; align-items:center; gap:4px; margin-top:2px;">
+                <span class="ic sm" data-ic="arrowRight"></span> ລິ້ງແຫຼ່ງສິນຄ້າ
+              </a>
+              {% endif %}
             </td>
             <td style="text-align:right;">{{ item.unit_price|kip }}</td>
             <td style="text-align:center; font-weight:600;">{{ item.qty }}</td>
@@ -130,6 +135,7 @@
           <div style="font-size:11px; color:var(--text-faint);">ที่อยู่จัดส่ง</div>
           <div style="margin-top:3px; line-height:1.4;">
             บ้าน {{ order.shipping_village }}, เมือง {{ order.shipping_city }}, แขวง {{ order.shipping_province }}
+            {% if order.shipping_branch %}<br>ສາຂາ: {{ order.shipping_branch }}{% endif %}
           </div>
         </div>
         <div>
@@ -144,9 +150,11 @@
       <a href="{% url 'admin_order_list' %}" class="btn btn-outline" style="display:inline-flex; align-items:center; gap:6px;">
         <span class="ic" data-ic="arrowLeft"></span> กลับหน้าหลัก
       </a>
+      {% if order.status == 'delivered' %}
       <a href="{% url 'admin_order_delete' order.pk %}" class="btn btn-outline" style="border-color:#ef4444; color:#ef4444; display:inline-flex; align-items:center; gap:6px;">
         <span class="ic" data-ic="trash"></span> ลบออเดอร์
       </a>
+      {% endif %}
     </div>
 
   </div>
