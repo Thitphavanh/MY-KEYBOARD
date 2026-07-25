@@ -613,10 +613,35 @@ def admin_product_create(request):
                 if url:
                     ProductImage.objects.create(product=product, image_url=url)
             messages.success(request, "ເພີ່ມສິນຄ້າສຳເລັດແລ້ວ")
+            if "again" in request.POST:
+                return redirect(f"{reverse('admin_product_create')}?prefill={product.pk}")
             return redirect("admin_product_list")
     else:
-        form = ProductForm()
-        
+        initial = None
+        prefill_id = request.GET.get("prefill")
+        if prefill_id:
+            prefill_product = Product.objects.filter(pk=prefill_id).first()
+            if prefill_product:
+                initial = {
+                    "name": prefill_product.name,
+                    "brand": prefill_product.brand_id,
+                    "category": prefill_product.category_id,
+                    "subcategory": prefill_product.subcategory_id,
+                    "price": prefill_product.price,
+                    "old_price": prefill_product.old_price,
+                    "stock": prefill_product.stock,
+                    "is_preorder": prefill_product.is_preorder,
+                    "icon": prefill_product.icon,
+                    "tag": prefill_product.tag,
+                    "desc": prefill_product.desc,
+                    "featured": prefill_product.featured,
+                    "best_seller": prefill_product.best_seller,
+                    "is_new": prefill_product.is_new,
+                    "source_link": prefill_product.source_link,
+                    "specs_raw": "\n".join(prefill_product.specs) if isinstance(prefill_product.specs, list) else "",
+                }
+        form = ProductForm(initial=initial)
+
     context = {
         "form": form,
         "title": "ເພີ່ມສິນຄ້າໃໝ່",

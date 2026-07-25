@@ -182,6 +182,9 @@
 
     <div style="display:flex; gap:12px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:20px; margin-top:26px;">
       <a href="{% url 'admin_product_list' %}" class="btn btn-outline">ยกเลิก</a>
+      {% if not product %}
+      <button type="submit" name="again" value="1" class="btn btn-outline" style="padding:10px 24px;">ບັນທຶກ ແລະ ເພີ່ມສິນຄ້າຄ້າຍກັນອີກ</button>
+      {% endif %}
       <button type="submit" class="btn btn-solid" style="padding:10px 24px;">บันทึกข้อมูลสินค้า</button>
     </div>
   </form>
