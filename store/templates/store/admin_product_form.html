@@ -58,11 +58,35 @@
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div class="field">
             <label>ราคาขายจริง (กีบ ₭) *</label>
-            <input type="number" name="price" value="{{ form.price.value|default:'' }}" required placeholder="เช่น 15000000">
+            <input type="number" id="id_price" name="price" value="{{ form.price.value|default:'' }}" required placeholder="เช่น 15000000">
           </div>
           <div class="field">
             <label>ราคาเก่าก่อนลด (กีบ ₭)</label>
             <input type="number" name="old_price" value="{{ form.old_price.value|default:'' }}" placeholder="ถ้ามี เช่น 18000000">
+          </div>
+        </div>
+
+        <div class="admin-card" style="padding:14px 16px; margin-bottom:18px; background:rgba(255,255,255,0.01);">
+          <h4 style="font-size:12px; margin-bottom:10px; color:var(--text-dim); display:flex; align-items:center; gap:6px;">
+            <span class="ic sm" data-ic="cart"></span> ຄິດໄລ່ລາຄາຈາກລາຄາຕົ້ນທາງ (ຊື້ຈາກ Shopee/Advice ເປັນຕົ້ນ)
+          </h4>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px;">
+            <div class="field" style="margin-bottom:0;">
+              <label style="font-size:11px;">ລາຄາຕົ້ນທາງ (฿ ບາດໄທ)</label>
+              <input type="number" step="0.01" id="calc-thb-price" placeholder="ເຊັ່ນ 500">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label style="font-size:11px;">ອັດຕາແລກປ່ຽນ (1฿ = ₭)</label>
+              <input type="number" step="0.01" id="calc-rate" value="{{ site_settings.price_calc_thb_rate }}">
+            </div>
+            <div class="field" style="margin-bottom:0;">
+              <label style="font-size:11px;">ກຳໄລ (%)</label>
+              <input type="number" step="0.01" id="calc-markup" value="{{ site_settings.price_calc_markup_percent }}">
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px;">
+            <div style="font-size:12.5px; color:var(--text-dim);">ລາຄາຂາຍແນະນຳ: <b id="calc-result" style="color:var(--text); font-size:15px;">—</b></div>
+            <button type="button" class="btn btn-outline btn-sm" onclick="applyCalculatedPrice()">ໃຊ້ລາຄານີ້</button>
           </div>
         </div>
 
@@ -166,6 +190,25 @@
 
 {% block extra_admin_scripts %}
 <script>
+  function updatePriceCalc() {
+    var thb = parseFloat(document.getElementById('calc-thb-price').value) || 0;
+    var rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+    var markup = parseFloat(document.getElementById('calc-markup').value) || 0;
+    var result = Math.round(thb * rate * (1 + markup / 100));
+    document.getElementById('calc-result').textContent = result > 0 ? result.toLocaleString('en-US') + ' ₭' : '—';
+  }
+  function applyCalculatedPrice() {
+    var thb = parseFloat(document.getElementById('calc-thb-price').value) || 0;
+    var rate = parseFloat(document.getElementById('calc-rate').value) || 0;
+    var markup = parseFloat(document.getElementById('calc-markup').value) || 0;
+    var result = Math.round(thb * rate * (1 + markup / 100));
+    if (result > 0) document.getElementById('id_price').value = result;
+  }
+  ['calc-thb-price', 'calc-rate', 'calc-markup'].forEach(function (id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', updatePriceCalc);
+  });
+
   function addImageRow() {
     const container = document.getElementById('image-upload-container');
     const row = document.createElement('div');

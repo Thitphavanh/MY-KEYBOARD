@@ -154,6 +154,15 @@ class SiteSettings(models.Model):
     contact_wa = models.CharField(max_length=30, blank=True, default="8562055551234")
     admin_notify_email = models.EmailField(blank=True, default="", help_text="ອີເມວຮັບແຈ້ງເຕືອນເມື່ອມີອໍເດີ້ໃໝ່ເຂົ້າມາ (ເວັ້ນວ່າງ = ບໍ່ສົ່ງແຈ້ງເຕືອນ)")
 
+    price_calc_thb_rate = models.DecimalField(
+        max_digits=10, decimal_places=2, default=620,
+        help_text="ອັດຕາແລກປ່ຽນ: 1 ບາດໄທ (฿) ເທົ່າກັບຈັກກີບ (₭) — ໃຊ້ໃນເຄື່ອງຄິດໄລ່ລາຄາຕົ້ນທາງໜ້າເພີ່ມ/ແກ້ໄຂສິນຄ້າ",
+    )
+    price_calc_markup_percent = models.DecimalField(
+        max_digits=5, decimal_places=2, default=25,
+        help_text="ເປີເຊັນກຳໄລເລີ່ມຕົ້ນໃນເຄື່ອງຄິດໄລ່ລາຄາຕົ້ນທາງ (ແກ້ໄຂໄດ້ຕໍ່ສິນຄ້າ)",
+    )
+
     stats_enabled = models.BooleanField(default=True)
     stat_metric_1 = models.CharField(max_length=20, choices=StatMetric.choices, default=StatMetric.MEMBERS)
     stat_metric_2 = models.CharField(max_length=20, choices=StatMetric.choices, default=StatMetric.SALES)
