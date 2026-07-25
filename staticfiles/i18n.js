@@ -67,7 +67,7 @@ const I18N = {
     register_incomplete: "ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ (ລະຫັດຜ່ານຢ່າງໜ້ອຍ 8 ໂຕອັກສອນ)",
     login_success_toast: "ເຂົ້າສູ່ລະບົບສຳເລັດ", register_success_toast: "ສະໝັກສະມາຊິກສຳເລັດ",
     label_email_register: "ອີເມວ", ph_email_register: "you@example.com", label_password_confirm: "ຢືນຢັນລະຫັດຜ່ານ",
-    otp_title: "ຢືນຢັນເບີໂທ", otp_sent_to: "ພວກເຮົາໄດ້ສົ່ງລະຫັດ OTP 6 ຕົວເລກໄປທີ່", otp_label: "ລະຫັດ OTP",
+    otp_title: "ຢືນຢັນອີເມວ", otp_sent_to: "ພວກເຮົາໄດ້ສົ່ງລະຫັດ OTP 6 ຕົວເລກໄປທີ່", otp_label: "ລະຫັດ OTP",
     otp_ph: "000000", otp_cta: "ຢືນຢັນ", otp_resend: "ບໍ່ໄດ້ຮັບລະຫັດ? ສົ່ງໃໝ່", otp_resent_toast: "ສົ່ງລະຫັດ OTP ໃໝ່ແລ້ວ",
     otp_invalid: "ລະຫັດ OTP ບໍ່ຖືກຕ້ອງ ຫຼື ໝົດອາຍຸ",
     /* profile */
@@ -239,7 +239,7 @@ const I18N = {
     register_incomplete: "กรุณากรอกข้อมูลให้ครบถ้วน (รหัสผ่านอย่างน้อย 8 ตัวอักษร)",
     login_success_toast: "เข้าสู่ระบบสำเร็จ", register_success_toast: "สมัครสมาชิกสำเร็จ",
     label_email_register: "อีเมล", ph_email_register: "you@example.com", label_password_confirm: "ยืนยันรหัสผ่าน",
-    otp_title: "ยืนยันเบอร์โทร", otp_sent_to: "เราได้ส่งรหัส OTP 6 หลักไปที่", otp_label: "รหัส OTP",
+    otp_title: "ยืนยันอีเมล", otp_sent_to: "เราได้ส่งรหัส OTP 6 หลักไปที่", otp_label: "รหัส OTP",
     otp_ph: "000000", otp_cta: "ยืนยัน", otp_resend: "ไม่ได้รับรหัส? ส่งใหม่", otp_resent_toast: "ส่งรหัส OTP ใหม่แล้ว",
     otp_invalid: "รหัส OTP ไม่ถูกต้อง หรือหมดอายุ",
     /* profile */
@@ -411,7 +411,7 @@ const I18N = {
     register_incomplete: "Please fill in all fields (password must be at least 8 characters)",
     login_success_toast: "Signed in successfully", register_success_toast: "Registered successfully",
     label_email_register: "Email", ph_email_register: "you@example.com", label_password_confirm: "Confirm password",
-    otp_title: "Verify phone number", otp_sent_to: "We sent a 6-digit OTP code to", otp_label: "OTP code",
+    otp_title: "Verify email", otp_sent_to: "We sent a 6-digit OTP code to", otp_label: "OTP code",
     otp_ph: "000000", otp_cta: "Verify", otp_resend: "Didn't get the code? Resend", otp_resent_toast: "OTP code resent",
     otp_invalid: "Invalid or expired OTP code",
     /* profile */
