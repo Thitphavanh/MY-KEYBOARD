@@ -1,8 +1,8 @@
 {% load store_extras %}
 <div class="product-card">
   <a href="{% url 'product_detail' p.pk %}" class="product-thumb-link">
-    <div class="product-thumb{% if p.first_image %} has-img{% endif %}">
-      {% if p.first_image %}<img src="{{ p.first_image }}" alt="" style="width:100%;height:100%;object-fit:contain;">{% else %}{{ p.icon }}{% endif %}
+    <div class="product-thumb">
+      {% if p.first_image %}<img src="{{ p.first_image }}" alt="" style="width:100%;height:100%;object-fit:cover;">{% else %}{{ p.icon }}{% endif %}
     </div>
   </a>
   <form method="post" action="{% url 'wishlist_toggle' p.pk %}" style="display:contents;">
