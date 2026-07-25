@@ -61,10 +61,10 @@ const I18N = {
     /* login */
     login_tab: "ເຂົ້າສູ່ລະບົບ", register_tab: "ສະໝັກສະມາຊິກ",
     label_email: "ອີເມວ ຫຼື ຊື່ຜູ້ໃຊ້", ph_email: "you@example.com ຫຼື admin", label_password: "ລະຫັດຜ່ານ", ph_password: "••••••••",
-    login_cta: "ເຂົ້າສູ່ລະບົບ", no_account_text: "ຍັງບໍ່ມີບັນຊີ?", register_here: "ສະໝັກສະມາຊິກທີ່ນີ້",
+    login_cta: "ເຂົ້າສູ່ລະບົບ", forgot_password: "ລືມລະຫັດຜ່ານ?", no_account_text: "ຍັງບໍ່ມີບັນຊີ?", register_here: "ສະໝັກສະມາຊິກທີ່ນີ້",
     label_fullname: "ຊື່ - ນາມສະກຸນ", ph_fullname: "ຊື່ຂອງທ່ານ", register_password_hint: "ຢ່າງໜ້ອຍ 8 ໂຕອັກສອນ",
     register_cta: "ສະໝັກສະມາຊິກ", have_account_text: "ມີບັນຊີແລ້ວ?", login_here: "ເຂົ້າສູ່ລະບົບທີ່ນີ້",
-    register_incomplete: "ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ (ລະຫັດຜ່ານຢ່າງໜ້ອຍ 6 ໂຕອັກສອນ)",
+    register_incomplete: "ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ (ລະຫັດຜ່ານຢ່າງໜ້ອຍ 8 ໂຕອັກສອນ)",
     login_success_toast: "ເຂົ້າສູ່ລະບົບສຳເລັດ", register_success_toast: "ສະໝັກສະມາຊິກສຳເລັດ",
     label_email_register: "ອີເມວ", ph_email_register: "you@example.com", label_password_confirm: "ຢືນຢັນລະຫັດຜ່ານ",
     /* profile */
@@ -230,10 +230,10 @@ const I18N = {
     /* login */
     login_tab: "เข้าสู่ระบบ", register_tab: "สมัครสมาชิก",
     label_email: "อีเมล หรือ ชื่อผู้ใช้", ph_email: "you@example.com หรือ admin", label_password: "รหัสผ่าน", ph_password: "••••••••",
-    login_cta: "เข้าสู่ระบบ", no_account_text: "ยังไม่มีบัญชี?", register_here: "สมัครสมาชิกที่นี่",
+    login_cta: "เข้าสู่ระบบ", forgot_password: "ลืมรหัสผ่าน?", no_account_text: "ยังไม่มีบัญชี?", register_here: "สมัครสมาชิกที่นี่",
     label_fullname: "ชื่อ - นามสกุล", ph_fullname: "ชื่อของคุณ", register_password_hint: "อย่างน้อย 8 ตัวอักษร",
     register_cta: "สมัครสมาชิก", have_account_text: "มีบัญชีแล้ว?", login_here: "เข้าสู่ระบบที่นี่",
-    register_incomplete: "กรุณากรอกข้อมูลให้ครบถ้วน (รหัสผ่านอย่างน้อย 6 ตัวอักษร)",
+    register_incomplete: "กรุณากรอกข้อมูลให้ครบถ้วน (รหัสผ่านอย่างน้อย 8 ตัวอักษร)",
     login_success_toast: "เข้าสู่ระบบสำเร็จ", register_success_toast: "สมัครสมาชิกสำเร็จ",
     label_email_register: "อีเมล", ph_email_register: "you@example.com", label_password_confirm: "ยืนยันรหัสผ่าน",
     /* profile */
@@ -399,10 +399,10 @@ const I18N = {
     /* login */
     login_tab: "Sign in", register_tab: "Register",
     label_email: "Email or Username", ph_email: "you@example.com or admin", label_password: "Password", ph_password: "••••••••",
-    login_cta: "Sign in", no_account_text: "Don't have an account?", register_here: "Register here",
+    login_cta: "Sign in", forgot_password: "Forgot password?", no_account_text: "Don't have an account?", register_here: "Register here",
     label_fullname: "Full name", ph_fullname: "Your name", register_password_hint: "At least 8 characters",
     register_cta: "Register", have_account_text: "Already have an account?", login_here: "Sign in here",
-    register_incomplete: "Please fill in all fields (password must be at least 6 characters)",
+    register_incomplete: "Please fill in all fields (password must be at least 8 characters)",
     login_success_toast: "Signed in successfully", register_success_toast: "Registered successfully",
     label_email_register: "Email", ph_email_register: "you@example.com", label_password_confirm: "Confirm password",
     /* profile */
@@ -510,7 +510,7 @@ const I18N = {
   },
 };
 
-const LANG_NAMES = { lo: "ພາສາລາວ", th: "ภาษาไทย", en: "English" };
+const LANG_NAMES = { lo: "ພາສາລາວ", th: "ພາສາໄທ", en: "ພາສາອັງກິດ" };
 
 window.NB_LANG = localStorage.getItem("nb_lang") || "lo";
 
