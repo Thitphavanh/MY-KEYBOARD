@@ -26,12 +26,11 @@
       <span class="product-stock out" data-i18n="out_of_stock"></span>
     {% endif %}
     <div class="product-actions">
-      <form method="post" action="{% url 'cart_add' p.pk %}" style="display:contents;" class="ajax-cart-form">
+      <form method="post" action="{% url 'cart_add' p.pk %}" class="ajax-cart-form">
         {% csrf_token %}
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="btn btn-ghost" {% if p.stock <= 0 and not p.is_preorder %}disabled{% endif %}><span class="ic sm" data-ic="cart"></span><span data-i18n="add_to_cart"></span></button>
+        <button type="submit" class="btn btn-solid btn-block" {% if p.stock <= 0 and not p.is_preorder %}disabled{% endif %}><span class="ic sm" data-ic="cart"></span><span data-i18n="add_to_cart"></span></button>
       </form>
-      <a href="{% url 'product_detail' p.pk %}" class="btn btn-solid" data-i18n="view_product"></a>
     </div>
   </div>
 </div>
