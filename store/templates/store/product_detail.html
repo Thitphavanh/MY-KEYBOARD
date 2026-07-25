@@ -11,7 +11,7 @@
     <div class="detail-gallery" id="detail-gallery" style="position: relative;">
       {% with images=product.images.all %}
       {% if images %}
-        <img src="{{ images.0.image.url }}" alt="{{ product.name }}" id="gallery-img" onclick="openLightbox()" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in; transition: opacity 0.15s ease;">
+        <img src="{{ images.0.display_url }}" alt="{{ product.name }}" id="gallery-img" onclick="openLightbox()" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in; transition: opacity 0.15s ease;">
         {% if images.count > 1 %}
           <button type="button" onclick="navigateGallery(-1, event)" style="position:absolute; left:12px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; z-index:2;"><span class="ic" data-ic="chevronLeft"></span></button>
           <button type="button" onclick="navigateGallery(1, event)" style="position:absolute; right:12px; top:50%; transform:translateY(-50%); background:rgba(0,0,0,0.5); border:none; border-radius:50%; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#fff; cursor:pointer; z-index:2;"><span class="ic" data-ic="chevronRight"></span></button>
@@ -23,7 +23,7 @@
     </div>
     <div class="detail-thumbs">
       {% for img in product.images.all %}
-      <button class="thumb-btn {% if forloop.first %}active{% endif %}" onclick="setActiveImg(this, '{{ img.image.url }}', {{ forloop.counter0 }})"><img src="{{ img.image.url }}" alt=""></button>
+      <button class="thumb-btn {% if forloop.first %}active{% endif %}" onclick="setActiveImg(this, '{{ img.display_url }}', {{ forloop.counter0 }})"><img src="{{ img.display_url }}" alt=""></button>
       {% endfor %}
     </div>
   </div>
@@ -102,7 +102,7 @@
 
   var galleryUrls = [
     {% for img in product.images.all %}
-    "{{ img.image.url }}",
+    "{{ img.display_url }}",
     {% endfor %}
   ];
   var currentGalleryIdx = 0;

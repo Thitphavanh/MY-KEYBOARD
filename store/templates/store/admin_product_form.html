@@ -130,7 +130,7 @@
           <div class="img-grid">
             {% for img in product.images.all %}
             <div class="img-card">
-              <img src="{{ img.image.url }}">
+              <img src="{{ img.display_url }}">
               <div class="del-chk">
                 <input type="checkbox" name="delete_images" value="{{ img.id }}" id="del_img_{{ img.id }}" style="margin-right:0;">
                 <label for="del_img_{{ img.id }}" style="display:none;"></label>
@@ -142,9 +142,10 @@
           {% endif %}
 
           <div class="field" id="image-upload-container">
-            <label>อัปโหลดรูปภาพใหม่</label>
+            <label>อัปโหลดรูปภาพใหม่ / ຫຼືໃສ່ລິ້ງຮູບ</label>
             <div class="image-input-row" style="display:flex; gap:10px; margin-bottom:8px;">
-              <input type="file" name="new_images" multiple accept="image/*" style="font-size:12.5px; color:var(--text-dim); flex:1;">
+              <input type="file" name="new_images" accept="image/*" style="font-size:12.5px; color:var(--text-dim); flex:1;">
+              <input type="url" name="new_image_urls" placeholder="ຫຼືໃສ່ລິ້ງຮູບ" style="font-size:12.5px; flex:1;">
             </div>
           </div>
           <button type="button" class="btn btn-outline" onclick="addImageRow()" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px; margin-top:2px;">
@@ -174,6 +175,7 @@
     row.style.marginBottom = '8px';
     row.innerHTML = `
       <input type="file" name="new_images" accept="image/*" style="font-size:12.5px; color:var(--text-dim); flex:1;">
+      <input type="url" name="new_image_urls" placeholder="ຫຼືໃສ່ລິ້ງຮູບ" style="font-size:12.5px; flex:1;">
       <button type="button" class="btn btn-outline" onclick="removeImageRow(this)" style="padding:6px 12px; border-color:#ef4444; color:#ef4444; font-size:12.5px; height:44px;">ລຶບ</button>
     `;
     container.appendChild(row);

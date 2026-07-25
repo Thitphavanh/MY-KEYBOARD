@@ -603,6 +603,12 @@ def admin_product_create(request):
             images = request.FILES.getlist('new_images')
             for img in images:
                 ProductImage.objects.create(product=product, image=img)
+            # Handle image links entered instead of file uploads
+            image_urls = request.POST.getlist('new_image_urls')
+            for url in image_urls:
+                url = url.strip()
+                if url:
+                    ProductImage.objects.create(product=product, image_url=url)
             messages.success(request, "ເພີ່ມສິນຄ້າສຳເລັດແລ້ວ")
             return redirect("admin_product_list")
     else:
@@ -631,6 +637,12 @@ def admin_product_edit(request, pk):
             images = request.FILES.getlist('new_images')
             for img in images:
                 ProductImage.objects.create(product=product, image=img)
+            # Handle image links entered instead of file uploads
+            image_urls = request.POST.getlist('new_image_urls')
+            for url in image_urls:
+                url = url.strip()
+                if url:
+                    ProductImage.objects.create(product=product, image_url=url)
             messages.success(request, "ແກ້ໄຂສິນຄ້າສຳເລັດແລ້ວ")
             return redirect("admin_product_list")
     else:

@@ -93,13 +93,18 @@ class Product(models.Model):
     @property
     def first_image(self):
         img = self.images.first()
-        return img.image.url if img else None
+        return img.display_url if img else None
 
 
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
-    image = models.ImageField(upload_to="products/")
+    image = models.ImageField(upload_to="products/", blank=True)
+    image_url = models.URLField(blank=True, default="", help_text="ໃສ່ລິ້ງຮູບແທນການອັບໂຫຼດໄຟລ໌ (ຖ້າໃສ່ ຈະໃຊ້ລິ້ງນີ້ແທນ)")
     order = models.PositiveIntegerField(default=0)
+
+    @property
+    def display_url(self):
+        return self.image_url or (self.image.url if self.image else None)
 
     class Meta:
         ordering = ["order", "id"]
