@@ -9,6 +9,7 @@ const ICON_PATHS = {
   menu: `<path d="M3 6h18M3 12h18M3 18h18"/>`,
   close: `<path d="M5 5l14 14M19 5L5 19"/>`,
   chevronDown: `<path d="M5 8l7 7 7-7"/>`,
+  chevronLeft: `<path d="M16 5l-7 7 7 7"/>`,
   chevronRight: `<path d="M8 5l7 7-7 7"/>`,
   truck: `<path d="M2 7h11v9H2z"/><path d="M13 10h4l4 3.5V16h-8z"/><circle cx="6.5" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/>`,
   shield: `<path d="M12 3l8 3v6c0 5-3.4 8.4-8 9-4.6-.6-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/>`,
