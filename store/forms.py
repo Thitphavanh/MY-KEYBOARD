@@ -32,19 +32,16 @@ class RegisterForm(UserCreationForm):
 
     def clean_email(self):
         email = self.cleaned_data["email"]
-        if User.objects.filter(email=email, is_active=True).exists():
+        if User.objects.filter(email=email).exists():
             raise forms.ValidationError("ອີເມວນີ້ຖືກໃຊ້ສະໝັກແລ້ວ")
         return email
 
     def save(self, commit=True):
-        # Drop any stale, never-verified signup that used this email/username before.
-        User.objects.filter(email=self.cleaned_data["email"], is_active=False).delete()
         user = super().save(commit=False)
         user.username = self.cleaned_data["email"]
         user.email = self.cleaned_data["email"]
         user.first_name = self.cleaned_data["name"]
         user.phone = self.cleaned_data["phone"]
-        user.is_active = False
         if commit:
             user.save()
         return user

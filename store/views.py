@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import timedelta
 
 from django.contrib import messages
 from django.contrib.admin.views.decorators import staff_member_required
@@ -19,7 +19,6 @@ from .models import (
     BankAccount, Banner, Brand, CARRIER_FEES, Coupon, Order, OrderItem, OrderStatus,
     Product, SiteSettings, User, Category, SubCategory, ProductImage,
 )
-from .otputils import generate_otp, otp_expiry, send_otp_email
 
 STAT_DEFS = {
     "members": {"label": "ສະມາຊິກຮ້ານເຮົາ", "icon": "user"},
@@ -481,25 +480,8 @@ def login_view(request):
             if not next_url:
                 next_url = "admin_dashboard" if user.is_staff else "home"
             return redirect(next_url)
-
-        # Account exists but is still pending email OTP verification
-        unverified = User.objects.filter(
-            Q(username=email_or_username) | Q(email=email_or_username), is_active=False
-        ).first()
-        if unverified and unverified.check_password(password):
-            _start_register_otp(request, unverified)
-            return redirect("register_verify")
-        else:
-            error = "ອີເມວ/ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ"
+        error = "ອີເມວ/ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ"
     return render(request, "store/login.html", {"error": error, "next": next_url or ""})
-
-
-def _start_register_otp(request, user):
-    code = generate_otp()
-    request.session["pending_register_user_id"] = user.pk
-    request.session["pending_register_otp"] = code
-    request.session["pending_register_otp_expiry"] = otp_expiry().isoformat()
-    send_otp_email(user.email, code)
 
 
 def register_view(request):
@@ -508,45 +490,13 @@ def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()  # created with is_active=False, pending OTP verification
-            _start_register_otp(request, user)
-            return redirect("register_verify")
+            user = form.save()
+            login(request, user)
+            merge_session_cart_into_user(request, user)
+            return redirect("home")
     else:
         form = RegisterForm()
     return render(request, "store/register.html", {"form": form})
-
-
-def register_verify_view(request):
-    user_id = request.session.get("pending_register_user_id")
-    expiry_iso = request.session.get("pending_register_otp_expiry")
-    if not user_id or not expiry_iso:
-        return redirect("register")
-    user = get_object_or_404(User, pk=user_id, is_active=False)
-
-    error = None
-    if request.method == "POST":
-        if "resend" in request.POST:
-            _start_register_otp(request, user)
-            messages.success(request, "ສົ່ງລະຫັດ OTP ໃໝ່ໄປແລ້ວ")
-        else:
-            code = request.POST.get("otp", "").strip()
-            expiry = datetime.fromisoformat(expiry_iso)
-            valid = (
-                code
-                and code == request.session.get("pending_register_otp")
-                and timezone.now() <= expiry
-            )
-            if valid:
-                user.is_active = True
-                user.save(update_fields=["is_active"])
-                login(request, user)
-                merge_session_cart_into_user(request, user)
-                del request.session["pending_register_user_id"]
-                del request.session["pending_register_otp"]
-                del request.session["pending_register_otp_expiry"]
-                return redirect("home")
-            error = "ລະຫັດ OTP ບໍ່ຖືກຕ້ອງ ຫຼື ໝົດອາຍຸ"
-    return render(request, "store/register_verify.html", {"error": error, "email": user.email})
 
 
 def logout_view(request):
