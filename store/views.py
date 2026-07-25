@@ -19,6 +19,8 @@ from .models import (
     BankAccount, Banner, Brand, CARRIER_FEES, Coupon, Order, OrderItem, OrderStatus,
     Product, SiteSettings, User, Category, SubCategory, ProductImage,
 )
+from .smsutils import check_otp, normalize_lao_phone, send_otp
+from twilio.base.exceptions import TwilioRestException
 
 STAT_DEFS = {
     "members": {"label": "ສະມາຊິກຮ້ານເຮົາ", "icon": "user"},
@@ -480,7 +482,23 @@ def login_view(request):
             if not next_url:
                 next_url = "admin_dashboard" if user.is_staff else "home"
             return redirect(next_url)
-        error = "ອີເມວ/ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ"
+
+        # Account exists but is still pending phone OTP verification
+        unverified = User.objects.filter(
+            Q(username=email_or_username) | Q(email=email_or_username), is_active=False
+        ).first()
+        if unverified and unverified.check_password(password):
+            phone = normalize_lao_phone(unverified.phone)
+            try:
+                send_otp(phone)
+            except TwilioRestException:
+                error = "ບັນຊີນີ້ຍັງບໍ່ໄດ້ຢືນຢັນເບີໂທ ແລະ ສົ່ງລະຫັດ OTP ບໍ່ສຳເລັດ, ລອງໃໝ່ພາຍຫຼັງ"
+            else:
+                request.session["pending_register_user_id"] = unverified.pk
+                request.session["pending_register_phone"] = phone
+                return redirect("register_verify")
+        else:
+            error = "ອີເມວ/ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ"
     return render(request, "store/login.html", {"error": error, "next": next_url or ""})
 
 
@@ -490,13 +508,49 @@ def register_view(request):
     if request.method == "POST":
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save()
-            login(request, user)
-            merge_session_cart_into_user(request, user)
-            return redirect("home")
+            user = form.save()  # created with is_active=False, pending OTP verification
+            phone = normalize_lao_phone(user.phone)
+            try:
+                send_otp(phone)
+            except TwilioRestException:
+                user.delete()
+                form.add_error("phone", "ສົ່ງລະຫັດ OTP ບໍ່ສຳເລັດ, ກະລຸນາກວດສອບເບີໂທ ແລ້ວລອງໃໝ່")
+            else:
+                request.session["pending_register_user_id"] = user.pk
+                request.session["pending_register_phone"] = phone
+                return redirect("register_verify")
     else:
         form = RegisterForm()
     return render(request, "store/register.html", {"form": form})
+
+
+def register_verify_view(request):
+    user_id = request.session.get("pending_register_user_id")
+    phone = request.session.get("pending_register_phone")
+    if not user_id or not phone:
+        return redirect("register")
+
+    error = None
+    if request.method == "POST":
+        if "resend" in request.POST:
+            try:
+                send_otp(phone)
+                messages.success(request, "ສົ່ງລະຫັດ OTP ໃໝ່ໄປແລ້ວ")
+            except TwilioRestException:
+                error = "ສົ່ງລະຫັດ OTP ບໍ່ສຳເລັດ, ລອງໃໝ່ພາຍຫຼັງ"
+        else:
+            code = request.POST.get("otp", "").strip()
+            if check_otp(phone, code):
+                user = get_object_or_404(User, pk=user_id, is_active=False)
+                user.is_active = True
+                user.save(update_fields=["is_active"])
+                login(request, user)
+                merge_session_cart_into_user(request, user)
+                del request.session["pending_register_user_id"]
+                del request.session["pending_register_phone"]
+                return redirect("home")
+            error = "ລະຫັດ OTP ບໍ່ຖືກຕ້ອງ ຫຼື ໝົດອາຍຸ"
+    return render(request, "store/register_verify.html", {"error": error, "phone": phone})
 
 
 def logout_view(request):

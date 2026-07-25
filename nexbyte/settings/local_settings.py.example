@@ -12,3 +12,10 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'youraccount@gmail.com'
 EMAIL_HOST_PASSWORD = 'your-16-char-app-password'
 DEFAULT_FROM_EMAIL = 'youraccount@gmail.com'
+
+# Twilio Verify (SMS OTP for registration) — get these from
+# https://console.twilio.com (Account SID + Auth Token) and the
+# Verify > Services section (Verify Service SID, starts with "VA").
+TWILIO_ACCOUNT_SID = 'ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
+TWILIO_AUTH_TOKEN = 'your-auth-token'
+TWILIO_VERIFY_SERVICE_SID = 'VAxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'
