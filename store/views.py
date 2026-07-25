@@ -1,3 +1,5 @@
+import csv
+import io
 from datetime import timedelta
 
 from django.contrib import messages
@@ -5,8 +7,9 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.db import transaction
 from django.db.models import Max, Min, Q, Sum
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.template.loader import render_to_string
 from django.urls import reverse
@@ -621,6 +624,138 @@ def admin_product_create(request):
         "subcategories": SubCategory.objects.select_related("category").all(),
     }
     return render(request, "store/admin_product_form.html", context)
+
+
+IMPORT_CSV_COLUMNS = [
+    "name", "category", "subcategory", "brand", "price", "old_price", "stock",
+    "desc", "tag", "icon", "specs", "image_urls", "featured", "best_seller", "is_new", "source_link",
+]
+
+
+def _parse_bool(value, default=False):
+    if value is None or str(value).strip() == "":
+        return default
+    return str(value).strip().lower() in ("1", "true", "yes", "y", "ແມ່ນ", "ใช่")
+
+
+@staff_required
+def admin_product_import(request):
+    results = None
+    if request.method == "POST":
+        csv_file = request.FILES.get("csv_file")
+        if not csv_file:
+            messages.error(request, "ກະລຸນາເລືອກໄຟລ໌ CSV")
+        else:
+            try:
+                decoded = csv_file.read().decode("utf-8-sig")
+            except UnicodeDecodeError:
+                decoded = None
+                messages.error(request, "ອ່ານໄຟລ໌ບໍ່ໄດ້ — ກະລຸນາບັນທຶກເປັນ CSV (UTF-8) ແລ້ວລອງໃໝ່")
+            if decoded is not None:
+                reader = csv.DictReader(io.StringIO(decoded))
+                created = 0
+                errors = []
+                for i, row in enumerate(reader, start=2):  # row 1 is the header
+                    name = (row.get("name") or "").strip()
+                    category_key = (row.get("category") or "").strip()
+                    price_raw = (row.get("price") or "").strip()
+                    if not name or not category_key or not price_raw:
+                        errors.append(f"ແຖວ {i}: ຂາດ name/category/price")
+                        continue
+                    category = Category.objects.filter(
+                        Q(slug__iexact=category_key) | Q(name__iexact=category_key)
+                    ).first()
+                    if not category:
+                        errors.append(f"ແຖວ {i}: ບໍ່ພົບໝວດໝູ່ '{category_key}'")
+                        continue
+                    try:
+                        price = int(float(price_raw))
+                    except ValueError:
+                        errors.append(f"ແຖວ {i}: ລາຄາບໍ່ຖືກຕ້ອງ '{price_raw}'")
+                        continue
+
+                    old_price_raw = (row.get("old_price") or "").strip()
+                    old_price = None
+                    if old_price_raw:
+                        try:
+                            old_price = int(float(old_price_raw))
+                        except ValueError:
+                            errors.append(f"ແຖວ {i}: ລາຄາເກົ່າບໍ່ຖືກຕ້ອງ '{old_price_raw}'")
+                            continue
+
+                    stock_raw = (row.get("stock") or "").strip()
+                    try:
+                        stock = int(float(stock_raw)) if stock_raw else 0
+                    except ValueError:
+                        stock = 0
+
+                    subcategory = None
+                    sub_key = (row.get("subcategory") or "").strip()
+                    if sub_key:
+                        subcategory = category.subcategories.filter(name__iexact=sub_key).first()
+
+                    brand = None
+                    brand_key = (row.get("brand") or "").strip()
+                    if brand_key:
+                        brand, _ = Brand.objects.get_or_create(name=brand_key)
+
+                    specs_raw = (row.get("specs") or "").strip()
+                    specs = [s.strip() for s in specs_raw.split("|") if s.strip()]
+
+                    with transaction.atomic():
+                        product = Product.objects.create(
+                            name=name,
+                            category=category,
+                            subcategory=subcategory,
+                            brand=brand,
+                            price=price,
+                            old_price=old_price,
+                            stock=stock,
+                            desc=(row.get("desc") or "").strip(),
+                            tag=(row.get("tag") or "").strip(),
+                            icon=(row.get("icon") or "").strip() or "💻",
+                            specs=specs,
+                            featured=_parse_bool(row.get("featured"), default=True),
+                            best_seller=_parse_bool(row.get("best_seller"), default=False),
+                            is_new=_parse_bool(row.get("is_new"), default=False),
+                            source_link=(row.get("source_link") or "").strip(),
+                        )
+                        image_urls_raw = (row.get("image_urls") or "").strip()
+                        for url in [u.strip() for u in image_urls_raw.split("|") if u.strip()]:
+                            ProductImage.objects.create(product=product, image_url=url)
+                    created += 1
+
+                results = {"created": created, "errors": errors}
+                if created and not errors:
+                    messages.success(request, f"ນຳເຂົ້າສິນຄ້າສຳເລັດ {created} ລາຍການ")
+                elif created:
+                    messages.warning(request, f"ນຳເຂົ້າສຳເລັດ {created} ລາຍການ, ມີ {len(errors)} ແຖວຜິດພາດ")
+                elif not errors:
+                    messages.error(request, "ໄຟລ໌ CSV ບໍ່ມີຂໍ້ມູນ")
+
+    context = {
+        "active_sub": "products",
+        "results": results,
+        "columns": IMPORT_CSV_COLUMNS,
+    }
+    return render(request, "store/admin_product_import.html", context)
+
+
+@staff_required
+def admin_product_import_template(request):
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(IMPORT_CSV_COLUMNS)
+    writer.writerow([
+        "ຕົວຢ່າງ ເມົ້າໄຮ້ສາຍ", "computer-accessories", "", "Logitech", "250000", "300000", "10",
+        "ລາຍລະອຽດສິນຄ້າ...", "Hot", "🖱️",
+        "DPI 16000|Battery 70h", "https://example.com/mouse1.jpg|https://example.com/mouse2.jpg",
+        "yes", "no", "yes", "https://shopee.co.th/...",
+    ])
+    response = HttpResponse(output.getvalue().encode("utf-8-sig"), content_type="text/csv")
+    response["Content-Disposition"] = "attachment; filename=product_import_template.csv"
+    return response
+
 
 @staff_required
 def admin_product_edit(request, pk):

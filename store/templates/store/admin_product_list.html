@@ -21,9 +21,14 @@
       <button type="submit" class="btn btn-outline" style="padding:10px 16px;"><span class="ic" data-ic="search"></span></button>
     </form>
 
-    <a href="{% url 'admin_product_create' %}" class="btn btn-solid" style="display:inline-flex; align-items:center; gap:8px;">
-      <span class="ic" data-ic="plus"></span> <span data-i18n="admin_btn_add_product">เพิ่มสินค้าใหม่</span>
-    </a>
+    <div style="display:flex; gap:10px;">
+      <a href="{% url 'admin_product_import' %}" class="btn btn-outline" style="display:inline-flex; align-items:center; gap:8px;">
+        <span class="ic" data-ic="upload"></span> ນຳເຂົ້າ CSV
+      </a>
+      <a href="{% url 'admin_product_create' %}" class="btn btn-solid" style="display:inline-flex; align-items:center; gap:8px;">
+        <span class="ic" data-ic="plus"></span> <span data-i18n="admin_btn_add_product">เพิ่มสินค้าใหม่</span>
+      </a>
+    </div>
   </div>
 
   <div style="overflow-x:auto;">

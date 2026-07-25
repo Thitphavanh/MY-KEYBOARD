@@ -1,0 +1,48 @@
+{% extends "store/admin_base.html" %}
+
+{% block admin_title %}ນຳເຂົ້າສິນຄ້າ — NexByte Computer{% endblock %}
+{% block admin_header_title %}ນຳເຂົ້າສິນຄ້າຫຼາຍລາຍການ (CSV){% endblock %}
+{% block admin_header_sub %}ເພີ່ມສິນຄ້າຫຼາຍໆລາຍການພ້ອມກັນຈາກໄຟລ໌ CSV{% endblock %}
+
+{% block admin_content %}
+<div class="admin-card" style="margin-bottom:20px;">
+  <h4 style="font-size:13px; margin-bottom:10px; color:var(--text-dim);">ວິທີໃຊ້</h4>
+  <ol style="font-size:12.5px; color:var(--text-dim); line-height:1.9; padding-left:18px;">
+    <li>ດາວໂຫຼດ <a href="{% url 'admin_product_import_template' %}" class="btn btn-outline btn-sm" style="display:inline-flex; margin:0 4px;">ໄຟລ໌ຕົວຢ່າງ CSV</a> ແລ້ວເປີດດ້ວຍ Excel / Google Sheets</li>
+    <li>ຕື່ມແຖວສິນຄ້າຂອງທ່ານ (ແຖວທຳອິດ = ຫົວຂໍ້ຄໍລໍາ, ຢ່າລຶບ) — <b>name, category, price</b> ຕ້ອງມີສະເໝີ</li>
+    <li><b>category</b>: ໃສ່ຊື່ ຫຼື slug ຂອງໝວດໝູ່ທີ່ມີຢູ່ແລ້ວໃນລະບົບ (ເບິ່ງໄດ້ຢູ່ໜ້າ "ໝວດໝູ່")</li>
+    <li><b>specs</b> ແລະ <b>image_urls</b>: ຖ້າມີຫຼາຍລາຍການ ໃຫ້ຄັ່ນດ້ວຍ <code>|</code> (ເຄື່ອງໝາຍ pipe) — ຮູບຕ້ອງເປັນລິ້ງ (URL) ເທົ່ານັ້ນ, ອັບໂຫຼດໄຟລ໌ຈາກ CSV ບໍ່ໄດ້</li>
+    <li><b>featured / best_seller / is_new</b>: ໃສ່ <code>yes</code> ຫຼື <code>no</code></li>
+    <li>ບັນທຶກໄຟລ໌ເປັນ <b>CSV UTF-8</b> ແລ້ວອັບໂຫຼດຢູ່ລຸ່ມນີ້</li>
+  </ol>
+</div>
+
+{% if results %}
+<div class="admin-card" style="margin-bottom:20px;">
+  <h4 style="font-size:13px; margin-bottom:10px; color:var(--text);">ຜົນການນຳເຂົ້າ</h4>
+  <p style="font-size:13px; color:var(--green); margin-bottom:8px;">✓ ສ້າງສິນຄ້າສຳເລັດ {{ results.created }} ລາຍການ</p>
+  {% if results.errors %}
+  <p style="font-size:12.5px; color:#ef4444; margin-bottom:6px;">ແຖວທີ່ຂ້າມ/ຜິດພາດ ({{ results.errors|length }}):</p>
+  <ul style="font-size:12px; color:var(--text-dim); line-height:1.8; padding-left:18px;">
+    {% for err in results.errors %}
+    <li>{{ err }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endif %}
+
+<div class="admin-card">
+  <form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="field">
+      <label>ໄຟລ໌ CSV</label>
+      <input type="file" name="csv_file" accept=".csv" required>
+    </div>
+    <button type="submit" class="btn btn-solid" style="margin-top:10px;">
+      <span class="ic sm" data-ic="cart"></span> ນຳເຂົ້າສິນຄ້າ
+    </button>
+    <a href="{% url 'admin_product_list' %}" class="btn btn-outline" style="margin-top:10px; margin-left:8px;">ກັບຄືນ</a>
+  </form>
+</div>
+{% endblock %}
