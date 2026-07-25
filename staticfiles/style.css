@@ -424,7 +424,7 @@ footer{border-top:1px solid var(--border); padding:44px 0 0; margin-top:80px; ba
   background:linear-gradient(160deg, var(--panel-3), var(--panel-2));
   border-bottom:1px solid var(--border);
   position:relative;
-  clip-path:polygon(0 0, 100% 0, 96% 100%, 4% 100%);
+  clip-path:polygon(0 0, 100% 0, 98.5% 100%, 1.5% 100%);
 }
 .product-tag{
   position:absolute; top:10px; left:10px; font-size:10px; font-weight:700; padding:4px 10px;
