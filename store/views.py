@@ -827,6 +827,18 @@ def admin_product_delete(request, pk):
     return render(request, "store/admin_product_delete.html", {"product": product, "active_sub": "products"})
 
 
+@staff_required
+def admin_product_bulk_delete(request):
+    if request.method == "POST":
+        ids = request.POST.getlist("selected")
+        deleted_count, _ = Product.objects.filter(pk__in=ids).delete()
+        if ids:
+            messages.success(request, f"ລຶບສິນຄ້າສຳເລັດ {len(ids)} ລາຍການ")
+        else:
+            messages.error(request, "ກະລຸນາເລືອກສິນຄ້າກ່ອນລົບ")
+    return redirect("admin_product_list")
+
+
 # ----------------- CATEGORY CRUD -----------------
 
 @staff_required

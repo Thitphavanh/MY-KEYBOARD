@@ -31,60 +31,93 @@
     </div>
   </div>
 
-  <div style="overflow-x:auto;">
-    <table class="admin-table">
-      <thead>
-        <tr>
-          <th data-i18n="admin_th_image" style="width:60px;">รูปภาพ</th>
-          <th data-i18n="admin_th_name">ชื่อสินค้า</th>
-          <th data-i18n="admin_th_category">หมวดหมู่</th>
-          <th data-i18n="admin_th_price">ราคา</th>
-          <th data-i18n="admin_th_stock" style="width:100px;">สินค้าคงเหลือ</th>
-          <th data-i18n="admin_th_actions" style="width:100px; text-align:center;">จัดการ</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for p in products %}
-        <tr>
-          <td>
-            {% if p.first_image %}
-            <img src="{{ p.first_image }}" style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--border);">
-            {% else %}
-            <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border-radius:6px; font-size:20px; border:1px solid var(--border);">
-              {{ p.icon|default:"💻" }}
-            </div>
-            {% endif %}
-          </td>
-          <td>
-            <div style="font-weight:600;"><a href="{% url 'admin_product_edit' p.pk %}" style="color:var(--text); text-decoration:none;">{{ p.name }}</a></div>
-            <div style="font-size:11px; color:var(--text-faint);">{% if p.brand %}{{ p.brand.name }}{% else %}-{% endif %}</div>
-          </td>
-          <td style="color:var(--text-dim);">{{ p.category.name }}</td>
-          <td>
-            <div style="font-weight:600; color:var(--violet-2);">{{ p.price|kip }}</div>
-            {% if p.old_price %}
-            <div style="font-size:11px; text-decoration:line-through; color:var(--text-faint);">{{ p.old_price|kip }}</div>
-            {% endif %}
-          </td>
-          <td>
-            {% if p.stock > 0 %}
-              <span style="font-weight:600;">{{ p.stock }}</span> <span data-i18n="admin_unit_pieces">ชิ้น</span>
-            {% else %}
-              <span class="badge badge-pending" style="background:rgba(239,68,68,0.15); color:#ef4444;" data-i18n="admin_badge_out">หมด</span>
-            {% endif %}
-          </td>
-          <td style="text-align:center;">
-            <div class="crud-actions" style="justify-content:center;">
-              <a href="{% url 'admin_product_edit' p.pk %}" title="แก้ไข"><span class="ic" data-ic="edit"></span></a>
-              <a href="{% url 'admin_product_delete' p.pk %}" class="delete-btn" title="ลบ"><span class="ic" data-ic="trash"></span></a>
-            </div>
-          </td>
-        </tr>
-        {% empty %}
-        <tr><td class="empty-row" colspan="6" data-i18n="admin_no_products">ไม่พบรายการสินค้า</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  <form method="post" action="{% url 'admin_product_bulk_delete' %}" id="bulk-delete-form">
+    {% csrf_token %}
+    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
+      <button type="submit" class="btn btn-danger btn-sm" id="bulk-delete-btn" style="display:none;" onclick="return confirm('ຢືນຢັນລົບສິນຄ້າທີ່ເລືອກ (' + document.querySelectorAll('.row-check:checked').length + ' ລາຍການ)?');">
+        <span class="ic sm" data-ic="trash"></span> ລົບທີ່ເລືອກ
+      </button>
+      <span id="bulk-select-count" style="font-size:12.5px; color:var(--text-dim);"></span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="admin-table">
+        <thead>
+          <tr>
+            <th style="width:36px;"><input type="checkbox" id="select-all-products"></th>
+            <th data-i18n="admin_th_image" style="width:60px;">รูปภาพ</th>
+            <th data-i18n="admin_th_name">ชื่อสินค้า</th>
+            <th data-i18n="admin_th_category">หมวดหมู่</th>
+            <th data-i18n="admin_th_price">ราคา</th>
+            <th data-i18n="admin_th_stock" style="width:100px;">สินค้าคงเหลือ</th>
+            <th data-i18n="admin_th_actions" style="width:100px; text-align:center;">จัดการ</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in products %}
+          <tr>
+            <td><input type="checkbox" name="selected" value="{{ p.pk }}" class="row-check"></td>
+            <td>
+              {% if p.first_image %}
+              <img src="{{ p.first_image }}" style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--border);">
+              {% else %}
+              <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border-radius:6px; font-size:20px; border:1px solid var(--border);">
+                {{ p.icon|default:"💻" }}
+              </div>
+              {% endif %}
+            </td>
+            <td>
+              <div style="font-weight:600;"><a href="{% url 'admin_product_edit' p.pk %}" style="color:var(--text); text-decoration:none;">{{ p.name }}</a></div>
+              <div style="font-size:11px; color:var(--text-faint);">{% if p.brand %}{{ p.brand.name }}{% else %}-{% endif %}</div>
+            </td>
+            <td style="color:var(--text-dim);">{{ p.category.name }}</td>
+            <td>
+              <div style="font-weight:600; color:var(--violet-2);">{{ p.price|kip }}</div>
+              {% if p.old_price %}
+              <div style="font-size:11px; text-decoration:line-through; color:var(--text-faint);">{{ p.old_price|kip }}</div>
+              {% endif %}
+            </td>
+            <td>
+              {% if p.stock > 0 %}
+                <span style="font-weight:600;">{{ p.stock }}</span> <span data-i18n="admin_unit_pieces">ชิ้น</span>
+              {% else %}
+                <span class="badge badge-pending" style="background:rgba(239,68,68,0.15); color:#ef4444;" data-i18n="admin_badge_out">หมด</span>
+              {% endif %}
+            </td>
+            <td style="text-align:center;">
+              <div class="crud-actions" style="justify-content:center;">
+                <a href="{% url 'admin_product_edit' p.pk %}" title="แก้ไข"><span class="ic" data-ic="edit"></span></a>
+                <a href="{% url 'admin_product_delete' p.pk %}" class="delete-btn" title="ลบ"><span class="ic" data-ic="trash"></span></a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td class="empty-row" colspan="7" data-i18n="admin_no_products">ไม่พบรายการสินค้า</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </form>
 </div>
+
+<script>
+  (function () {
+    var selectAll = document.getElementById('select-all-products');
+    var bulkBtn = document.getElementById('bulk-delete-btn');
+    var countLabel = document.getElementById('bulk-select-count');
+    if (!selectAll) return;
+
+    function updateBulkBar() {
+      var checked = document.querySelectorAll('.row-check:checked').length;
+      bulkBtn.style.display = checked > 0 ? 'inline-flex' : 'none';
+      countLabel.textContent = checked > 0 ? 'ເລືອກແລ້ວ ' + checked + ' ລາຍການ' : '';
+    }
+    selectAll.addEventListener('change', function () {
+      document.querySelectorAll('.row-check').forEach(function (cb) { cb.checked = selectAll.checked; });
+      updateBulkBar();
+    });
+    document.querySelectorAll('.row-check').forEach(function (cb) {
+      cb.addEventListener('change', updateBulkBar);
+    });
+  })();
+</script>
 {% endblock %}
