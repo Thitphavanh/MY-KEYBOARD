@@ -15,6 +15,19 @@
     <div class="eyebrow" style="justify-content:center;"><span class="dot"></span>{% for s in category.subcategories.all %}{{ s.name }}{% if not forloop.last %} · {% endif %}{% endfor %}</div>
     {% endif %}
     <h2>{{ category.name }}</h2>
+
+    {% if category.subcategories.all %}
+    <div class="subcat-pills" style="display:flex; flex-wrap:wrap; justify-content:center; gap:8px; margin-top:16px;">
+      <a href="{% url 'category_detail' category.slug %}" style="padding:6px 16px; border-radius:20px; text-decoration:none; font-size:13px; font-weight:500; transition:all 0.2s; {% if not selected_subcategory %}background:var(--primary); color:#fff;{% else %}background:var(--bg-card); color:var(--text-muted); border:1px solid var(--border);{% endif %}">
+        <span data-i18n="tab_all">ທັງໝົດ</span>
+      </a>
+      {% for s in category.subcategories.all %}
+      <a href="{% url 'category_detail' category.slug %}?sub={{ s.pk }}" style="padding:6px 16px; border-radius:20px; text-decoration:none; font-size:13px; font-weight:500; transition:all 0.2s; {% if selected_subcategory and selected_subcategory.pk == s.pk %}background:var(--primary); color:#fff;{% else %}background:var(--bg-card); color:var(--text-muted); border:1px solid var(--border);{% endif %}">
+        {{ s.name }}
+      </a>
+      {% endfor %}
+    </div>
+    {% endif %}
   </div>
 
   <form method="get" id="filter-form" class="cat-container">
@@ -66,9 +79,26 @@
           </select>
         </div>
         {% if products %}
-        <div class="product-grid">
-          {% for p in products %}{% include "store/_product_card.html" %}{% endfor %}
-        </div>
+          {% if grouped_subcategories %}
+            {% for group in grouped_subcategories %}
+              <div class="subcat-block" style="margin-bottom:36px;">
+                <div class="subcat-title-bar" style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px; padding-bottom:8px; border-bottom:1px solid var(--border);">
+                  <h3 style="margin:0; font-size:1.15rem; font-weight:700; color:var(--text-main); display:flex; align-items:center; gap:8px;">
+                    <span style="width:10px; height:10px; border-radius:50%; background:var(--primary); display:inline-block;"></span>
+                    {% if group.subcategory %}{{ group.subcategory.name }}{% else %}{{ group.name }}{% endif %}
+                  </h3>
+                  <span style="font-size:12px; font-weight:500; color:var(--text-muted); background:var(--bg-hover); padding:4px 10px; border-radius:12px;">{{ group.products|length }} รายการ</span>
+                </div>
+                <div class="product-grid">
+                  {% for p in group.products %}{% include "store/_product_card.html" %}{% endfor %}
+                </div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="product-grid">
+              {% for p in products %}{% include "store/_product_card.html" %}{% endfor %}
+            </div>
+          {% endif %}
         {% else %}
         <div class="empty-state">
           <div class="ic-lg"><span class="ic" data-ic="search"></span></div>

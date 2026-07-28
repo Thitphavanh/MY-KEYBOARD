@@ -121,7 +121,11 @@ def category_detail(request, slug):
 
     all_products = Product.objects.select_related("category", "brand").prefetch_related("images").filter(category=category)
 
-    price_bounds = all_products.aggregate(lo=Min("price"), hi=Max("price"))
+    products = all_products
+    if selected_subcategory:
+        products = products.filter(subcategory=selected_subcategory)
+
+    price_bounds = products.aggregate(lo=Min("price"), hi=Max("price"))
     price_min = price_bounds["lo"] or 0
     price_max = price_bounds["hi"] or 0
 
@@ -130,11 +134,14 @@ def category_detail(request, slug):
     selected_min = int(min_price_param) if min_price_param.isdigit() else price_min
     selected_max = int(max_price_param) if max_price_param.isdigit() else price_max
 
-    products = all_products
     if search_term:
         products = products.filter(Q(name__icontains=search_term) | Q(brand__name__icontains=search_term))
 
-    brands = Brand.objects.filter(products__category=category).distinct()
+    if selected_subcategory:
+        brands = Brand.objects.filter(products__subcategory=selected_subcategory).distinct()
+    else:
+        brands = Brand.objects.filter(products__category=category).distinct()
+
     if brand_ids:
         products = products.filter(brand_id__in=brand_ids)
 
@@ -152,9 +159,29 @@ def category_detail(request, slug):
 
     wishlist_ids = set(get_wishlist(request).products.values_list("pk", flat=True))
 
+    grouped_subcategories = []
+    if not selected_subcategory and category.subcategories.exists():
+        prod_list = list(products)
+        subcats = category.subcategories.all()
+        for sub in subcats:
+            sub_prods = [p for p in prod_list if p.subcategory_id == sub.pk]
+            if sub_prods:
+                grouped_subcategories.append({
+                    "subcategory": sub,
+                    "products": sub_prods,
+                })
+        uncategorized = [p for p in prod_list if p.subcategory_id is None]
+        if uncategorized:
+            grouped_subcategories.append({
+                "subcategory": None,
+                "name": "ສິນຄ້າອື່ນໆ",
+                "products": uncategorized,
+            })
+
     context = {
         "category": category,
         "products": products,
+        "grouped_subcategories": grouped_subcategories,
         "result_count": products.count(),
         "search_term": search_term,
         "sort": sort,
