@@ -1,8 +1,8 @@
 {% extends "store/admin_base.html" %}
 {% load store_extras %}
 
-{% block admin_title %}คำสั่งซื้อ #{{ order.order_number }} — MY KEYBOARD{% endblock %}
-{% block admin_header_title %}รายละเอียดคำสั่งซื้อ #{{ order.order_number }}{% endblock %}
+{% block admin_title %}ອໍເດີ #{{ order.order_number }} — MY KEYBOARD{% endblock %}
+{% block admin_header_title %}รายละเอียดອໍເດີ #{{ order.order_number }}{% endblock %}
 {% block admin_header_sub %}ตรวจสอบหลักฐานการโอนและปรับปรุงสถานะการจัดส่ง{% endblock %}
 
 {% block admin_content %}
@@ -69,7 +69,7 @@
     <!-- Payment Slip -->
     <div class="admin-card">
       <h3 style="margin-bottom:14px; display:flex; align-items:center; gap:8px;">
-        <span class="ic" data-ic="image"></span> สลิปหลักฐานการชำระเงิน
+        <span class="ic" data-ic="image"></span> สลิปหลักฐานการຊຳລະເງິນ
       </h3>
       {% if order.payment_slip %}
       <div style="text-align:center; padding:10px; background:rgba(0,0,0,0.15); border-radius:10px; border:1px solid var(--border);">
@@ -77,7 +77,7 @@
       </div>
       {% else %}
       <div class="empty-row" style="background:rgba(255,255,255,0.01); border-radius:8px; border:1px dashed var(--border);">
-        ยังไม่มีการแนบสลิปชำระเงิน
+        ยังไม่มีการแนบสลิปຊຳລະເງິນ
       </div>
       {% endif %}
     </div>
@@ -92,7 +92,7 @@
         <span style="font-size:12px; color:var(--text-faint);">สถานะปัจจุบัน:</span>
         <div style="margin-top:6px;">
           {% if order.status == 'pending' %}
-            <span class="badge badge-pending" style="font-size:13px; padding:6px 12px;">รอชำระเงิน</span>
+            <span class="badge badge-pending" style="font-size:13px; padding:6px 12px;">รอຊຳລະເງິນ</span>
           {% elif order.status == 'preparing' %}
             <span class="badge badge-preparing" style="font-size:13px; padding:6px 12px;">กำลังเตรียมสินค้า</span>
           {% elif order.status == 'shipping' %}
@@ -132,14 +132,14 @@
           <div style="font-weight:600; margin-top:3px; color:var(--violet-2);">{{ order.shipping_phone }}</div>
         </div>
         <div>
-          <div style="font-size:11px; color:var(--text-faint);">ที่อยู่จัดส่ง</div>
+          <div style="font-size:11px; color:var(--text-faint);">ທີ່ຢູ່ຈັດສົ່ງ</div>
           <div style="margin-top:3px; line-height:1.4;">
             บ้าน {{ order.shipping_village }}, เมือง {{ order.shipping_city }}, แขวง {{ order.shipping_province }}
             {% if order.shipping_branch %}<br>ສາຂາ: {{ order.shipping_branch }}{% endif %}
           </div>
         </div>
         <div>
-          <div style="font-size:11px; color:var(--text-faint);">ช่องทางชำระเงิน</div>
+          <div style="font-size:11px; color:var(--text-faint);">ช่องทางຊຳລະເງິນ</div>
           <div style="font-weight:600; margin-top:3px;">{{ order.get_payment_method_display|default:"-" }}</div>
         </div>
       </div>

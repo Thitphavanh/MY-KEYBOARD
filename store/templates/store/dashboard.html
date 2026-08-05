@@ -1,8 +1,8 @@
 {% extends "store/admin_base.html" %}
 {% load store_extras %}
 
-{% block admin_title %}แดชบอร์ด — MY KEYBOARD{% endblock %}
-{% block admin_header_title %}<span data-i18n="admin_dashboard_title">แดชบอร์ดผู้ดูแลระบบ</span>{% endblock %}
+{% block admin_title %}ແດັດບອດ — MY KEYBOARD{% endblock %}
+{% block admin_header_title %}<span data-i18n="admin_dashboard_title">ແດັດບອດผู้ดูแลระบบ</span>{% endblock %}
 {% block admin_header_sub %}<span data-i18n="admin_dashboard_sub">ภาพรวมสถิติตัวเลขและการขาย</span>{% endblock %}
 
 {% block admin_content %}
@@ -66,7 +66,7 @@
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.get_full_path }}">
               <select name="status" onchange="this.form.submit()" class="status-select status-select-{{ o.status }}">
-                <option value="pending" {% if o.status == 'pending' %}selected{% endif %} data-i18n="order_status_pending">รอชำระเงิน</option>
+                <option value="pending" {% if o.status == 'pending' %}selected{% endif %} data-i18n="order_status_pending">รอຊຳລະເງິນ</option>
                 <option value="preparing" {% if o.status == 'preparing' %}selected{% endif %} data-i18n="order_status_preparing">กำลังเตรียมสินค้า</option>
                 <option value="shipping" {% if o.status == 'shipping' %}selected{% endif %} data-i18n="order_status_shipping">กำลังจัดส่ง</option>
                 <option value="delivered" {% if o.status == 'delivered' %}selected{% endif %} data-i18n="order_status_delivered">จัดส่งสำเร็จ</option>
