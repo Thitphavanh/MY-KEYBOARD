@@ -1,4 +1,4 @@
-/* NexByte Computer — inline SVG icon set (replaces emoji everywhere) */
+/* MY KEYBOARD — inline SVG icon set (replaces emoji everywhere) */
 
 const ICON_PATHS = {
   cart: `<circle cx="9" cy="20" r="1.4"/><circle cx="18" cy="20" r="1.4"/><path d="M2.5 3h2l2.4 12.2a2 2 0 0 0 2 1.6h8.2a2 2 0 0 0 2-1.6L21 8H6"/>`,

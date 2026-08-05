@@ -169,7 +169,7 @@ class StatMetric(models.TextChoices):
 
 class SiteSettings(models.Model):
     """Singleton row (always pk=1) holding all admin-editable site config."""
-    store_name = models.CharField(max_length=100, default="NexByte")
+    store_name = models.CharField(max_length=100, default="MY KEYBOARD")
     logo = models.ImageField(upload_to="site/", blank=True, null=True)
 
     contact_fb = models.URLField(blank=True, default="https://facebook.com/nexbytecomputer")

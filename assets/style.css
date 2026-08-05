@@ -1,4 +1,4 @@
-/* NexByte Computer — shared e-commerce theme */
+/* MY KEYBOARD — shared e-commerce theme */
 :root{
   --bg:#0a0913;
   --bg-2:#0d0b18;
@@ -296,7 +296,8 @@ footer{border-top:1px solid var(--border); padding:44px 0 0; margin-top:80px; ba
 .sec-head{max-width:640px; margin:0 auto 40px; text-align:center;}
 .sec-head h2{font-size:30px; font-weight:700; letter-spacing:-0.6px;}
 .sec-head p{color:var(--text-dim); font-size:14.5px; margin-top:12px; line-height:1.7;}
-/* ---------- hero (image-only banner) ---------- */
+
+/* ---------- hero (image-only banner) ---------- */
 .hero-dual-grid{ display:grid; grid-template-columns:1fr; gap:16px; }
 .hero-dual-grid.has-side{ grid-template-columns:1.8fr 1fr; }
 @media (max-width:900px){ .hero-dual-grid.has-side{ grid-template-columns:1fr; } .hero-side-banner{display:none;} }

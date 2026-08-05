@@ -14,7 +14,7 @@ class UserAdmin(BaseUserAdmin):
     list_filter = ("is_staff", "is_active")
     search_fields = ("username", "email", "first_name", "last_name", "phone")
     fieldsets = BaseUserAdmin.fieldsets + (
-        ("ข้อมูลลูกค้า (NexByte)", {"fields": ("phone", "address", "city", "province")}),
+        ("ข้อมูลลูกค้า (MY KEYBOARD)", {"fields": ("phone", "address", "city", "province")}),
     )
 
 
@@ -91,6 +91,6 @@ admin.site.register(Cart)
 admin.site.register(CartItem)
 admin.site.register(Wishlist)
 
-admin.site.site_header = "NexByte Computer — จัดการร้านค้า"
-admin.site.site_title = "NexByte Admin"
+admin.site.site_header = "MY KEYBOARD — จัดการร้านค้า"
+admin.site.site_title = "MY KEYBOARD Admin"
 admin.site.index_title = "แดชบอร์ดผู้ดูแลระบบ"

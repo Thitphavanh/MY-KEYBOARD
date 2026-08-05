@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% load store_extras %}
-{% block title %}{{ product.name }} — NexByte Computer{% endblock %}
+{% block title %}{{ product.name }} — MY KEYBOARD{% endblock %}
 {% block content %}
 <div class="breadcrumb">
   <a href="{% url 'home' %}" data-i18n="nav_home"></a> / {% if product.category %}<a href="{% url 'category_detail' product.category.slug %}">{{ product.category.name }}</a> / {% endif %}<span>{{ product.name }}</span>

@@ -1,4 +1,4 @@
-/* NexByte Computer — search bar: recent history + live product suggestions */
+/* MY KEYBOARD — search bar: recent history + live product suggestions */
 
 var SEARCH_HISTORY_KEY = "nb_search_history";
 var SEARCH_HISTORY_MAX = 8;
