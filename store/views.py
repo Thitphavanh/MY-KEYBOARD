@@ -7,6 +7,7 @@ from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth import authenticate, login, logout, views as auth_views
 from django.contrib.auth.decorators import login_required
 from django.core.mail import send_mail
+from django.core.paginator import Paginator
 from django.db import transaction
 from django.db.models import Max, Min, Q, Sum
 from django.http import HttpResponse, JsonResponse
@@ -24,11 +25,11 @@ from .models import (
 )
 
 STAT_DEFS = {
-    "members": {"label": "ສະມາຊິກຮ້ານເຮົາ", "icon": "user"},
-    "sales": {"label": "ຍອດຂາຍລວມ", "icon": "chart"},
-    "completedOrders": {"label": "ອໍເດີສຳເລັດ", "icon": "check"},
-    "totalOrders": {"label": "ອໍເດີທັງໝົດ", "icon": "truck"},
-    "products": {"label": "ສິນຄ້າທັງໝົດ", "icon": "grid"},
+    "members": {"label_key": "stat_members", "icon": "user"},
+    "sales": {"label_key": "stat_sales", "icon": "chart"},
+    "completedOrders": {"label_key": "stat_completedOrders", "icon": "check"},
+    "totalOrders": {"label_key": "stat_totalOrders", "icon": "truck"},
+    "products": {"label_key": "stat_products", "icon": "grid"},
 }
 
 
@@ -62,7 +63,7 @@ def _store_stats(settings_obj):
         raw = override if override is not None else _compute_stat_raw(key, settings_obj)
         stats.append({
             "key": key,
-            "label": STAT_DEFS[key]["label"],
+            "label_key": STAT_DEFS[key]["label_key"],
             "icon": STAT_DEFS[key]["icon"],
             "is_currency": key == "sales",
             "value": max(raw, 0),
@@ -96,8 +97,8 @@ def home(request):
     context = {
         "banners": Banner.objects.all(),
         "stats": _store_stats(settings_obj),
-        "best_sellers": Product.objects.filter(best_seller=True)[:8],
-        "new_arrivals": Product.objects.filter(is_new=True)[:8],
+        "best_sellers": Product.objects.filter(best_seller=True)[:10],
+        "new_arrivals": Product.objects.filter(is_new=True)[:10],
         "products": products,
         "result_count": products.count(),
         "active_cat": active_cat,
@@ -217,11 +218,12 @@ def search_suggest(request):
 def product_detail(request, pk):
     product = get_object_or_404(Product.objects.select_related("category", "brand").prefetch_related("images"), pk=pk)
     wishlist = get_wishlist(request)
-    related = Product.objects.filter(category=product.category).exclude(pk=product.pk)[:4]
+    related = Product.objects.filter(category=product.category).exclude(pk=product.pk).select_related("brand").prefetch_related("images")[:8]
     context = {
         "product": product,
         "in_wishlist": wishlist.products.filter(pk=product.pk).exists(),
         "related": related,
+        "wishlist_ids": set(wishlist.products.values_list("pk", flat=True)),
     }
     return render(request, "store/product_detail.html", context)
 
@@ -338,7 +340,7 @@ def checkout_view(request):
             order.user = request.user
             order.subtotal = cart.subtotal()
             order.discount = cart.discount()
-            order.shipping_fee = CARRIER_FEES.get(order.carrier, 0)
+            order.shipping_fee = 0
             order.total = cart.total() + order.shipping_fee
             
             if cart.coupon:
@@ -556,7 +558,7 @@ def admin_dashboard(request):
     if not request.user.is_staff:
         messages.error(request, "ທ່ານບໍ່ມີສິດເຂົ້າເຖິງໜ້ານີ້")
         return redirect("home")
-    orders = Order.objects.all()
+    orders = Order.objects.select_related("user").all()
     today = timezone.now().date()
     now = timezone.now()
 
@@ -604,18 +606,24 @@ def staff_required(view_func):
 
 @staff_required
 def admin_product_list(request):
-    query = request.GET.get('q', '')
-    cat_slug = request.GET.get('category', '')
+    query = request.GET.get('q', '').strip()
+    cat_slug = request.GET.get('category', '').strip()
     
-    products = Product.objects.all()
+    products = Product.objects.select_related('category', 'brand', 'subcategory').prefetch_related('images').all()
     if query:
         products = products.filter(Q(name__icontains=query) | Q(desc__icontains=query))
     if cat_slug:
         products = products.filter(category_id=cat_slug)
         
     categories = Category.objects.all()
+    
+    paginator = Paginator(products, 50)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        "products": products,
+        "products": page_obj,
+        "page_obj": page_obj,
         "categories": categories,
         "query": query,
         "selected_category": cat_slug,
@@ -908,8 +916,18 @@ def admin_category_edit(request, slug):
 def admin_category_delete(request, slug):
     category = get_object_or_404(Category, slug=slug)
     if request.method == "POST":
-        category.delete()
-        messages.success(request, "ລຶບໝວດໝູ່ສຳເລັດແລ້ວ")
+        try:
+            Product.objects.filter(category=category).update(category=None, subcategory=None)
+            category.subcategories.all().delete()
+            category.delete()
+            messages.success(request, "ລຶບໝວດໝູ່ສຳເລັດແລ້ວ")
+        except Exception:
+            try:
+                Product.objects.filter(category=category).update(category=None, subcategory=None)
+                category.delete()
+                messages.success(request, "ລຶບໝວດໝູ່ສຳເລັດແລ້ວ")
+            except Exception as e:
+                messages.error(request, f"ບໍ່ສາມາດລຶບໄດ້: {str(e)}")
         return redirect("admin_category_list")
     return render(request, "store/admin_category_delete.html", {"category": category, "active_sub": "categories"})
 
@@ -959,8 +977,12 @@ def admin_subcategory_edit(request, pk):
 def admin_subcategory_delete(request, pk):
     subcategory = get_object_or_404(SubCategory, pk=pk)
     if request.method == "POST":
-        subcategory.delete()
-        messages.success(request, "ລຶບໝວດໝູ່ຍ່ອຍສຳເລັດແລ້ວ")
+        try:
+            Product.objects.filter(subcategory=subcategory).update(subcategory=None)
+            subcategory.delete()
+            messages.success(request, "ລຶບໝວດໝູ່ຍ່ອຍສຳເລັດແລ້ວ")
+        except Exception as e:
+            messages.error(request, f"ບໍ່ສາມາດລຶບໄດ້: {str(e)}")
         return redirect("admin_category_list")
     return render(request, "store/admin_subcategory_delete.html", {"subcategory": subcategory, "active_sub": "categories"})
 
@@ -1015,17 +1037,22 @@ def admin_brand_delete(request, pk):
 
 @staff_required
 def admin_order_list(request):
-    status_filter = request.GET.get('status', '')
-    query = request.GET.get('q', '')
+    status_filter = request.GET.get('status', '').strip()
+    query = request.GET.get('q', '').strip()
     
-    orders = Order.objects.all()
+    orders = Order.objects.select_related('user').prefetch_related('items__product').all()
     if status_filter:
         orders = orders.filter(status=status_filter)
     if query:
         orders = orders.filter(Q(shipping_name__icontains=query) | Q(shipping_phone__icontains=query) | Q(id__icontains=query))
         
+    paginator = Paginator(orders, 30)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
     context = {
-        "orders": orders,
+        "orders": page_obj,
+        "page_obj": page_obj,
         "status_choices": OrderStatus.choices,
         "selected_status": status_filter,
         "query": query,

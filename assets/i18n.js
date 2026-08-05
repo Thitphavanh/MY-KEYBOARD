@@ -12,6 +12,8 @@ const I18N = {
     hero3_eyebrow: "ໂປຣໂມຊັນພິເສດ", hero3_title1: "ຫຼຸດສູງສຸດ", hero3_title2: "30% ເດືອນນີ້ເທົ່ານັ້ນ",
     hero3_desc: "ໃຊ້ໂຄ້ດສ່ວນຫຼຸດຕອນຈ່າຍເງິນ ຮັບສ່ວນຫຼຸດເພີ່ມສູງສຸດ 20% ສຳລັບສະມາຊິກ", hero3_cta: "ເບິ່ງດີນທັງໝົດ",
     categories_eyebrow: "ໝວດໝູ່ສິນຄ້າ", categories_title: "ເລືອກຊື້ຕາມໝວດໝູ່", cat_all: "ທັງໝົດ",
+    stat_members: "ສະມາຊິກຮ້ານເຮົາ", stat_sales: "ຍອດຂາຍລວມ", stat_completedOrders: "ອໍເດີສຳເລັດ",
+    stat_totalOrders: "ອໍເດີທັງໝົດ", stat_products: "ສິນຄ້າທັງໝົດ",
     view_all: "ເບິ່ງທັງໝົດ",
     footer_desc: "ຮ້ານອຸປະກອນໄອທີ ແລະ ຄອມພິວເຕີຄົບວົງຈອນ ຈັດສົ່ງທົ່ວປະເທດ ຮັບປະກັນສິນຄ້າແທ້ 100%",
     footer_help: "ຊ່ວຍເຫຼືອ", footer_link_contact: "ຕິດຕໍ່ພວກເຮົາ", footer_link_orders: "ກວດສອບສະຖານະສິນຄ້າ", footer_link_cart: "ກະຕ່າສິນຄ້າ",
@@ -20,6 +22,9 @@ const I18N = {
     contact_widget_title: "ຕິດຕໍ່ພວກເຮົາ", contact_fb: "Facebook", contact_wa: "WhatsApp",
     cat_laptop: "ໂນດບຸກ", cat_pc: "ຄອມພິວເຕີຕັ້ງໂຕະ", cat_monitor: "ຈໍມອນິເຕີ", cat_gpu: "ກາດຈໍ",
     cat_kbm: "ຄີບອດ/ເມົາສ໌", cat_storage: "ອຸປະກອນເກັບຂໍ້ມູນ", cat_headset: "ຫູຟັງ/ລຳໂພງ", cat_accessory: "ອຸປະກອນເສີມ",
+    cat_gaming_gear: "ອຸປະກອນເກມມິ້ງ", "cat_gaming-gear": "ອຸປະກອນເກມມິ້ງ", cat_cables: "ສາຍຕ່າງໆ",
+    cat_monitor_arm: "ແຂນຈັບຈໍ", "cat_monitor-arm": "ແຂນຈັບຈໍ", cat_pc_decor: "ຂອງແຕ່ງຄອມ", "cat_pc-decor": "ຂອງແຕ່ງຄອມ",
+    cat_desk: "ໂຕະຄອມ", cat_stool: "ຕັ່ງ", cat_pc_case: "ເຄສຄອມ", "cat_pc-case": "ເຄສຄອມ",
     add_to_cart: "ໃສ່ລົງກະຕ່າ", view_product: "ເບິ່ງສິນຄ້າ", buy_now: "ສັ່ງຊື້ທັນທີ",
     in_stock: "ພ້ອມສົ່ງ", out_of_stock: "ສິນຄ້າໝົດ", preorder_label: "ພຣີອໍເດີ້", qty_label: "ຈຳນວນ",
     low_stock_prefix: "ເຫຼືອ", low_stock_suffix: "ໜ່ວຍ",
@@ -181,6 +186,8 @@ const I18N = {
     hero3_eyebrow: "โปรโมชั่นพิเศษ", hero3_title1: "ลดสูงสุด", hero3_title2: "30% เดือนนี้เท่านั้น",
     hero3_desc: "ใช้โค้ดส่วนลดตอนจ่ายเงิน รับส่วนลดเพิ่มสูงสุด 20% สำหรับสมาชิก", hero3_cta: "ดูดีลทั้งหมด",
     categories_eyebrow: "หมวดหมู่สินค้า", categories_title: "เลือกซื้อตามหมวดหมู่", cat_all: "ทั้งหมด",
+    stat_members: "สมาชิกร้านเรา", stat_sales: "ยอดขายรวม", stat_completedOrders: "ออเดอร์สำเร็จ",
+    stat_totalOrders: "ออเดอร์ทั้งหมด", stat_products: "สินค้าทั้งหมด",
     view_all: "ดูทั้งหมด",
     footer_desc: "ร้านอุปกรณ์ไอที และคอมพิวเตอร์ครบวงจร จัดส่งทั่วประเทศ รับประกันสินค้าแท้ 100%",
     footer_help: "ช่วยเหลือ", footer_link_contact: "ติดต่อเรา", footer_link_orders: "ตรวจสอบสถานะสินค้า", footer_link_cart: "ตะกร้าสินค้า",
@@ -189,6 +196,16 @@ const I18N = {
     contact_widget_title: "ติดต่อเรา", contact_fb: "Facebook", contact_wa: "WhatsApp",
     cat_laptop: "โน้ตบุ๊ก", cat_pc: "คอมพิวเตอร์ตั้งโต๊ะ", cat_monitor: "จอมอนิเตอร์", cat_gpu: "การ์ดจอ",
     cat_kbm: "คีย์บอร์ด/เมาส์", cat_storage: "อุปกรณ์เก็บข้อมูล", cat_headset: "หูฟัง/ลำโพง", cat_accessory: "อุปกรณ์เสริม",
+    cat_gaming_gear: "อุปกรณ์เกมมิ่ง", "cat_gaming-gear": "อุปกรณ์เกมมิ่ง", cat_cables: "สายต่างๆ",
+    cat_monitor_arm: "แขนจับจอ", "cat_monitor-arm": "แขนจับจอ", cat_pc_decor: "ของแต่งคอม", "cat_pc-decor": "ของแต่งคอม",
+    cat_desk: "โต๊ะคอม", cat_stool: "เก้าอี้คอม", cat_pc_case: "เคสคอม", "cat_pc-case": "เคสคอม",
+    "ອຸປະກອນເກມມິ້ງ": "อุปกรณ์เกมมิ่ง", "ສາຍຕ່າງໆ": "สายต่างๆ", "ແຂນຈັບຈໍ": "แขนจับจอ", "ຂອງແຕ່ງຄອມ": "ของแต่งคอม",
+    "ໂຕະຄອມ": "โต๊ะคอม", "ຕັ່ງ": "เก้าอี้คอม", "ເຄສຄອມ": "เคสคอม", "ຄອມປະກອບ": "คอมประกอบ", "ໂນດບຸກ": "โน้ตบุ๊ก", "ຮາດແວ": "ฮาร์ดแวร์",
+    "ຄີບອດ": "คีย์บอร์ด", "ຫູຟັງຄອມ": "หูฟังคอม", "ເມົ້າ": "เมาส์", "ເເຜ່ນຮອງເມົ້າ": "แผ่นรองเมาส์", "ໄມໂຄໂຟນຄອມ": "ไมโครโฟนคอม",
+    "ສາຍ HDMI": "สาย HDMI", "ສາຍ VGA": "สาย VGA", "ສອງເເຂນ": "แขนคู่", "ເເຂນດຽວ": "แขนเดี่ยว",
+    "ຄີເເຄັບ": "คีย์แคป", "ບໍດີຄີບອດ": "บอดี้คีย์บอร์ด", "ສາຍຖັກຄີບອດ": "สายถักคีย์บอร์ด", "ໄຟໄລ້ບຮາ": "ไฟตกแต่ง LED",
+    "ໂຕະ 120": "โต๊ะ 120 ซม.", "ໂຕະ 140": "โต๊ะ 140 ซม.", "ໂຕະ 180": "โต๊ะ 180 ซม.", "ໂຕະ 200": "โต๊ะ 200 ซม.",
+    "ຕັ່ງເກມມິ້ງ": "เก้าอี้เกมมิ่ง", "ຕັ່ງເພື່ອສຸຂະພາບ": "เก้าอี้เพื่อสุขภาพ", "ເຄສ 2ຕອນ": "เคส 2 ช่อง", "ເຄສ 3ຕອນ": "เคส 3 ช่อง",
     add_to_cart: "ใส่ลงตะกร้า", view_product: "ดูสินค้า", buy_now: "สั่งซื้อทันที",
     in_stock: "พร้อมส่ง", out_of_stock: "สินค้าหมด", preorder_label: "พรีออเดอร์", qty_label: "จำนวน",
     low_stock_prefix: "เหลือ", low_stock_suffix: "ชิ้น",
@@ -350,6 +367,8 @@ const I18N = {
     hero3_eyebrow: "Special promotion", hero3_title1: "Up to 30% off", hero3_title2: "this month only",
     hero3_desc: "Apply a discount code at checkout — members save an extra 20% on top.", hero3_cta: "See all deals",
     categories_eyebrow: "Categories", categories_title: "Shop by category", cat_all: "All",
+    stat_members: "Store Members", stat_sales: "Total Sales", stat_completedOrders: "Completed Orders",
+    stat_totalOrders: "Total Orders", stat_products: "Total Products",
     view_all: "View all",
     footer_desc: "A full-service IT & computer store. Nationwide delivery, 100% genuine products guaranteed.",
     footer_help: "Help", footer_link_contact: "Contact us", footer_link_orders: "Track your order", footer_link_cart: "Shopping cart",
@@ -358,6 +377,16 @@ const I18N = {
     contact_widget_title: "Contact us", contact_fb: "Facebook", contact_wa: "WhatsApp",
     cat_laptop: "Laptops", cat_pc: "Desktop PCs", cat_monitor: "Monitors", cat_gpu: "Graphics Cards",
     cat_kbm: "Keyboard/Mouse", cat_storage: "Storage", cat_headset: "Headsets/Speakers", cat_accessory: "Accessories",
+    cat_gaming_gear: "Gaming Gear", "cat_gaming-gear": "Gaming Gear", cat_cables: "Cables & Adapters",
+    cat_monitor_arm: "Monitor Arms", "cat_monitor-arm": "Monitor Arms", cat_pc_decor: "PC Setup & Decor", "cat_pc-decor": "PC Setup & Decor",
+    cat_desk: "Gaming Desks", cat_stool: "Gaming Chairs", cat_pc_case: "PC Cases", "cat_pc-case": "PC Cases",
+    "ອຸປະກອນເກມມິ້ງ": "Gaming Gear", "ສາຍຕ່າງໆ": "Cables", "ແຂນຈັບຈໍ": "Monitor Arms", "ຂອງແຕ່ງຄອມ": "PC Decor",
+    "ໂຕະຄອມ": "PC Desks", "ຕັ່ງ": "Chairs", "ເຄສຄອມ": "PC Cases",
+    "ຄີບອດ": "Keyboards", "ຫູຟັງຄອມ": "Headsets", "ເມົ້າ": "Mice", "ເເຜ່ນຮອງເມົ້າ": "Mouse Pads", "ໄມໂຄໂຟນຄອມ": "Microphones",
+    "ສາຍ HDMI": "HDMI Cable", "ສາຍ VGA": "VGA Cable", "ສອງເເຂນ": "Dual Arm", "ເເຂນດຽວ": "Single Arm",
+    "ຄີເເຄັບ": "Keycaps", "ບໍດີຄີບອດ": "Keyboard Body", "ສາຍຖັກຄີບອດ": "Braided Keyboard Cable", "ໄຟໄລ້ບຮາ": "LED Lighting",
+    "ໂຕະ 120": "120cm Desk", "ໂຕະ 140": "140cm Desk", "ໂຕະ 180": "180cm Desk", "ໂຕະ 200": "200cm Desk",
+    "ຕັ່ງເກມມິ້ງ": "Gaming Chair", "ຕັ່ງເພື່ອສຸຂະພາບ": "Ergonomic Chair", "ເຄສ 2ຕອນ": "2-Chamber Case", "ເຄສ 3ຕອນ": "3-Chamber Case",
     add_to_cart: "Add to cart", view_product: "View product", buy_now: "Buy now",
     in_stock: "In stock", out_of_stock: "Out of stock", preorder_label: "Pre-order", qty_label: "Quantity",
     low_stock_prefix: "Only", low_stock_suffix: "left",
@@ -511,6 +540,11 @@ const I18N = {
 };
 
 const LANG_NAMES = { lo: "ພາສາລາວ", th: "ພາສາໄທ", en: "ພາສາອັງກິດ" };
+const LANG_FLAGS = {
+  lo: '<svg viewBox="0 0 30 20" width="100%" height="100%"><rect width="30" height="20" fill="#CE1126"/><rect y="5" width="30" height="10" fill="#002868"/><circle cx="15" cy="10" r="4" fill="#fff"/></svg>',
+  th: '<svg viewBox="0 0 30 20" width="100%" height="100%"><rect width="30" height="20" fill="#A51931"/><rect y="3.33" width="30" height="13.34" fill="#F4F5F8"/><rect y="6.67" width="30" height="6.67" fill="#2D2A4A"/></svg>',
+  en: '<svg viewBox="0 0 60 30" width="100%" height="100%"><rect width="60" height="30" fill="#00247d"/><g stroke="#fff" stroke-width="6"><path d="M0,0 L60,30 M60,0 L0,30"/></g><g stroke="#cf142b" stroke-width="2"><path d="M0,0 L60,30 M60,0 L0,30"/></g><g stroke="#fff" stroke-width="10"><path d="M30,0 V30 M0,15 H60"/></g><g stroke="#cf142b" stroke-width="6"><path d="M30,0 V30 M0,15 H60"/></g></svg>',
+};
 
 window.NB_LANG = localStorage.getItem("nb_lang") || "lo";
 
@@ -535,14 +569,22 @@ function applyI18n() {
   });
   document.querySelectorAll("[data-cat-name]").forEach((el) => {
     const slug = el.getAttribute("data-cat-name");
-    const translation = t("cat_" + slug.toLowerCase());
-    if (translation && translation !== "cat_" + slug) {
+    if (!slug) return;
+    const slugLower = slug.toLowerCase();
+    const slugUnderscore = slugLower.replace(/-/g, "_");
+    const translation = t("cat_" + slugUnderscore) || t("cat_" + slugLower);
+    if (translation && !translation.startsWith("cat_")) {
       el.textContent = translation;
     }
   });
   document.querySelectorAll("[data-subcat-name]").forEach((el) => {
     const name = el.getAttribute("data-subcat-name");
-    const key = "subcat_" + name.toLowerCase().replace(/\\s+/g, "_");
+    const direct = I18N[window.NB_LANG] && I18N[window.NB_LANG][name];
+    if (direct) {
+      el.textContent = direct;
+      return;
+    }
+    const key = "subcat_" + name.toLowerCase().replace(/\s+/g, "_");
     const translation = t(key);
     if (translation && translation !== key) {
       el.textContent = translation;

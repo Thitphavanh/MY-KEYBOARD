@@ -26,7 +26,6 @@
       {% for it in order.items.all %}
       <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:14px;"><span>{{ it.product_name }} x{{ it.qty }}</span><span>{{ it.line_total|kip }}</span></div>
       {% endfor %}
-      <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:14px;"><span data-i18n="shipping_fee_label"></span><span>{{ order.shipping_fee|kip }}</span></div>
       {% if order.discount %}
       <div style="display:flex; justify-content:space-between; padding:5px 0; font-size:14px;"><span data-i18n="used_coupon_label"></span><span>− {{ order.discount|kip }}</span></div>
       {% endif %}

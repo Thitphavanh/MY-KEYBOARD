@@ -18,7 +18,6 @@
       {% for it in order.items.all %}
       <div class="row"><span>{{ it.product_name }} x{{ it.qty }}</span><span>{{ it.line_total|kip }}</span></div>
       {% endfor %}
-      <div class="row"><span data-i18n="shipping_fee_label"></span><span>{{ order.shipping_fee|kip }}</span></div>
       {% if order.discount %}<div class="row"><span data-i18n="used_coupon_label"></span><span>− {{ order.discount|kip }}</span></div>{% endif %}
       <div class="row total"><span data-i18n="cart_total_label"></span><span>{{ order.total|kip }}</span></div>
     </div>

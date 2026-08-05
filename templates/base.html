@@ -6,7 +6,7 @@
 <title>{% block title %}NexByte Computer — ร้านอุปกรณ์ไอทีและคอมพิวเตอร์{% endblock %}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Thai:wght@400;500;600;700&family=Noto+Sans+Lao:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'style.css' %}?v=19">
+<link rel="stylesheet" href="{% static 'style.css' %}?v=23">
 <script src="https://cdn.tailwindcss.com"></script>
 <script>
   tailwind.config = {
@@ -91,7 +91,7 @@
 {% include "footer.html" %}
 
 <script src="{% static 'icons.js' %}?v=2"></script>
-<script src="{% static 'i18n.js' %}?v=4"></script>
+<script src="{% static 'i18n.js' %}?v=7"></script>
 <script src="{% static 'search.js' %}"></script>
 <script>
   function fillIcons(root) {
@@ -137,15 +137,15 @@
   }, { passive: true });
 
   function renderLangSwitches() {
-    var html = '<button type="button" class="lang-btn" onclick="toggleLangMenu(event)"><span class="ic" data-ic="globe"></span><span>' + LANG_NAMES[window.NB_LANG] + '</span><span class="ic chev" data-ic="chevronDown"></span></button>' +
+    var html = '<button type="button" class="lang-btn" onclick="toggleLangMenu(event)"><span class="lang-flag">' + LANG_FLAGS[window.NB_LANG] + '</span><span>' + LANG_NAMES[window.NB_LANG] + '</span><span class="ic chev" data-ic="chevronDown"></span></button>' +
       '<div class="lang-dropdown">' + Object.keys(LANG_NAMES).map(function (l) {
-        return '<button type="button" class="' + (window.NB_LANG === l ? 'active' : '') + '" onclick="setLang(\'' + l + '\')">' + LANG_NAMES[l] + '</button>';
+        return '<button type="button" class="' + (window.NB_LANG === l ? 'active' : '') + '" onclick="setLang(\'' + l + '\')"><span class="lang-flag">' + LANG_FLAGS[l] + '</span>' + LANG_NAMES[l] + '</button>';
       }).join('') + '</div>';
     var navSwitch = document.getElementById('nav-lang-switch');
     if (navSwitch) navSwitch.innerHTML = html;
     var drawerSwitch = document.getElementById('drawer-lang-switch');
     if (drawerSwitch) drawerSwitch.innerHTML = Object.keys(LANG_NAMES).map(function (l) {
-      return '<button type="button" class="' + (window.NB_LANG === l ? 'active' : '') + '" onclick="setLang(\'' + l + '\')">' + LANG_NAMES[l] + '</button>';
+      return '<button type="button" class="' + (window.NB_LANG === l ? 'active' : '') + '" onclick="setLang(\'' + l + '\')"><span class="lang-flag">' + LANG_FLAGS[l] + '</span>' + LANG_NAMES[l] + '</button>';
     }).join('');
   }
   function onLangChange() { renderLangSwitches(); }

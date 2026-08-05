@@ -123,6 +123,13 @@ class ProductForm(forms.ModelForm):
             "best_seller",
             "is_new",
             "source_link",
+            "video_url",
+            "video_thumb",
+            "image_fit",
+            "image_zoom",
+            "image_padding",
+            "image_bg",
+            "image_blend",
         ]
         labels = {
             "name": "ชื่อสินค้า",
@@ -140,6 +147,12 @@ class ProductForm(forms.ModelForm):
             "best_seller": "สินค้าขายดี",
             "is_new": "สินค้าใหม่",
             "source_link": "ລິ້ງແຫຼ່ງສິນຄ້າ (ບ່ອນສັ່ງເອົາມາຂາຍ) — ເຫັນສະເພາະໜ້າແອັດມິນ",
+            "video_url": "ລິ້ງວິດີໂອສິນຄ້າ (YouTube, Facebook, TikTok)",
+            "image_fit": "ຮູບແບບກອບຊະໜາດຮູບສິນຄ້າ (Image Fit)",
+            "image_zoom": "ລະດັບຊູມຮູບ (%)",
+            "image_padding": "ໄລຍະຫ່າງຂອບກອບ (px)",
+            "image_bg": "ສີພື້ນຫຼັງກອບຮູບ (Background Color)",
+            "image_blend": "ລົບພື້ນຫຼັງສີຂາວອອກ (Multiply Blend Mode)",
         }
 
     def __init__(self, *args, **kwargs):

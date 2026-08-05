@@ -63,7 +63,7 @@ class SubCategory(models.Model):
 class Product(models.Model):
     name = models.CharField(max_length=200)
     brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name="products")
-    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name="products")
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="products")
     subcategory = models.ForeignKey(SubCategory, on_delete=models.SET_NULL, null=True, blank=True, related_name="products")
     price = models.PositiveIntegerField(help_text="ราคาเป็นกีบ (₭)")
     old_price = models.PositiveIntegerField(null=True, blank=True)
@@ -79,6 +79,22 @@ class Product(models.Model):
     best_seller = models.BooleanField(default=False)
     is_new = models.BooleanField(default=False)
     source_link = models.TextField(blank=True, default="", validators=[URLValidator()], help_text="ລິ້ງແຫຼ່ງສິນຄ້າ (ບ່ອນສັ່ງເອົາມາຂາຍ) — ເຫັນສະເພາະໜ້າແອັດມິນ, ລູກຄ້າບໍ່ເຫັນ")
+    video_url = models.URLField(blank=True, default="", help_text="ລິ້ງວິດີໂອສິນຄ້າ (YouTube, Facebook, TikTok ເປັນຕົ້ນ) — ລູກຄ້າຈະກົດເບິ່ງໄດ້ຢູ່ໜ້າສິນຄ້າ")
+    video_thumb = models.URLField(blank=True, default="", help_text="ລິ້ງຮູບ Thumbnail ຂອງວິດີໂອ (ຖ້າບໍ່ໃສ່ ລະບົບຈະດຶງຮູບຈາກວິດີໂອອັດໂນມັດ)")
+    image_fit = models.CharField(
+        max_length=20,
+        choices=[
+            ("contain", "ກອບພໍດີກ່ອງ (Contain — ຮູບຄົບບໍ່ຕັດຂອບ)"),
+            ("cover", "ກອບເຕັມກ່ອງ (Cover — ຮູບເຕັມກ່ອງ)"),
+            ("original", "ຂະໜາດເດີມ (Original — ອັດຕາສ່ວນເດີມ)"),
+        ],
+        default="contain",
+        help_text="ຮູບແບບກອບຊະໜາດຮູບສິນຄ້າ (Contain: ພໍດີກ່ອງ / Cover: ເຕັມກ່ອງ / Original: ຂະໜາດເດີມ)"
+    )
+    image_zoom = models.PositiveIntegerField(default=100, help_text="ຊູມຮູບ (%) ເຊັ່ນ 100, 110, 120")
+    image_padding = models.PositiveIntegerField(default=16, help_text="ໄລຍະຫ່າງຂອບກອບ (px)")
+    image_bg = models.CharField(max_length=20, default="#ffffff", help_text="ສີພື້ນຫຼັງກອບຮູບ (#ffffff = ສີຂາວ, #f4f5f8 = ສີເທາະ, #12101f = ສີເຂັ້ມ)")
+    image_blend = models.BooleanField(default=False, help_text="ລົບພື້ນຫຼັງສີຂາວອອກ (Multiply Blend Mode — ໃຫ້ພື້ນຫຼັງສີຂາວຂອງຮູບເນື້ອດຽວກັນກັບກອບ)")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -89,6 +105,12 @@ class Product(models.Model):
 
     def get_absolute_url(self):
         return reverse("product_detail", args=[self.pk])
+
+    @property
+    def image_scale(self):
+        if not self.image_zoom:
+            return 1.0
+        return round(self.image_zoom / 100.0, 2)
 
     @property
     def first_image(self):

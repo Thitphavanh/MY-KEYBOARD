@@ -27,7 +27,7 @@
     {% for s in stats %}
     <div class="stat-box">
       <div class="stat-text">
-        <div class="stat-lb">{{ s.label }}</div>
+        <div class="stat-lb" data-i18n="{{ s.label_key }}"></div>
         <div class="stat-val">{% if s.is_currency %}{{ s.value|kip }}{% else %}{{ s.value|floatformat:0 }}{% endif %}</div>
       </div>
       <div class="stat-ic"><span class="ic" data-ic="{{ s.icon }}"></span></div>
@@ -61,7 +61,7 @@
 </section>
 {% endif %}
 
-<section id="products" style="padding:56px 0 80px;">
+<section id="products" style="padding:40px 0 80px;">
   <div class="toolbar">
     <div class="count" id="result-count" data-count="{{ result_count }}" data-search="{{ search_term }}">{{ result_count }} รายการ</div>
     <form method="get" id="sort-form">
@@ -122,6 +122,10 @@
   if (carouselEl) {
     carouselEl.addEventListener('mouseenter', function () { clearInterval(heroTimer); });
     carouselEl.addEventListener('mouseleave', resetHeroTimer);
+  }
+  function scrollSlider(id, amount) {
+    var el = document.getElementById(id);
+    if (el) el.scrollBy({ left: amount, behavior: 'smooth' });
   }
   setupScrollReveal('.product-card');
 

@@ -167,11 +167,62 @@
 
   {% block admin_content %}{% endblock %}
 </main>
+<div id="admin-progress-bar" style="position:fixed; top:0; left:0; width:0%; height:3px; background:linear-gradient(90deg, var(--violet-2), #3b82f6, #ec4899); z-index:99999; transition:width 0.2s ease, opacity 0.3s ease; box-shadow:0 0 10px var(--violet-glow); pointer-events:none;"></div>
+
 <form method="post" id="quick-delete-form" style="display:none;">{% csrf_token %}</form>
 {% endblock %}
 {% block extra_scripts %}
 <script>
   fillIcons(); applyI18n();
+
+  // Instant Hover Prefetcher & Fast Navigation Engine for Admin
+  (function () {
+    var prefetched = {};
+    var progressBar = document.getElementById('admin-progress-bar');
+
+    function startProgress() {
+      if (!progressBar) return;
+      progressBar.style.opacity = '1';
+      progressBar.style.width = '35%';
+      setTimeout(function() { if (progressBar.style.width === '35%') progressBar.style.width = '70%'; }, 150);
+    }
+    function finishProgress() {
+      if (!progressBar) return;
+      progressBar.style.width = '100%';
+      setTimeout(function() { progressBar.style.opacity = '0'; progressBar.style.width = '0%'; }, 300);
+    }
+
+    function prefetchUrl(url) {
+      if (!url || prefetched[url] || url.includes('#') || url.includes('logout') || url.includes('delete')) return;
+      prefetched[url] = true;
+      var link = document.createElement('link');
+      link.rel = 'prefetch';
+      link.href = url;
+      document.head.appendChild(link);
+    }
+
+    document.addEventListener('mouseover', function (e) {
+      var a = e.target.closest('a');
+      if (a && a.href && a.origin === location.origin) {
+        prefetchUrl(a.href);
+      }
+    });
+
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a');
+      if (a && a.href && a.origin === location.origin && !a.target && !a.hasAttribute('download')) {
+        startProgress();
+      }
+    });
+
+    document.addEventListener('submit', function () {
+      startProgress();
+    });
+
+    window.addEventListener('pageshow', function () {
+      finishProgress();
+    });
+  })();
 
   function adminSkipDeleteConfirmActive() {
     var until = localStorage.getItem('admin_skip_delete_confirm_until');

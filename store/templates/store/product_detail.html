@@ -3,28 +3,50 @@
 {% block title %}{{ product.name }} — NexByte Computer{% endblock %}
 {% block content %}
 <div class="breadcrumb">
-  <a href="{% url 'home' %}" data-i18n="nav_home"></a> / <a href="{% url 'category_detail' product.category.slug %}">{{ product.category.name }}</a> / <span>{{ product.name }}</span>
+  <a href="{% url 'home' %}" data-i18n="nav_home"></a> / {% if product.category %}<a href="{% url 'category_detail' product.category.slug %}">{{ product.category.name }}</a> / {% endif %}<span>{{ product.name }}</span>
 </div>
 
 <div class="detail-wrap">
   <div>
     <div class="detail-gallery" id="detail-gallery" style="position: relative;">
-      {% with images=product.images.all %}
-      {% if images %}
-        <img src="{{ images.0.display_url }}" alt="{{ product.name }}" id="gallery-img" onclick="openLightbox()" style="width:100%; height:100%; object-fit:cover; cursor:zoom-in; transition: opacity 0.15s ease;">
-        {% if images.count > 1 %}
-          <button type="button" class="gallery-nav-btn prev" onclick="navigateGallery(-1, event)" aria-label="prev"><span class="ic" data-ic="chevronLeft"></span></button>
-          <button type="button" class="gallery-nav-btn next" onclick="navigateGallery(1, event)" aria-label="next"><span class="ic" data-ic="chevronRight"></span></button>
+      <div id="gallery-img-wrap" style="width:100%; height:100%; display:flex; align-items:center; justify-content:center;">
+        {% with images=product.images.all %}
+        {% if images %}
+          <img src="{{ images.0.display_url }}" alt="{{ product.name }}" id="gallery-img" onclick="openLightbox()" style="width:100%; height:100%; object-fit:contain; cursor:zoom-in; transition: opacity 0.15s ease;">
+        {% else %}
+          {{ product.icon }}
         {% endif %}
-      {% else %}
-        {{ product.icon }}
+        {% endwith %}
+      </div>
+      <div id="gallery-video-wrap" style="display:none; width:100%; height:100%; background:#000; border-radius:inherit; overflow:hidden;"></div>
+
+      {% if product.images.count > 1 or product.video_url %}
+        <button type="button" class="gallery-arrow arrow-prev" onclick="navigateGallery(-1, event)" aria-label="prev" title="ຮູບກ່ອນໜ້າ" style="position:absolute; top:50%; left:14px; transform:translateY(-50%); background:none; border:none; color:#ffffff; cursor:pointer; z-index:10; padding:0; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8)); opacity:0.85;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <button type="button" class="gallery-arrow arrow-next" onclick="navigateGallery(1, event)" aria-label="next" title="ຮູບຖັດໄປ" style="position:absolute; top:50%; right:14px; transform:translateY(-50%); background:none; border:none; color:#ffffff; cursor:pointer; z-index:10; padding:0; filter:drop-shadow(0 2px 8px rgba(0,0,0,0.8)); opacity:0.85;">
+          <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
       {% endif %}
-      {% endwith %}
     </div>
-    <div class="detail-thumbs">
+
+    <div class="detail-thumbs" id="detail-thumbs-container">
       {% for img in product.images.all %}
-      <button class="thumb-btn {% if forloop.first %}active{% endif %}" onclick="setActiveImg(this, '{{ img.display_url }}', {{ forloop.counter0 }})"><img src="{{ img.display_url }}" alt=""></button>
+      <button type="button" class="thumb-btn {% if forloop.first %}active{% endif %}" onclick="setActiveImg(this, '{{ img.display_url }}', {{ forloop.counter0 }})"><img src="{{ img.display_url }}" alt=""></button>
       {% endfor %}
+      {% if product.video_url %}
+      <button type="button" class="thumb-btn thumb-video-btn" onclick="showVideoInGallery(this)" title="ວິດີໂອສິນຄ້າ">
+        {% if product.video_thumb %}
+          <img id="video-thumb-img" src="{{ product.video_thumb }}" alt="Video">
+        {% else %}
+          <video id="video-thumb-elem" src="{{ product.video_url }}#t=0.5" preload="metadata" muted playsinline style="width:100%; height:100%; object-fit:cover; pointer-events:none;"></video>
+          <img id="video-thumb-img" src="" alt="Video" style="display:none; width:100%; height:100%; object-fit:cover;">
+        {% endif %}
+        <span class="thumb-video-badge">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="white" style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));"><path d="M8 5v14l11-7z"/></svg>
+        </span>
+      </button>
+      {% endif %}
     </div>
   </div>
   <div class="detail-info">
@@ -77,6 +99,18 @@
   </div>
 </div>
 
+{% if related %}
+<section id="related-products" style="padding:36px 0 20px;">
+  <div class="sec-head">
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span>ສິນຄ້າຄ້າຍກັນ</span></div>
+    <h2>ສິນຄ້າອື່ນທີ່ຄ້າຍກັນ</h2>
+  </div>
+  <div class="product-grid">
+    {% for p in related %}{% include "store/_product_card.html" %}{% endfor %}
+  </div>
+</section>
+{% endif %}
+
 <!-- Lightbox Modal -->
 <div id="gallery-lightbox" onclick="closeLightbox()" style="display:none; position:fixed; z-index:9999; top:0; left:0; width:100%; height:100%; background:rgba(10,9,19,0.92); align-items:center; justify-content:center; opacity:0; transition:opacity 0.2s ease;">
   <span style="position:absolute; top:24px; right:24px; color:#fff; font-size:36px; font-weight:bold; cursor:pointer; user-select:none;">&times;</span>
@@ -105,34 +139,97 @@
     "{{ img.display_url }}",
     {% endfor %}
   ];
+  var hasVideo = {{ product.video_url|yesno:"true,false" }};
+  var totalGalleryItems = galleryUrls.length + (hasVideo ? 1 : 0);
   var currentGalleryIdx = 0;
 
-  function setActiveImg(btn, url, index) {
-    var imgEl = document.getElementById('gallery-img');
-    if (!imgEl) return;
-    imgEl.style.opacity = 0.3;
-    setTimeout(function() {
-      imgEl.src = url;
-      imgEl.style.opacity = 1;
-    }, 100);
-    
-    document.querySelectorAll('.thumb-btn').forEach(function (b) { b.classList.remove('active'); });
-    if (btn) {
-      btn.classList.add('active');
-    } else {
-      var thumbs = document.querySelectorAll('.thumb-btn');
-      if (thumbs[index]) thumbs[index].classList.add('active');
+  function scrollThumbs(amount) {
+    var c = document.getElementById('detail-thumbs-container');
+    if (c) c.scrollBy({ left: amount, behavior: 'smooth' });
+  }
+
+  function updateGalleryUi(idx) {
+    currentGalleryIdx = idx;
+    var thumbs = document.querySelectorAll('.thumb-btn');
+    thumbs.forEach(function (t, i) {
+      if (i === idx) t.classList.add('active');
+      else t.classList.remove('active');
+    });
+  }
+
+  function showVideoInGallery(btn) {
+    var imgWrap = document.getElementById('gallery-img-wrap');
+    var videoWrap = document.getElementById('gallery-video-wrap');
+    if (imgWrap) imgWrap.style.display = 'none';
+    if (videoWrap) {
+      videoWrap.style.display = 'block';
+      if (!videoWrap.innerHTML.trim() && productVideoUrl) {
+        videoWrap.innerHTML = videoToEmbedHtml(productVideoUrl);
+      }
     }
-    currentGalleryIdx = index;
+    updateGalleryUi(galleryUrls.length);
+  }
+
+  function setActiveImg(btn, url, index) {
+    var imgWrap = document.getElementById('gallery-img-wrap');
+    var videoWrap = document.getElementById('gallery-video-wrap');
+    if (videoWrap) videoWrap.style.display = 'none';
+    if (imgWrap) imgWrap.style.display = 'flex';
+
+    var imgEl = document.getElementById('gallery-img');
+    if (imgEl) {
+      imgEl.style.opacity = 0.3;
+      setTimeout(function() {
+        imgEl.src = url;
+        imgEl.style.opacity = 1;
+      }, 100);
+    }
+    updateGalleryUi(index);
   }
 
   function navigateGallery(direction, event) {
     if (event) event.stopPropagation();
-    if (galleryUrls.length <= 1) return;
+    if (totalGalleryItems <= 1) return;
     var nextIdx = currentGalleryIdx + direction;
-    if (nextIdx < 0) nextIdx = galleryUrls.length - 1;
-    if (nextIdx >= galleryUrls.length) nextIdx = 0;
-    setActiveImg(null, galleryUrls[nextIdx], nextIdx);
+    if (nextIdx < 0) nextIdx = totalGalleryItems - 1;
+    if (nextIdx >= totalGalleryItems) nextIdx = 0;
+
+    if (hasVideo && nextIdx === galleryUrls.length) {
+      var vBtn = document.querySelector('.thumb-video-btn');
+      showVideoInGallery(vBtn);
+      currentGalleryIdx = nextIdx;
+    } else {
+      setActiveImg(null, galleryUrls[nextIdx], nextIdx);
+    }
+  }
+
+  var productVideoUrl = "{{ product.video_url|escapejs }}";
+
+  if (productVideoUrl) {
+    var ytMatch = productVideoUrl.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/);
+    if (ytMatch && ytMatch[1]) {
+      var vImg = document.getElementById('video-thumb-img');
+      var vElem = document.getElementById('video-thumb-elem');
+      if (vElem) vElem.style.display = 'none';
+      if (vImg) {
+        vImg.src = 'https://img.youtube.com/vi/' + ytMatch[1] + '/mqdefault.jpg';
+        vImg.style.display = 'block';
+      }
+    }
+  }
+
+  function videoToEmbedHtml(url) {
+    var yt = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([a-zA-Z0-9_-]{6,})/);
+    if (yt) {
+      return '<iframe src="https://www.youtube.com/embed/' + yt[1] + '?rel=0" title="ວິດີໂອສິນຄ້າ" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen style="width:100%;height:100%;"></iframe>';
+    }
+    if (/facebook\.com|fb\.watch/i.test(url)) {
+      return '<iframe src="https://www.facebook.com/plugins/video.php?href=' + encodeURIComponent(url) + '&show_text=false" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="width:100%;height:100%;"></iframe>';
+    }
+    if (/\.(mp4|webm|ogg)(\?.*)?$/i.test(url)) {
+      return '<video src="' + url + '" controls style="width:100%;height:100%;object-fit:contain;background:#000;"></video>';
+    }
+    return '<iframe src="' + url + '" frameborder="0" allow="autoplay; encrypted-media; picture-in-picture" allowfullscreen style="width:100%;height:100%;"></iframe>';
   }
 
   function openLightbox() {
