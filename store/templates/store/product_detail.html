@@ -94,7 +94,7 @@
       </form>
     </div>
     {% if user.is_authenticated and user.is_admin %}
-    <a href="{% url 'admin:store_product_change' product.pk %}" class="btn btn-ghost admin-edit-btn"><span class="ic sm" data-ic="edit"></span>แก้ไขสินค้านี้ (แอดมิน)</a>
+    <a href="{% url 'admin_product_edit' product.pk %}" class="btn btn-ghost admin-edit-btn"><span class="ic sm" data-ic="edit"></span>ແກ້ໄຂສິນຄ້ານີ້ (ແອດມິນ)</a>
     {% endif %}
   </div>
 </div>

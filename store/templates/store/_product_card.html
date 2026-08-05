@@ -11,7 +11,7 @@
     <button type="submit" class="wish-btn {% if p.pk in wishlist_ids %}active{% endif %}" title="Wishlist"><span class="ic" data-ic="{% if p.pk in wishlist_ids %}heartFill{% else %}heart{% endif %}"></span></button>
   </form>
   {% if user.is_authenticated and user.is_admin %}
-  <a href="{% url 'admin:store_product_change' p.pk %}" class="admin-quick-edit" title="แก้ไขสินค้า (แอดมิน)"><span class="ic sm" data-ic="edit"></span></a>
+  <a href="{% url 'admin_product_edit' p.pk %}" class="admin-quick-edit" title="ແກ້ໄຂສິນຄ້າ (ແອດມິນ)"><span class="ic sm" data-ic="edit"></span></a>
   {% endif %}
   <div class="product-body">
     <a href="{% url 'product_detail' p.pk %}"><div class="product-name" title="{{ p.name }}">{{ p.name }}</div></a>

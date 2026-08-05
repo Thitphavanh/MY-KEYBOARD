@@ -540,6 +540,11 @@ const I18N = {
 };
 
 const LANG_NAMES = { lo: "ພາສາລາວ", th: "ພາສາໄທ", en: "ພາສາອັງກິດ" };
+const LANG_FLAGS = {
+  lo: '<svg viewBox="0 0 30 20" width="100%" height="100%"><rect width="30" height="20" fill="#CE1126"/><rect y="5" width="30" height="10" fill="#002868"/><circle cx="15" cy="10" r="4" fill="#fff"/></svg>',
+  th: '<svg viewBox="0 0 30 20" width="100%" height="100%"><rect width="30" height="20" fill="#A51931"/><rect y="3.33" width="30" height="13.34" fill="#F4F5F8"/><rect y="6.67" width="30" height="6.67" fill="#2D2A4A"/></svg>',
+  en: '<svg viewBox="0 0 60 30" width="100%" height="100%"><rect width="60" height="30" fill="#00247d"/><g stroke="#fff" stroke-width="6"><path d="M0,0 L60,30 M60,0 L0,30"/></g><g stroke="#cf142b" stroke-width="2"><path d="M0,0 L60,30 M60,0 L0,30"/></g><g stroke="#fff" stroke-width="10"><path d="M30,0 V30 M0,15 H60"/></g><g stroke="#cf142b" stroke-width="6"><path d="M30,0 V30 M0,15 H60"/></g></svg>',
+};
 
 window.NB_LANG = localStorage.getItem("nb_lang") || "lo";
 
