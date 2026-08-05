@@ -27,7 +27,7 @@
     {% for s in stats %}
     <div class="stat-box">
       <div class="stat-text">
-        <div class="stat-lb" data-i18n="{{ s.label_key }}"></div>
+        <div class="stat-lb" data-i18n="{{ s.label_key }}">{% if s.key == 'members' %}ສະມາຊິກຮ້ານເຮົາ{% elif s.key == 'sales' %}ຍອດຂາຍລວມ{% elif s.key == 'completedOrders' %}ອໍເດີສຳເລັດ{% elif s.key == 'totalOrders' %}ອໍເດີທັງໝົດ{% else %}ສິນຄ້າທັງໝົດ{% endif %}</div>
         <div class="stat-val">{% if s.is_currency %}{{ s.value|kip }}{% else %}{{ s.value|floatformat:0 }}{% endif %}</div>
       </div>
       <div class="stat-ic"><span class="ic" data-ic="{{ s.icon }}"></span></div>
