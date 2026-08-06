@@ -4,34 +4,34 @@
 {% block content %}
 
 <div class="sec-head" style="margin-top:32px; margin-bottom:8px;">
-  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="step_payment"></span></div>
-  <h2 data-i18n="payment_page_title"></h2>
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="step_payment">ຊຳລະເງິນ</span></div>
+  <h2 data-i18n="payment_page_title">ເລືອກຊ່ອງທາງການຊຳລະເງິນ</h2>
 </div>
 
 {% include "store/_steps.html" with active=2 %}
 
 <div class="form-wrap">
   <div class="form-card">
-    <h2 data-i18n="payment_summary_title"></h2>
-    <p class="sub" data-i18n="payment_summary_sub"></p>
+    <h2 data-i18n="payment_summary_title">ສະຫຼຸບຄຳສັ່ງຊື້</h2>
+    <p class="sub" data-i18n="payment_summary_sub">ກວດສອບຂໍ້ມູນກ່ອນຢືນຢັນການຊຳລະເງິນ</p>
     <div class="summary-mini">
       {% for it in order.items.all %}
       <div class="row"><span>{{ it.product_name }} x{{ it.qty }}</span><span>{{ it.line_total|kip }}</span></div>
       {% endfor %}
-      {% if order.discount %}<div class="row"><span data-i18n="used_coupon_label"></span><span>− {{ order.discount|kip }}</span></div>{% endif %}
-      <div class="row total"><span data-i18n="cart_total_label"></span><span>{{ order.total|kip }}</span></div>
+      {% if order.discount %}<div class="row"><span data-i18n="used_coupon_label">ໃຊ້ໂຄ້ດ</span><span>− {{ order.discount|kip }}</span></div>{% endif %}
+      <div class="row total"><span data-i18n="cart_total_label">ຍອດຊຳລະທັງໝົດ</span><span>{{ order.total|kip }}</span></div>
     </div>
 
     <div style="font-size:13px; color:var(--text-dim); margin-bottom:20px; background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:10px; padding:14px;">
-      <div><b style="color:var(--text)"><span data-i18n="ship_to_label"></span></b> {{ order.shipping_name }} · {{ order.shipping_phone }}</div>
+      <div><b style="color:var(--text)"><span data-i18n="ship_to_label">ຈັດສົ່ງເຖິງ</span></b> {{ order.shipping_name }} · {{ order.shipping_phone }}</div>
       <div style="margin-top:4px;">{{ order.shipping_village }}, {{ order.shipping_city }}, {{ order.shipping_province }}</div>
-      {% if order.shipping_branch %}<div style="margin-top:4px;"><span data-i18n="label_branch"></span>: {{ order.shipping_branch }}</div>{% endif %}
-      <div style="margin-top:4px;"><span data-i18n="carrier_label"></span>: {{ order.get_carrier_display }}</div>
+      {% if order.shipping_branch %}<div style="margin-top:4px;"><span data-i18n="label_branch">ສາຂາ</span>: {{ order.shipping_branch }}</div>{% endif %}
+      <div style="margin-top:4px;"><span data-i18n="carrier_label">ບໍລິສັດຈັດສົ່ງ</span>: {{ order.get_carrier_display }}</div>
     </div>
 
     <form method="post" enctype="multipart/form-data">
       {% csrf_token %}
-      <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:10px;" data-i18n="payment_method_label"></label>
+      <label style="font-size:12px; color:var(--text-dim); display:block; margin-bottom:10px;" data-i18n="payment_method_label">ຊ່ອງທາງການຊຳລະເງິນ</label>
       <div class="option-cards" id="bank-cards">
         {% for value, label in form.payment_method.field.choices %}
         {% if value %}
@@ -57,30 +57,30 @@
         <div class="bank-detail-item" data-bank-name="{{ bank.name }}" style="margin-bottom:14px; padding-bottom:14px; {% if not forloop.last %}border-bottom:1px solid var(--border);{% endif %}">
           {% if bank.qr %}<img src="{{ bank.qr.url }}" class="bank-qr" alt="QR" data-lightbox="{{ bank.qr.url }}">{% endif %}
           <b>{{ bank.name }}{% if bank.sub %} ({{ bank.sub }}){% endif %}</b><br>
-          <span data-i18n="account_name_label"></span>: {{ bank.account_name }}<br>
-          <span data-i18n="account_number_label"></span>: {{ bank.account_number }}<br>
-          {% if bank.branch %}<span data-i18n="branch_label"></span>: {{ bank.branch }}<br>{% endif %}
+          <span data-i18n="account_name_label">ຊື່ບັນຊີ</span>: {{ bank.account_name }}<br>
+          <span data-i18n="account_number_label">ເລກບັນຊີ</span>: {{ bank.account_number }}<br>
+          {% if bank.branch %}<span data-i18n="branch_label">ສາຂາ</span>: {{ bank.branch }}<br>{% endif %}
         </div>
         {% endfor %}
-        <p style="font-size:12.5px; color:var(--text-dim);" data-i18n="bank_transfer_note"></p>
+        <p style="font-size:12.5px; color:var(--text-dim);" data-i18n="bank_transfer_note">ຫຼັງຈາກໂອນເງິນແລ້ວ ກະລຸນາແນບຮູບສະລິບໂອນເງິນຢູ່ດ້ານລຸ່ມນີ້</p>
       </div>
       {% endif %}
 
-      <label style="font-size:12px; color:var(--text-dim); display:block; margin:18px 0 10px;" data-i18n="slip_label"></label>
+      <label style="font-size:12px; color:var(--text-dim); display:block; margin:18px 0 10px;" data-i18n="slip_label">ແນບສະລິບໂອນເງິນ</label>
       <label class="slip-upload" for="id_payment_slip" id="slip-upload-box">
         <div class="slip-placeholder" id="slip-placeholder">
           <span class="ic" data-ic="upload"></span>
-          <span data-i18n="slip_placeholder"></span>
+          <span data-i18n="slip_placeholder">ຄລິກເພື່ອແນບຮູບສະລິບໂອນເງິນ (JPG, PNG)</span>
         </div>
         <img id="slip-preview" style="display:none;" alt="">
         <button type="button" id="slip-remove" style="display:none;"><span class="ic sm" data-ic="close"></span></button>
       </label>
       <input type="file" name="payment_slip" id="id_payment_slip" accept="image/*" style="position:absolute; width:0; height:0; opacity:0; pointer-events:none;">
       {% if form.payment_slip.errors %}<div class="field-error">{{ form.payment_slip.errors.0 }}</div>{% endif %}
-      <p id="slip-required-note" class="field-error" style="margin-top:6px; display:none;" data-i18n="slip_error"></p>
+      <p id="slip-required-note" class="field-error" style="margin-top:6px; display:none;" data-i18n="slip_error">ກະລຸນາແນບສະລິບໂອນເງິນ</p>
 
-      <button type="submit" id="confirm-submit-btn" class="btn btn-solid btn-block" style="margin-top:20px;" disabled><span data-i18n="confirm_cta"></span><span class="ic" data-ic="arrowRight"></span></button>
-      <a href="{% url 'checkout' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="back_to_shipping"></a>
+      <button type="submit" id="confirm-submit-btn" class="btn btn-solid btn-block" style="margin-top:20px;" disabled><span data-i18n="confirm_cta">ຢືນຢັນຄຳສັ່ງຊື້</span><span class="ic" data-ic="arrowRight"></span></button>
+      <a href="{% url 'checkout' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="back_to_shipping">ກັບໄປແກ້ໄຂທີ່ຢູ່ຈັດສົ່ງ</a>
     </form>
   </div>
 </div>

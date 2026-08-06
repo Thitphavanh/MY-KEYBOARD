@@ -7,9 +7,9 @@
       <span class="logo-text">{{ site_settings.store_name }}</span>
     </a>
     <div class="nav-pill" id="nav-pill">
-      <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' and not request.GET.cat %}active{% endif %}" data-i18n="nav_home"></a>
+      <a href="{% url 'home' %}" class="{% if request.resolver_match.url_name == 'home' and not request.GET.cat %}active{% endif %}" data-i18n="nav_home">ໜ້າຫຼັກ</a>
       <div class="mega-trigger">
-        <a href="{% url 'home' %}#categories" data-i18n="nav_categories"><span class="ic chev" data-ic="chevronDown"></span></a>
+        <a href="{% url 'home' %}#categories" data-i18n="nav_categories">ໝວດໝູ່ສິນຄ້າ <span class="ic chev" data-ic="chevronDown"></span></a>
         <div class="mega-menu">
           <div class="mega-menu-inner">
             <div class="mega-left">
@@ -24,7 +24,7 @@
               <div class="mega-right-panel {% if forloop.first %}active{% endif %}" data-cat="{{ c.slug }}" style="{% if not forloop.first %}display:none;{% endif %}">
                 <div class="mega-right-head">
                   <span data-cat-name="{{ c.slug }}">{{ c.name }}</span>
-                  <a href="{% url 'category_detail' c.slug %}" data-i18n="view_all"><span class="ic" data-ic="arrowRight"></span></a>
+                  <a href="{% url 'category_detail' c.slug %}" data-i18n="view_all">ເບິ່ງທັງໝົດ <span class="ic" data-ic="arrowRight"></span></a>
                 </div>
                 <div class="mega-sub-grid">
                   {% for s in c.subcategories.all %}<a href="{% url 'category_detail' c.slug %}?sub={{ s.pk }}" class="mega-sub-item" data-subcat-name="{{ s.name }}">{{ s.name }}</a>{% endfor %}
@@ -38,28 +38,28 @@
           </div>
         </div>
       </div>
-      <a href="{% url 'orders' %}" class="{% if request.resolver_match.url_name == 'orders' %}active{% endif %}" data-i18n="nav_orders"></a>
-      <a href="{% url 'contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}" data-i18n="nav_contact"></a>
+      <a href="{% url 'orders' %}" class="{% if request.resolver_match.url_name == 'orders' %}active{% endif %}" data-i18n="nav_orders">ກວດສອບສະຖານະ</a>
+      <a href="{% url 'contact' %}" class="{% if request.resolver_match.url_name == 'contact' %}active{% endif %}" data-i18n="nav_contact">ຕິດຕໍ່ພວກເຮົາ</a>
     </div>
     <form class="nav-search" action="{% url 'home' %}" method="get">
-      <input type="text" name="search" placeholder="" data-i18n-ph="search_placeholder" autocomplete="off">
+      <input type="text" name="search" placeholder="ຄົ້ນຫາສິນຄ້າ..." data-i18n-ph="search_placeholder" autocomplete="off">
       <button type="submit"><span class="ic" data-ic="search"></span></button>
       <div class="search-suggest"></div>
     </form>
     <div class="nav-right">
       <div class="lang-switch" id="nav-lang-switch"></div>
       {% if user.is_authenticated and user.is_admin %}
-      <a href="{% url 'admin_dashboard' %}" class="icon-btn" title="ไปหน้าแอดมิน"><span class="ic" data-ic="chart"></span></a>
+      <a href="{% url 'admin_dashboard' %}" class="icon-btn" title="ໄປໜ້າແອດມິນ"><span class="ic" data-ic="chart"></span></a>
       {% endif %}
-      <a href="{% url 'wishlist' %}" class="icon-btn" title=""><span class="ic" data-ic="heart"></span><span class="badge" {% if not wishlist_count %}style="display:none"{% endif %}>{{ wishlist_count }}</span></a>
-      <a href="{% url 'cart' %}" class="icon-btn" title=""><span class="ic" data-ic="cart"></span><span class="badge" id="nav-cart-badge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span></a>
+      <a href="{% url 'wishlist' %}" class="icon-btn" title="ລາຍການທີ່ມັກ"><span class="ic" data-ic="heart"></span><span class="badge" {% if not wishlist_count %}style="display:none"{% endif %}>{{ wishlist_count }}</span></a>
+      <a href="{% url 'cart' %}" class="icon-btn" title="ກະຕ່າສິນຄ້າ"><span class="ic" data-ic="cart"></span><span class="badge" id="nav-cart-badge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span></a>
       <a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}" class="icon-btn account-btn" title="">
-        <span class="ic" data-ic="user"></span><span class="acc-label">{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}<span data-i18n="account_login"></span>{% endif %}</span>
+        <span class="ic" data-ic="user"></span><span class="acc-label">{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}<span data-i18n="account_login">ເຂົ້າສູ່ລະບົບ</span>{% endif %}</span>
       </a>
     </div>
   </nav>
   <form class="mobile-search-row" action="{% url 'home' %}" method="get">
-    <input type="text" name="search" data-i18n-ph="search_placeholder" autocomplete="off">
+    <input type="text" name="search" placeholder="ຄົ້ນຫາສິນຄ້າ..." data-i18n-ph="search_placeholder" autocomplete="off">
     <button type="submit"><span class="ic" data-ic="search"></span></button>
     <div class="search-suggest"></div>
   </form>
@@ -75,20 +75,20 @@
     <button type="button" onclick="toggleMobileMenu()" aria-label="Close"><span class="ic" data-ic="close"></span></button>
   </div>
   <nav class="drawer-nav">
-    <a href="{% url 'home' %}"><span class="ic" data-ic="grid"></span><span data-i18n="nav_home"></span></a>
-    <a href="{% url 'orders' %}"><span class="ic" data-ic="truck"></span><span data-i18n="nav_orders"></span></a>
-    <a href="{% url 'contact' %}"><span class="ic" data-ic="mail"></span><span data-i18n="nav_contact"></span></a>
-    <a href="{% url 'wishlist' %}"><span class="ic" data-ic="heart"></span><span data-i18n="wishlist_label"></span></a>
-    <a href="{% url 'cart' %}"><span class="ic" data-ic="cart"></span><span data-i18n="cart_label"></span></a>
+    <a href="{% url 'home' %}"><span class="ic" data-ic="grid"></span><span data-i18n="nav_home">ໜ້າຫຼັກ</span></a>
+    <a href="{% url 'orders' %}"><span class="ic" data-ic="truck"></span><span data-i18n="nav_orders">ກວດສອບສະຖານະ</span></a>
+    <a href="{% url 'contact' %}"><span class="ic" data-ic="mail"></span><span data-i18n="nav_contact">ຕິດຕໍ່ພວກເຮົາ</span></a>
+    <a href="{% url 'wishlist' %}"><span class="ic" data-ic="heart"></span><span data-i18n="wishlist_label">ລາຍການທີ່ມັກ</span></a>
+    <a href="{% url 'cart' %}"><span class="ic" data-ic="cart"></span><span data-i18n="cart_label">ກະຕ່າ</span></a>
     <a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}">
-      <span class="ic" data-ic="user"></span>{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}<span data-i18n="account_login"></span>{% endif %}
+      <span class="ic" data-ic="user"></span>{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}<span data-i18n="account_login">ເຂົ້າສູ່ລະບົບ</span>{% endif %}
     </a>
     {% if user.is_authenticated and user.is_admin %}
-    <a href="{% url 'admin_dashboard' %}"><span class="ic" data-ic="chart"></span>ไปหน้าแอดมิน</a>
+    <a href="{% url 'admin_dashboard' %}"><span class="ic" data-ic="chart"></span>ໄປໜ້າແອດມິນ</a>
     {% endif %}
   </nav>
   <div class="drawer-cats">
-    <div class="drawer-cats-title" data-i18n="categories_title"></div>
+    <div class="drawer-cats-title" data-i18n="categories_title">ໝວດໝູ່ສິນຄ້າ</div>
     {% for c in nav_categories %}
     <div class="drawer-cat-item">
       <div class="drawer-cat-row">
@@ -108,19 +108,19 @@
 
 <nav class="mobile-tabbar" id="mobile-tabbar">
   <a href="{% url 'home' %}" class="tab-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
-    <span class="tab-ic"><span class="ic" data-ic="home"></span></span><span class="tab-label" data-i18n="nav_home"></span>
+    <span class="tab-ic"><span class="ic" data-ic="home"></span></span><span class="tab-label" data-i18n="nav_home">ໜ້າຫຼັກ</span>
   </a>
   <a href="{% url 'home' %}#categories" class="tab-item">
-    <span class="tab-ic"><span class="ic" data-ic="grid"></span></span><span class="tab-label" data-i18n="nav_categories"></span>
+    <span class="tab-ic"><span class="ic" data-ic="grid"></span></span><span class="tab-label" data-i18n="nav_categories">ໝວດໝູ່</span>
   </a>
   <a href="{% url 'cart' %}" class="tab-item tab-elevated {% if request.resolver_match.url_name == 'cart' %}active{% endif %}">
-    <span class="tab-ic"><span class="ic" data-ic="cart"></span><span class="tab-badge" id="tab-cart-badge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span></span><span class="tab-label" data-i18n="cart_label"></span>
+    <span class="tab-ic"><span class="ic" data-ic="cart"></span><span class="tab-badge" id="tab-cart-badge" {% if not cart_count %}style="display:none"{% endif %}>{{ cart_count }}</span></span><span class="tab-label" data-i18n="cart_label">ກະຕ່າ</span>
   </a>
   <a href="{% url 'wishlist' %}" class="tab-item {% if request.resolver_match.url_name == 'wishlist' %}active{% endif %}">
-    <span class="tab-ic"><span class="ic" data-ic="heart"></span>{% if wishlist_count %}<span class="tab-badge">{{ wishlist_count }}</span>{% endif %}</span><span class="tab-label" data-i18n="wishlist_label"></span>
+    <span class="tab-ic"><span class="ic" data-ic="heart"></span>{% if wishlist_count %}<span class="tab-badge">{{ wishlist_count }}</span>{% endif %}</span><span class="tab-label" data-i18n="wishlist_label">ທີ່ມັກ</span>
   </a>
   <a href="{% if user.is_authenticated %}{% url 'profile' %}{% else %}{% url 'login' %}{% endif %}" class="tab-item {% if request.resolver_match.url_name == 'profile' or request.resolver_match.url_name == 'login' %}active{% endif %}">
-    <span class="tab-ic"><span class="ic" data-ic="user"></span></span><span class="tab-label">{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}<span data-i18n="account_login"></span>{% endif %}</span>
+    <span class="tab-ic"><span class="ic" data-ic="user"></span></span><span class="tab-label">{% if user.is_authenticated %}{{ user.first_name|default:user.username }}{% else %}<span data-i18n="account_login">ເຂົ້າສູ່ລະບົບ</span>{% endif %}</span>
   </a>
 </nav>
 

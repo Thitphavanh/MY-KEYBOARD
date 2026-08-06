@@ -6,26 +6,26 @@
         <img src="{% if site_settings.logo_url %}{{ site_settings.logo_url }}{% elif site_settings.logo %}{{ site_settings.logo.url }}{% else %}{% static 'images/logo.svg' %}{% endif %}" class="logo-mark{% if site_settings.logo_url or site_settings.logo %} custom{% endif %}" alt="">
         <span class="name">{{ site_settings.store_name }}</span>
       </div>
-      <p class="footer-desc" data-i18n="footer_desc"></p>
+      <p class="footer-desc" data-i18n="footer_desc">ຮ້ານອຸປະກອນໄອທີ ແລະ ຄອມພິວເຕີຄົບວົງຈອນ ຈັດສົ່ງທົ່ວປະເທດ ຮັບປະກັນສິນຄ້າແທ້ 100%</p>
     </div>
     <div class="footer-col">
-      <h6 data-i18n="footer_help"></h6>
-      <a href="{% url 'contact' %}" data-i18n="footer_link_contact"></a>
-      <a href="{% url 'orders' %}" data-i18n="footer_link_orders"></a>
-      <a href="{% url 'cart' %}" data-i18n="footer_link_cart"></a>
+      <h6 data-i18n="footer_help">ຊ່ວຍເຫຼືອ</h6>
+      <a href="{% url 'contact' %}" data-i18n="footer_link_contact">ຕິດຕໍ່ພວກເຮົາ</a>
+      <a href="{% url 'orders' %}" data-i18n="footer_link_orders">ກວດສອບສະຖານະສິນຄ້າ</a>
+      <a href="{% url 'cart' %}" data-i18n="footer_link_cart">ກະຕ່າສິນຄ້າ</a>
     </div>
     <div class="footer-col">
-      <h6 data-i18n="footer_account"></h6>
-      <a href="{% url 'login' %}" data-i18n="footer_link_login"></a>
-      <a href="{% url 'profile' %}" data-i18n="footer_link_profile"></a>
-      <a href="{% url 'wishlist' %}" data-i18n="footer_link_wishlist"></a>
+      <h6 data-i18n="footer_account">ບັນຊີ</h6>
+      <a href="{% url 'login' %}" data-i18n="footer_link_login">ເຂົ້າສູ່ລະບົບ / ສະໝັກສະມາຊິກ</a>
+      <a href="{% url 'profile' %}" data-i18n="footer_link_profile">ແກ້ໄຂໂປຣໄຟລ໌</a>
+      <a href="{% url 'wishlist' %}" data-i18n="footer_link_wishlist">ສິນຄ້າທີ່ມັກ</a>
     </div>
     <div class="footer-col">
-      <h6 data-i18n="footer_contact_title"></h6>
+      <h6 data-i18n="footer_contact_title">ຕິດຕໍ່</h6>
       <a href="{{ site_settings.contact_fb }}" target="_blank" rel="noopener" class="footer-contact-link"><span class="ic" data-ic="facebook"></span><span>Facebook</span></a>
       <a href="https://wa.me/{{ site_settings.contact_wa }}" target="_blank" rel="noopener" class="footer-contact-link"><span class="ic" data-ic="whatsapp"></span><span>WhatsApp: {{ site_settings.contact_wa }}</span></a>
-      <p class="footer-desc" style="margin-top:10px; display:flex; align-items:center; gap:6px;"><span class="ic sm" data-ic="mapPin"></span>ນະຄอนຫຼວງວຽງຈັນ, ສປປ ລາວ</p>
+      <p class="footer-desc" style="margin-top:10px; display:flex; align-items:center; gap:6px;"><span class="ic sm" data-ic="mapPin"></span>ນະຄອນຫຼວງວຽງຈັນ, ສປປ ລາວ</p>
     </div>
   </div>
-  <div class="wrap footer-bottom"><span data-i18n="footer_copyright"></span> · <a href="{% url 'admin_dashboard' %}" style="color:var(--text-faint);">ຈັດການຮ້ານຄ້າ</a></div>
+  <div class="wrap footer-bottom"><span data-i18n="footer_copyright">© 2026 MY KEYBOARD. ສະຫງວນລິຂະສິດ.</span> · <a href="{% url 'admin_dashboard' %}" style="color:var(--text-faint);">ຈັດການຮ້ານຄ້າ</a></div>
 </footer>

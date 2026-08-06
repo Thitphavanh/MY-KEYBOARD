@@ -3,7 +3,7 @@
 {% block title %}{{ product.name }} — MY KEYBOARD{% endblock %}
 {% block content %}
 <div class="breadcrumb">
-  <a href="{% url 'home' %}" data-i18n="nav_home"></a> / {% if product.category %}<a href="{% url 'category_detail' product.category.slug %}">{{ product.category.name }}</a> / {% endif %}<span>{{ product.name }}</span>
+  <a href="{% url 'home' %}" data-i18n="nav_home">ໜ້າຫຼັກ</a> / {% if product.category %}<a href="{% url 'category_detail' product.category.slug %}">{{ product.category.name }}</a> / {% endif %}<span>{{ product.name }}</span>
 </div>
 
 <div class="detail-wrap">
@@ -56,8 +56,8 @@
       <span class="price">{{ product.price|kip }}</span>
       {% if product.old_price %}<span class="oldprice">{{ product.old_price|kip }}</span>{% endif %}
       <div style="margin-top:8px;">
-        {% if product.stock <= 0 and product.is_preorder %}<span class="product-stock preorder" data-i18n="preorder_label"></span>
-        {% elif product.stock <= 0 %}<span class="product-stock out" data-i18n="out_of_stock"></span>{% endif %}
+        {% if product.stock <= 0 and product.is_preorder %}<span class="product-stock preorder" data-i18n="preorder_label">ພຣີອໍເດີ້</span>
+        {% elif product.stock <= 0 %}<span class="product-stock out" data-i18n="out_of_stock">ສິນຄ້າໝົດ</span>{% endif %}
       </div>
     </div>
     <p class="desc">{{ product.desc }}</p>
@@ -67,7 +67,7 @@
       {% endfor %}
     </ul>
     <div class="qty-row">
-      <span class="qty-label" data-i18n="qty_label"></span>
+      <span class="qty-label" data-i18n="qty_label">ຈຳນວນ</span>
       <div class="qty-stepper">
         <button type="button" onclick="changeQty(-1)">−</button>
         <input type="text" id="qty-input" value="1" readonly>
@@ -84,13 +84,13 @@
         {% csrf_token %}
         <input type="hidden" name="qty" id="add-cart-qty" value="1">
         <input type="hidden" name="next" value="{{ request.get_full_path }}">
-        <button type="submit" class="btn btn-ghost" {% if product.stock <= 0 and not product.is_preorder %}disabled{% endif %}><span class="ic sm" data-ic="cart"></span><span data-i18n="add_to_cart"></span></button>
+        <button type="submit" class="btn btn-ghost" {% if product.stock <= 0 and not product.is_preorder %}disabled{% endif %}><span class="ic sm" data-ic="cart"></span><span data-i18n="add_to_cart">ໃສ່ລົງກະຕ່າ</span></button>
       </form>
       <form method="post" action="{% url 'cart_add' product.pk %}" style="display:contents;" id="buy-now-form">
         {% csrf_token %}
         <input type="hidden" name="qty" id="buy-now-qty" value="1">
         <input type="hidden" name="next" value="{% url 'cart' %}">
-        <button type="submit" class="btn btn-solid" {% if product.stock <= 0 and not product.is_preorder %}disabled{% endif %}><span data-i18n="buy_now"></span><span class="ic" data-ic="arrowRight"></span></button>
+        <button type="submit" class="btn btn-solid" {% if product.stock <= 0 and not product.is_preorder %}disabled{% endif %}><span data-i18n="buy_now">ສັ່ງຊື້ທັນທີ</span><span class="ic" data-ic="arrowRight"></span></button>
       </form>
     </div>
     {% if user.is_authenticated and user.is_admin %}

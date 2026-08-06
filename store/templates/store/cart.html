@@ -4,8 +4,8 @@
 {% block content %}
 
 <div class="sec-head" style="margin-top:32px; margin-bottom:8px;">
-  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="cart_label"></span></div>
-  <h2 data-i18n="cart_review_title"></h2>
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="cart_label">ກະຕ່າ</span></div>
+  <h2 data-i18n="cart_review_title">ກວດສອບລາຍການສັ່ງຊື້</h2>
 </div>
 
 {% include "store/_steps.html" with active=0 %}
@@ -15,9 +15,9 @@
   <div class="cart-list" style="grid-column:1/-1;">
     <div class="cart-empty">
       <div class="ic-lg"><span class="ic" data-ic="cart"></span></div>
-      <h3 style="color:var(--text); margin-bottom:8px;" data-i18n="cart_empty_title"></h3>
-      <p style="margin-bottom:20px;" data-i18n="cart_empty_desc"></p>
-      <a href="{% url 'home' %}" class="btn btn-solid"><span data-i18n="hero_cta_shop"></span><span class="ic" data-ic="arrowRight"></span></a>
+      <h3 style="color:var(--text); margin-bottom:8px;" data-i18n="cart_empty_title">ກະຕ່າຂອງທ່ານຫວ່າງເປົ່າ</h3>
+      <p style="margin-bottom:20px;" data-i18n="cart_empty_desc">ຍັງບໍ່ມີສິນຄ້າໃນກະຕ່າ ໄປເລືອກຊື້ສິນຄ້າກັນເລີຍ</p>
+      <a href="{% url 'home' %}" class="btn btn-solid"><span data-i18n="hero_cta_shop">ເລືອກຊື້ສິນຄ້າ</span><span class="ic" data-ic="arrowRight"></span></a>
     </div>
   </div>
   {% else %}
@@ -48,32 +48,32 @@
     {% endfor %}
   </div>
   <div class="summary-card">
-    <h3 data-i18n="cart_summary_title"></h3>
-    <div class="summary-row"><span><span data-i18n="cart_items_label"></span> ({{ cart.count }})</span><span>{{ subtotal|kip }}</span></div>
+    <h3 data-i18n="cart_summary_title">ສະຫຼຸບຄຳສັ່ງຊື້</h3>
+    <div class="summary-row"><span><span data-i18n="cart_items_label">ຍອດລວມສິນຄ້າ</span> ({{ cart.count }})</span><span>{{ subtotal|kip }}</span></div>
     {% if cart.coupon %}
-    <div class="summary-row"><span class="discount"><span data-i18n="used_coupon_label"></span> ({{ cart.coupon.code }})</span><span class="discount">− {{ discount|kip }}</span></div>
+    <div class="summary-row"><span class="discount"><span data-i18n="used_coupon_label">ໃຊ້ໂຄ້ດ</span> ({{ cart.coupon.code }})</span><span class="discount">− {{ discount|kip }}</span></div>
     {% endif %}
-    <div class="summary-row total"><span data-i18n="cart_total_label"></span><span>{{ total|kip }}</span></div>
+    <div class="summary-row total"><span data-i18n="cart_total_label">ຍອດຊຳລະທັງໝົດ</span><span>{{ total|kip }}</span></div>
 
     {% if cart.coupon %}
     <div class="coupon-applied">
-      <span><span class="ic sm" data-ic="check"></span> <span data-i18n="used_coupon_label"></span> "{{ cart.coupon.code }}" — {{ cart.coupon.label }}</span>
+      <span><span class="ic sm" data-ic="check"></span> <span data-i18n="used_coupon_label">ໃຊ້ໂຄ້ດ</span> "{{ cart.coupon.code }}" — {{ cart.coupon.label }}</span>
       <form method="post" action="{% url 'cart_remove_coupon' %}" style="display:contents;">
         {% csrf_token %}
-        <button type="submit" data-i18n="coupon_cancel"></button>
+        <button type="submit" data-i18n="coupon_cancel">ຍົກເລີກ</button>
       </form>
     </div>
     {% else %}
     <form method="post" action="{% url 'cart_apply_coupon' %}" class="coupon-row">
       {% csrf_token %}
-      <input type="text" name="code" data-i18n-ph="coupon_placeholder">
-      <button type="submit" class="btn btn-ghost btn-sm" data-i18n="coupon_use_cta"></button>
+      <input type="text" name="code" placeholder="ກອກລະຫັດສ່ວນຫຼຸດ ເຊັ່ນ SAVE10" data-i18n-ph="coupon_placeholder">
+      <button type="submit" class="btn btn-ghost btn-sm" data-i18n="coupon_use_cta">ໃຊ້ໂຄ້ດ</button>
     </form>
-    <div class="coupon-hint" data-i18n="coupon_hint"></div>
+    <div class="coupon-hint" data-i18n="coupon_hint">ໂຄ້ດທີ່ໃຊ້ໄດ້: SAVE10, VIP15, NEXBYTE20</div>
     {% endif %}
 
-    <a href="{% url 'checkout' %}" class="btn btn-solid btn-block"><span data-i18n="cart_checkout_cta"></span><span class="ic" data-ic="arrowRight"></span></a>
-    <a href="{% url 'home' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="cart_continue_shopping"></a>
+    <a href="{% url 'checkout' %}" class="btn btn-solid btn-block"><span data-i18n="cart_checkout_cta">ດຳເນີນການຊຳລະເງິນ</span><span class="ic" data-ic="arrowRight"></span></a>
+    <a href="{% url 'home' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="cart_continue_shopping">ເລືອກຊື້ສິນຄ້າເພີ່ມ</a>
   </div>
   {% endif %}
 </div>

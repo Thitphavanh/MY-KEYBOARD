@@ -4,61 +4,61 @@
 {% block content %}
 
 <div class="sec-head" style="margin-top:32px; margin-bottom:8px;">
-  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="step_shipping"></span></div>
-  <h2 data-i18n="checkout_page_title"></h2>
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="step_shipping">ທີ່ຢູ່ຈັດສົ່ງ</span></div>
+  <h2 data-i18n="checkout_page_title">ກອກຂໍ້ມູນການຈັດສົ່ງ</h2>
 </div>
 
 {% include "store/_steps.html" with active=1 %}
 
 <div class="form-wrap">
   <div class="form-card">
-    <h2 data-i18n="checkout_form_title"></h2>
-    <p class="sub" data-i18n="checkout_form_sub"></p>
+    <h2 data-i18n="checkout_form_title">ຂໍ້ມູນຜູ້ຮັບສິນຄ້າ</h2>
+    <p class="sub" data-i18n="checkout_form_sub">ກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນເພື່ອຄວາມວ່ອງໄວໃນການຈັດສົ່ງ</p>
 
     <div class="summary-mini">
       {% for row in items %}
       <div class="row"><span>{{ row.product.name }} x{{ row.item.qty }}</span><span>{{ row.line_total|kip }}</span></div>
       {% endfor %}
-      {% if discount %}<div class="row"><span data-i18n="used_coupon_label"></span><span>− {{ discount|kip }}</span></div>{% endif %}
-      <div class="row total"><span data-i18n="cart_total_label"></span><span>{{ total|kip }}</span></div>
+      {% if discount %}<div class="row"><span data-i18n="used_coupon_label">ໃຊ້ໂຄ້ດ</span><span>− {{ discount|kip }}</span></div>{% endif %}
+      <div class="row total"><span data-i18n="cart_total_label">ຍອດຊຳລະທັງໝົດ</span><span>{{ total|kip }}</span></div>
     </div>
 
     <form method="post">
       {% csrf_token %}
       <div class="form-grid">
         <div class="field full {% if form.shipping_name.errors %}error{% endif %}">
-          <label data-i18n="label_customer_name"></label>
+          <label data-i18n="label_customer_name">ຊື່ລູກຄ້າ</label>
           {{ form.shipping_name }}
           {% if form.shipping_name.errors %}<div class="field-error">{{ form.shipping_name.errors.0 }}</div>{% endif %}
         </div>
         <div class="field full {% if form.shipping_phone.errors %}error{% endif %}">
-          <label data-i18n="label_phone"></label>
+          <label data-i18n="label_phone">ເບີໂທລະສັບ</label>
           {{ form.shipping_phone }}
           {% if form.shipping_phone.errors %}<div class="field-error">{{ form.shipping_phone.errors.0 }}</div>{% endif %}
         </div>
         <div class="field {% if form.shipping_province.errors %}error{% endif %}">
-          <label data-i18n="label_province"></label>
+          <label data-i18n="label_province">ແຂວງ</label>
           {{ form.shipping_province }}
           {% if form.shipping_province.errors %}<div class="field-error">{{ form.shipping_province.errors.0 }}</div>{% endif %}
         </div>
         <div class="field {% if form.shipping_city.errors %}error{% endif %}">
-          <label data-i18n="label_city"></label>
+          <label data-i18n="label_city">ເມືອງ</label>
           {{ form.shipping_city }}
           {% if form.shipping_city.errors %}<div class="field-error">{{ form.shipping_city.errors.0 }}</div>{% endif %}
         </div>
         <div class="field full {% if form.shipping_village.errors %}error{% endif %}">
-          <label data-i18n="label_address"></label>
+          <label data-i18n="label_address">ບ້ານ / ທີ່ຢູ່ໂດຍລະອຽດ</label>
           {{ form.shipping_village }}
           {% if form.shipping_village.errors %}<div class="field-error">{{ form.shipping_village.errors.0 }}</div>{% endif %}
         </div>
         <div class="field full {% if form.shipping_branch.errors %}error{% endif %}">
-          <label data-i18n="label_branch"></label>
+          <label data-i18n="label_branch">ສາຂາ</label>
           {{ form.shipping_branch }}
           {% if form.shipping_branch.errors %}<div class="field-error">{{ form.shipping_branch.errors.0 }}</div>{% endif %}
         </div>
       </div>
 
-      <label style="font-size:12px; color:var(--text-dim); display:block; margin:6px 0 10px;" data-i18n="label_carrier"></label>
+      <label style="font-size:12px; color:var(--text-dim); display:block; margin:6px 0 10px;" data-i18n="label_carrier">ບໍລິສັດຈັດສົ່ງ</label>
       <div class="option-cards" id="carrier-cards">
         {% for value, label in form.carrier.field.choices %}
         <label class="option-card {% if form.carrier.value == value %}selected{% endif %}">
@@ -76,8 +76,8 @@
       </div>
       {% if form.carrier.errors %}<div class="field-error" style="margin:-10px 0 16px;">{{ form.carrier.errors.0 }}</div>{% endif %}
 
-      <button type="submit" class="btn btn-solid btn-block"><span data-i18n="checkout_submit_cta"></span><span class="ic" data-ic="arrowRight"></span></button>
-      <a href="{% url 'cart' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="back_to_cart"></a>
+      <button type="submit" class="btn btn-solid btn-block"><span data-i18n="checkout_submit_cta">ໄປໜ້າຊຳລະເງິນ</span><span class="ic" data-ic="arrowRight"></span></button>
+      <a href="{% url 'cart' %}" class="btn btn-ghost btn-block" style="margin-top:10px;" data-i18n="back_to_cart">ກັບໄປກະຕ່າສິນຄ້າ</a>
     </form>
   </div>
 </div>

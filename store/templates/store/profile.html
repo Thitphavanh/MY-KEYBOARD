@@ -4,8 +4,8 @@
 
 <div class="form-wrap" style="margin-top:56px;">
   <div class="form-card">
-    <h2 data-i18n="profile_title"></h2>
-    <p class="sub" data-i18n="profile_sub"></p>
+    <h2 data-i18n="profile_title">ໂປຣໄຟລ໌ຂອງຂ້ອຍ</h2>
+    <p class="sub" data-i18n="profile_sub">ຈັດການຂໍ້ມູນສ່ວນຕົວ ແລະ ທີ່ຢູ່ຈັດສົ່ງ</p>
 
     {% if messages %}
     {% for message in messages %}<div class="form-msg show success">{{ message }}</div>{% endfor %}
@@ -15,43 +15,43 @@
       {% csrf_token %}
       <div class="form-grid">
         <div class="field full {% if form.first_name.errors %}error{% endif %}">
-          <label data-i18n="label_customer_name"></label>
+          <label data-i18n="label_customer_name">ຊື່ລູກຄ້າ</label>
           {{ form.first_name }}
           {% if form.first_name.errors %}<div class="field-error">{{ form.first_name.errors.0 }}</div>{% endif %}
         </div>
         <div class="field">
-          <label data-i18n="label_email_readonly"></label>
+          <label data-i18n="label_email_readonly">ອີເມວ</label>
           <input type="email" value="{{ user.email }}" disabled style="opacity:.6;">
         </div>
         <div class="field {% if form.phone.errors %}error{% endif %}">
-          <label data-i18n="label_phone"></label>
+          <label data-i18n="label_phone">ເບີໂທລະສັບ</label>
           {{ form.phone }}
           {% if form.phone.errors %}<div class="field-error">{{ form.phone.errors.0 }}</div>{% endif %}
         </div>
         <div class="field {% if form.province.errors %}error{% endif %}">
-          <label data-i18n="label_province"></label>
+          <label data-i18n="label_province">ແຂວງ</label>
           {{ form.province }}
           {% if form.province.errors %}<div class="field-error">{{ form.province.errors.0 }}</div>{% endif %}
         </div>
         <div class="field {% if form.city.errors %}error{% endif %}">
-          <label data-i18n="label_city"></label>
+          <label data-i18n="label_city">ເມືອງ</label>
           {{ form.city }}
           {% if form.city.errors %}<div class="field-error">{{ form.city.errors.0 }}</div>{% endif %}
         </div>
         <div class="field full {% if form.address.errors %}error{% endif %}">
-          <label data-i18n="label_address"></label>
+          <label data-i18n="label_address">ບ້ານ / ທີ່ຢູ່ໂດຍລະອຽດ</label>
           {{ form.address }}
           {% if form.address.errors %}<div class="field-error">{{ form.address.errors.0 }}</div>{% endif %}
         </div>
       </div>
-      <button type="submit" class="btn btn-solid btn-block" data-i18n="save_cta"></button>
+      <button type="submit" class="btn btn-solid btn-block" data-i18n="save_cta">ບັນທຶກຂໍ້ມູນ</button>
     </form>
 
     <div style="display:flex; gap:10px; margin-top:14px;">
-      <a href="{% url 'orders' %}" class="btn btn-ghost btn-block" data-i18n="my_orders_cta"></a>
+      <a href="{% url 'orders' %}" class="btn btn-ghost btn-block" data-i18n="my_orders_cta">ປະຫວັດອໍເດີ</a>
       <form method="post" action="{% url 'logout' %}" style="display:contents;">
         {% csrf_token %}
-        <button type="submit" class="btn btn-danger btn-block" data-i18n="logout_cta"></button>
+        <button type="submit" class="btn btn-danger btn-block" data-i18n="logout_cta">ອອກຈາກລະບົບ</button>
       </form>
     </div>
   </div>

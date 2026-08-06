@@ -27,7 +27,7 @@
     {% for s in stats %}
     <div class="stat-box">
       <div class="stat-text">
-        <div class="stat-lb" data-i18n="{{ s.label_key }}">{% if s.key == 'members' %}ສະມາຊິກຮ້ານເຮົາ{% elif s.key == 'sales' %}ຍອດຂາຍລວມ{% elif s.key == 'completedOrders' %}ອໍເດີສຳເລັດ{% elif s.key == 'totalOrders' %}ອໍເດີທັງໝົດ{% else %}ສິນຄ້າທັງໝົດ{% endif %}</div>
+        <div class="stat-lb" data-i18n="{{ s.label_key }}">{{ s.label }}</div>
         <div class="stat-val">{% if s.is_currency %}{{ s.value|kip }}{% else %}{{ s.value|floatformat:0 }}{% endif %}</div>
       </div>
       <div class="stat-ic"><span class="ic" data-ic="{{ s.icon }}"></span></div>
@@ -40,8 +40,8 @@
 {% if best_sellers %}
 <section id="best-sellers" style="padding:36px 0 20px;">
   <div class="sec-head">
-    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="best_sellers_eyebrow"></span></div>
-    <h2 data-i18n="best_sellers_title"></h2>
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="best_sellers_eyebrow">ສິນຄ້ານິຍົມ</span></div>
+    <h2 data-i18n="best_sellers_title">ສິນຄ້າຂາຍດີ</h2>
   </div>
   <div class="product-grid">
     {% for p in best_sellers %}{% include "store/_product_card.html" %}{% endfor %}
@@ -52,8 +52,8 @@
 {% if new_arrivals %}
 <section id="new-arrivals" style="padding:16px 0 20px;">
   <div class="sec-head">
-    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="new_arrivals_eyebrow"></span></div>
-    <h2 data-i18n="new_arrivals_title"></h2>
+    <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="new_arrivals_eyebrow">ມາໃໝ່</span></div>
+    <h2 data-i18n="new_arrivals_title">ສິນຄ້າເຂົ້າໃໝ່</h2>
   </div>
   <div class="product-grid">
     {% for p in new_arrivals %}{% include "store/_product_card.html" %}{% endfor %}
@@ -82,18 +82,18 @@
   {% else %}
   <div class="empty-state">
     <div class="ic-lg"><span class="ic" data-ic="search"></span></div>
-    <h3 data-i18n="no_results"></h3>
+    <h3 data-i18n="no_results">ບໍ່ພົບສິນຄ້າ</h3>
   </div>
   {% endif %}
 </section>
 
 <section class="why-us-section" style="padding:20px 0 60px;">
-  <h2 class="why-us-title-main" data-i18n="why_us_title"></h2>
+  <h2 class="why-us-title-main" data-i18n="why_us_title">ເປັນຫຍັງຕ້ອງເລືອກເຮົາ</h2>
   <div class="why-us-grid">
-    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="truck"></span></div><div class="why-us-card-title" data-i18n="why_us_convenient_title"></div><div class="why-us-desc" data-i18n="why_us_convenient_desc"></div></div>
-    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="shield"></span></div><div class="why-us-card-title" data-i18n="why_us_secure_title"></div><div class="why-us-desc" data-i18n="why_us_secure_desc"></div></div>
-    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="headset"></span></div><div class="why-us-card-title" data-i18n="why_us_service_title"></div><div class="why-us-desc" data-i18n="why_us_service_desc"></div></div>
-    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="check"></span></div><div class="why-us-card-title" data-i18n="why_us_warranty_title"></div><div class="why-us-desc" data-i18n="why_us_warranty_desc"></div></div>
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="truck"></span></div><div class="why-us-card-title" data-i18n="why_us_convenient_title">ຈັດສົ່ງວ່ອງໄວ</div><div class="why-us-desc" data-i18n="why_us_convenient_desc">ຈັດສົ່ງທົ່ວປະເທດ 2-4 ວັນ</div></div>
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="shield"></span></div><div class="why-us-card-title" data-i18n="why_us_secure_title">ຂອງແທ້ 100%</div><div class="why-us-desc" data-i18n="why_us_secure_desc">ຮັບປະກັນສິນຄ້າແທ້ທຸກຊິ້ນ</div></div>
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="headset"></span></div><div class="why-us-card-title" data-i18n="why_us_service_title">ບໍລິການ 24/7</div><div class="why-us-desc" data-i18n="why_us_service_desc">ທີມງານຄອຍໃຫ້ຄຳປຶກສາ</div></div>
+    <div class="why-us-card"><div class="why-us-ic"><span class="ic" data-ic="check"></span></div><div class="why-us-card-title" data-i18n="why_us_warranty_title">ຮັບປະກັນສິນຄ້າ</div><div class="why-us-desc" data-i18n="why_us_warranty_desc">ຮັບປະກັນຫຼັງການຂາຍ</div></div>
   </div>
 </section>
 

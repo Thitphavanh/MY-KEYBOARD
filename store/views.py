@@ -32,6 +32,14 @@ STAT_DEFS = {
     "products": {"label_key": "stat_products", "icon": "grid"},
 }
 
+STAT_LABELS_LO = {
+    "members": "ສະມາຊິກຮ້ານເຮົາ",
+    "sales": "ຍອດຂາຍລວມ",
+    "completedOrders": "ອໍເດີສຳເລັດ",
+    "totalOrders": "ອໍເດີທັງໝົດ",
+    "products": "ສິນຄ້າທັງໝົດ",
+}
+
 
 def _compute_stat_raw(key, settings_obj):
     if key == "members":
@@ -64,6 +72,7 @@ def _store_stats(settings_obj):
         stats.append({
             "key": key,
             "label_key": STAT_DEFS[key]["label_key"],
+            "label": STAT_LABELS_LO.get(key, key),
             "icon": STAT_DEFS[key]["icon"],
             "is_currency": key == "sales",
             "value": max(raw, 0),

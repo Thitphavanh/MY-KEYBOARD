@@ -5,7 +5,7 @@
 <div class="form-wrap" style="margin-top:56px;">
   <div class="form-card">
     <div class="auth-tabs">
-      <span data-i18n="register_tab"></span>
+      <span data-i18n="register_tab">ສະໝັກສະມາຊິກ</span>
     </div>
 
     {% if form.non_field_errors %}
@@ -15,36 +15,36 @@
     <form method="post">
       {% csrf_token %}
       <div class="field {% if form.name.errors %}error{% endif %}">
-        <label data-i18n="label_fullname"></label>
-        <input type="text" name="name" value="{{ form.name.value|default:'' }}" data-i18n-ph="ph_fullname" required>
+        <label data-i18n="label_fullname">ຊື່ - ນາມສະກຸນ</label>
+        <input type="text" name="name" value="{{ form.name.value|default:'' }}" placeholder="ຊື່ - ນາມສະກຸນ ຜູ້ຮັບສິນຄ້າ" data-i18n-ph="ph_fullname" required>
         {% if form.name.errors %}<div class="field-error">{{ form.name.errors.0 }}</div>{% endif %}
       </div>
       <div class="field {% if form.phone.errors %}error{% endif %}">
-        <label data-i18n="label_phone"></label>
-        <input type="text" name="phone" value="{{ form.phone.value|default:'' }}" data-i18n-ph="ph_phone" required>
+        <label data-i18n="label_phone">ເບີໂທລະສັບ</label>
+        <input type="text" name="phone" value="{{ form.phone.value|default:'' }}" placeholder="020 XXXX XXXX" data-i18n-ph="ph_phone" required>
         {% if form.phone.errors %}<div class="field-error">{{ form.phone.errors.0 }}</div>{% endif %}
       </div>
       <div class="field {% if form.email.errors %}error{% endif %}">
-        <label data-i18n="label_email_register"></label>
-        <input type="email" name="email" value="{{ form.email.value|default:'' }}" data-i18n-ph="ph_email_register" required>
+        <label data-i18n="label_email_register">ອີເມວ</label>
+        <input type="email" name="email" value="{{ form.email.value|default:'' }}" placeholder="example@domain.com" data-i18n-ph="ph_email_register" required>
         {% if form.email.errors %}<div class="field-error">{{ form.email.errors.0 }}</div>{% endif %}
       </div>
       <div class="field {% if form.password1.errors %}error{% endif %}">
-        <label data-i18n="label_password"></label>
-        <input type="password" name="password1" data-i18n-ph="ph_password" minlength="8" required>
+        <label data-i18n="label_password">ລະຫັດຜ່ານ</label>
+        <input type="password" name="password1" placeholder="ຢ່າງໜ້ອຍ 8 ຕົວອັກສອນ" data-i18n-ph="ph_password" minlength="8" required>
         {% if form.password1.errors %}
           <div class="field-error">{{ form.password1.errors.0 }}</div>
         {% else %}
-          <p class="field-hint" data-i18n="register_password_hint" style="font-size:11px; color:var(--text-faint); margin-top:5px;"></p>
+          <p class="field-hint" data-i18n="register_password_hint" style="font-size:11px; color:var(--text-faint); margin-top:5px;">ລະຫັດຜ່ານຕ້ອງມີຢ່າງໜ້ອຍ 8 ຕົວອັກສອນ</p>
         {% endif %}
       </div>
       <div class="field {% if form.password2.errors %}error{% endif %}">
-        <label data-i18n="label_password_confirm"></label>
-        <input type="password" name="password2" data-i18n-ph="ph_password" minlength="8" required>
+        <label data-i18n="label_password_confirm">ຢືນຢັນລະຫັດຜ່ານ</label>
+        <input type="password" name="password2" placeholder="ຢ່າງໜ້ອຍ 8 ຕົວອັກສອນ" data-i18n-ph="ph_password" minlength="8" required>
         {% if form.password2.errors %}<div class="field-error">{{ form.password2.errors.0 }}</div>{% endif %}
       </div>
-      <button type="submit" class="btn btn-solid btn-block"><span data-i18n="register_cta"></span><span class="ic" data-ic="arrowRight"></span></button>
-      <p class="form-footer-link"><span data-i18n="have_account_text"></span> <a href="{% url 'login' %}" data-i18n="login_here"></a></p>
+      <button type="submit" class="btn btn-solid btn-block"><span data-i18n="register_cta">ສະໝັກສະມາຊິກ</span><span class="ic" data-ic="arrowRight"></span></button>
+      <p class="form-footer-link"><span data-i18n="have_account_text">ມີບັນຊີຢູ່ແລ້ວບໍ?</span> <a href="{% url 'login' %}" data-i18n="login_here">ເຂົ້າສູ່ລະບົບທີ່ນີ້</a></p>
     </form>
   </div>
 </div>

@@ -3,9 +3,9 @@
 {% block content %}
 
 <div class="sec-head" style="margin-top:32px;">
-  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="wishlist_label"></span></div>
-  <h2 data-i18n="wishlist_page_title"></h2>
-  {% if products %}<p>{{ products|length }} <span data-i18n="wishlist_items_suffix"></span></p>{% endif %}
+  <div class="eyebrow" style="justify-content:center;"><span class="dot"></span><span data-i18n="wishlist_label">ລາຍການທີ່ມັກ</span></div>
+  <h2 data-i18n="wishlist_page_title">ສິນຄ້າທີ່ມັກ</h2>
+  {% if products %}<p>{{ products|length }} <span data-i18n="wishlist_items_suffix">ລາຍການ</span></p>{% endif %}
 </div>
 
 {% if products %}
@@ -15,9 +15,9 @@
 {% else %}
 <div class="empty-state">
   <div class="ic-lg"><span class="ic" data-ic="heart"></span></div>
-  <h3 data-i18n="wishlist_empty_title"></h3>
-  <p data-i18n="wishlist_empty_desc"></p>
-  <a href="{% url 'home' %}" class="btn btn-solid" style="margin-top:16px;"><span data-i18n="hero_cta_shop"></span><span class="ic" data-ic="arrowRight"></span></a>
+  <h3 data-i18n="wishlist_empty_title">ຍັງບໍ່ມີສິນຄ້າໃນລາຍການທີ່ມັກ</h3>
+  <p data-i18n="wishlist_empty_desc">ກົດໄອຄອນຮູບຫົວໃຈຢູ່ໜ້າສິນຄ້າເພື່ອບັນທຶກສິນຄ້າທີ່ທ່ານມັກ</p>
+  <a href="{% url 'home' %}" class="btn btn-solid" style="margin-top:16px;"><span data-i18n="hero_cta_shop">ເລືອກຊື້ສິນຄ້າ</span><span class="ic" data-ic="arrowRight"></span></a>
 </div>
 {% endif %}
 
