@@ -2,8 +2,8 @@
 {% load store_extras %}
 
 {% block admin_title %}ຈັດການໝວດໝູ່ — MY KEYBOARD{% endblock %}
-{% block admin_header_title %}ຈັດການໝວດໝູ່สินค้า{% endblock %}
-{% block admin_header_sub %}ຈັດການໝວດໝູ່หลักและหมวดหมู่ย่อยสำหรับคัดกรองสินค้า{% endblock %}
+{% block admin_header_title %}ຈັດການໝວດໝູ່ສິນຄ້າ{% endblock %}
+{% block admin_header_sub %}ຈັດການໝວດໝູ່ຫຼັກ ແລະ ໝວດໝູ່ຍ່ອຍສຳລັບຄັດກອງສິນຄ້າ{% endblock %}
 
 {% block admin_content %}
 <div style="display:grid; grid-template-columns:1fr 1fr; gap:24px;">
@@ -11,19 +11,19 @@
   <!-- Left Side: Categories -->
   <div class="admin-card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-      <h3 style="margin-bottom:0;">หมวดหมู่หลัก</h3>
+      <h3 style="margin-bottom:0;">ໝວດໝູ່ຫຼັກ</h3>
       <a href="{% url 'admin_category_create' %}" class="btn btn-solid" style="padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
-        <span class="ic" data-ic="plus"></span> เพิ่มหมวดหมู่
+        <span class="ic" data-ic="plus"></span> ເພີ່ມໝວດໝູ່
       </a>
     </div>
 
     <table class="admin-table">
       <thead>
         <tr>
-          <th style="width:40px; text-align:center;">ไอคอน</th>
-          <th>หมวดหมู่</th>
-          <th style="width:80px; text-align:center;">ลำดับ</th>
-          <th style="width:80px; text-align:center;">จัดการ</th>
+          <th style="width:40px; text-align:center;">ໄອຄອນ</th>
+          <th>ໝວດໝູ່</th>
+          <th style="width:80px; text-align:center;">ລຳດັບ</th>
+          <th style="width:80px; text-align:center;">ຈັດການ</th>
         </tr>
       </thead>
       <tbody>
@@ -37,13 +37,13 @@
           <td style="text-align:center;">{{ c.order }}</td>
           <td style="text-align:center;">
             <div class="crud-actions" style="justify-content:center;">
-              <a href="{% url 'admin_category_edit' c.slug %}" title="แก้ไข"><span class="ic" data-ic="edit"></span></a>
-              <a href="{% url 'admin_category_delete' c.slug %}" class="delete-btn" title="ลบ"><span class="ic" data-ic="trash"></span></a>
+              <a href="{% url 'admin_category_edit' c.slug %}" title="ແກ້ໄຂ"><span class="ic" data-ic="edit"></span></a>
+              <a href="{% url 'admin_category_delete' c.slug %}" class="delete-btn" title="ລົບ"><span class="ic" data-ic="trash"></span></a>
             </div>
           </td>
         </tr>
         {% empty %}
-        <tr><td class="empty-row" colspan="4">ยังไม่มีหมวดหมู่หลัก</td></tr>
+        <tr><td class="empty-row" colspan="4">ຍັງບໍ່ມີໝວດໝູ່ຫຼັກ</td></tr>
         {% endfor %}
       </tbody>
     </table>
@@ -52,19 +52,19 @@
   <!-- Right Side: Subcategories -->
   <div class="admin-card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:18px;">
-      <h3 style="margin-bottom:0;">หมวดหมู่ย่อย</h3>
+      <h3 style="margin-bottom:0;">ໝວດໝູ່ຍ່ອຍ</h3>
       <a href="{% url 'admin_subcategory_create' %}" class="btn btn-solid" style="padding:6px 12px; font-size:12px; display:inline-flex; align-items:center; gap:6px;">
-        <span class="ic" data-ic="plus"></span> เพิ่มหมวดหมู่ย่อย
+        <span class="ic" data-ic="plus"></span> ເພີ່ມໝວດໝູ່ຍ່ອຍ
       </a>
     </div>
 
     <table class="admin-table">
       <thead>
         <tr>
-          <th>หมวดหมู่หลัก</th>
-          <th>ชื่อหมวดหมู่ย่อย</th>
-          <th style="width:80px; text-align:center;">ลำดับ</th>
-          <th style="width:80px; text-align:center;">จัดการ</th>
+          <th>ໝວດໝູ່ຫຼັກ</th>
+          <th>ຊື່ໝວດໝູ່ຍ່ອຍ</th>
+          <th style="width:80px; text-align:center;">ລຳດັບ</th>
+          <th style="width:80px; text-align:center;">ຈັດການ</th>
         </tr>
       </thead>
       <tbody>
@@ -77,13 +77,13 @@
           <td style="text-align:center;">{{ s.order }}</td>
           <td style="text-align:center;">
             <div class="crud-actions" style="justify-content:center;">
-              <a href="{% url 'admin_subcategory_edit' s.pk %}" title="แก้ไข"><span class="ic" data-ic="edit"></span></a>
-              <a href="{% url 'admin_subcategory_delete' s.pk %}" class="delete-btn" title="ลบ"><span class="ic" data-ic="trash"></span></a>
+              <a href="{% url 'admin_subcategory_edit' s.pk %}" title="ແກ້ໄຂ"><span class="ic" data-ic="edit"></span></a>
+              <a href="{% url 'admin_subcategory_delete' s.pk %}" class="delete-btn" title="ລົບ"><span class="ic" data-ic="trash"></span></a>
             </div>
           </td>
         </tr>
         {% empty %}
-        <tr><td class="empty-row" colspan="4">ยังไม่มีหมวดหมู่ย่อย</td></tr>
+        <tr><td class="empty-row" colspan="4">ຍັງບໍ່ມີໝວດໝູ່ຍ່ອຍ</td></tr>
         {% endfor %}
       </tbody>
     </table>

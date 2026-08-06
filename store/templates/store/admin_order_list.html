@@ -3,16 +3,16 @@
 
 {% block admin_title %}ຈັດການອໍເດີ — MY KEYBOARD{% endblock %}
 {% block admin_header_title %}<span data-i18n="admin_nav_orders">ຈັດການອໍເດີ</span>{% endblock %}
-{% block admin_header_sub %}<span data-i18n="admin_order_list_sub">ดูรายละเอียดและอัปเดตสถานะการจัดส่งสินค้า</span>{% endblock %}
+{% block admin_header_sub %}<span data-i18n="admin_order_list_sub">ເບິ່ງຣາຍລະອຽດ ແລະ ອັບເດດສະຖານະການຈັດສົ່ງສິນຄ້າ</span>{% endblock %}
 
 {% block admin_content %}
 <div class="admin-card">
   <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px; margin-bottom:20px;">
     <form method="get" style="display:flex; gap:10px; flex:1; max-width:600px;">
-      <input type="text" name="q" value="{{ query }}" data-i18n-ph="ph_search_order" placeholder="ค้นหาเลขออเดอร์, ชื่อลูกค้า, เบอร์โทร..." style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); flex:1;">
+      <input type="text" name="q" value="{{ query }}" data-i18n-ph="ph_search_order" placeholder="ຄົ້ນຫາເລກອໍເດີ, ຊື່ລູກຄ້າ, ເບີໂທ..." style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); flex:1;">
       
       <select name="status" onchange="this.form.submit()" style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); min-width:150px;">
-        <option value="" data-i18n="admin_all_statuses">-- ทุกสถานะ --</option>
+        <option value="" data-i18n="admin_all_statuses">-- ທຸກສະຖານະ --</option>
         {% for code, name in status_choices %}
         <option value="{{ code }}" {% if selected_status == code %}selected{% endif %} data-i18n="order_status_{{ code }}">{{ name }}</option>
         {% endfor %}
@@ -26,14 +26,14 @@
     <table class="admin-table">
       <thead>
         <tr>
-          <th data-i18n="order_no_label" style="width:100px;">หมายเลขออเดอร์</th>
-          <th data-i18n="admin_th_date">วันที่สั่งซื้อ</th>
-          <th data-i18n="admin_th_recipient">ชื่อผู้รับ</th>
-          <th data-i18n="label_phone">เบอร์โทร</th>
-          <th data-i18n="carrier_label">การจัดส่ง</th>
-          <th data-i18n="cart_total_label">ยอดรวมชำระ</th>
-          <th data-i18n="status_label" style="width:180px;">สถานะ</th>
-          <th data-i18n="admin_th_actions" style="width:100px; text-align:center;">จัดการ</th>
+          <th data-i18n="order_no_label" style="width:100px;">ໝາຍເລກອໍເດີ</th>
+          <th data-i18n="admin_th_date">ວັນທີສັ່ງຊື້</th>
+          <th data-i18n="admin_th_recipient">ຊື່ຜູ້ຮັບ</th>
+          <th data-i18n="label_phone">ເບີໂທ</th>
+          <th data-i18n="carrier_label">ການຈັດສົ່ງ</th>
+          <th data-i18n="cart_total_label">ຍອດລວມຊຳລະ</th>
+          <th data-i18n="status_label" style="width:180px;">ສະຖານະ</th>
+          <th data-i18n="admin_th_actions" style="width:100px; text-align:center;">ຈັດການ</th>
         </tr>
       </thead>
       <tbody>
@@ -52,24 +52,24 @@
               {% csrf_token %}
               <input type="hidden" name="next" value="{{ request.get_full_path }}">
               <select name="status" onchange="this.form.submit()" class="status-select status-select-{{ o.status }}">
-                <option value="pending" {% if o.status == 'pending' %}selected{% endif %} data-i18n="order_status_pending">รอຊຳລະເງິນ</option>
-                <option value="preparing" {% if o.status == 'preparing' %}selected{% endif %} data-i18n="order_status_preparing">กำลังเตรียมสินค้า</option>
-                <option value="shipping" {% if o.status == 'shipping' %}selected{% endif %} data-i18n="order_status_shipping">กำลังจัดส่ง</option>
-                <option value="delivered" {% if o.status == 'delivered' %}selected{% endif %} data-i18n="order_status_delivered">จัดส่งสำเร็จ</option>
+                <option value="pending" {% if o.status == 'pending' %}selected{% endif %} data-i18n="order_status_pending">ຣໍຊຳລະເງິນ</option>
+                <option value="preparing" {% if o.status == 'preparing' %}selected{% endif %} data-i18n="order_status_preparing">ກຳລັງກຽມສິນຄ້າ</option>
+                <option value="shipping" {% if o.status == 'shipping' %}selected{% endif %} data-i18n="order_status_shipping">ກຳລັງຈັດສົ່ງ</option>
+                <option value="delivered" {% if o.status == 'delivered' %}selected{% endif %} data-i18n="order_status_delivered">ຈັດສົ່ງສຳເລັດ</option>
               </select>
             </form>
           </td>
           <td style="text-align:center;">
             <div class="crud-actions" style="justify-content:center;">
-              <a href="{% url 'admin_order_detail' o.pk %}" title="ดูรายละเอียด"><span class="ic" data-ic="eye"></span></a>
+              <a href="{% url 'admin_order_detail' o.pk %}" title="ເບິ່ງຣາຍລະອຽດ"><span class="ic" data-ic="eye"></span></a>
               {% if o.status == 'delivered' %}
-              <a href="{% url 'admin_order_delete' o.pk %}" class="delete-btn" title="ลบออเดอร์"><span class="ic" data-ic="trash"></span></a>
+              <a href="{% url 'admin_order_delete' o.pk %}" class="delete-btn" title="ລົບອໍເດີ"><span class="ic" data-ic="trash"></span></a>
               {% endif %}
             </div>
           </td>
         </tr>
         {% empty %}
-        <tr><td class="empty-row" colspan="8" data-i18n="admin_no_orders">ไม่พบรายการสั่งซื้อ</td></tr>
+        <tr><td class="empty-row" colspan="8" data-i18n="admin_no_orders">ບໍ່ພົບລາຍການສັ່ງຊື້</td></tr>
         {% endfor %}
       </tbody>
     </table>

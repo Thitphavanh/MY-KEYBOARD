@@ -3,7 +3,7 @@
 
 {% block admin_title %}{{ title }} — MY KEYBOARD{% endblock %}
 {% block admin_header_title %}{{ title }}{% endblock %}
-{% block admin_header_sub %}กรอกข้อมูลและรายละเอียดบัญชีผู้รับเงินโอนสำหรับการຊຳລະເງິນของลูกค้า{% endblock %}
+{% block admin_header_sub %}ກອກຂໍ້ມູນ ແລະ ຣາຍລະອຽດບັນຊີຜູ້ຮັບເງິນໂອນສຳລັບການຊຳລະເງິນຂອງລູກຄ້າ{% endblock %}
 
 {% block admin_content %}
 <div class="admin-card" style="max-width:600px; margin:0 auto;">
@@ -29,8 +29,8 @@
     {% endfor %}
 
     <div style="display:flex; gap:12px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:20px; margin-top:26px;">
-      <a href="{% url 'admin_bank_list' %}" class="btn btn-outline">ยกเลิก</a>
-      <button type="submit" class="btn btn-solid" style="padding:10px 24px;">บันทึกข้อมูล</button>
+      <a href="{% url 'admin_bank_list' %}" class="btn btn-outline">ຍົກເລີກ</a>
+      <button type="submit" class="btn btn-solid" style="padding:10px 24px;">ບັນທຶກຂໍ້ມູນ</button>
     </div>
   </form>
 </div>

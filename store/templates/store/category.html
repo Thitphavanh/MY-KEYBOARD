@@ -70,7 +70,7 @@
 
       <div class="cat-main">
         <div class="toolbar">
-          <div class="count" id="result-count" data-count="{{ result_count }}" data-search="{{ search_term }}">{{ result_count }} รายการ</div>
+          <div class="count" id="result-count" data-count="{{ result_count }}" data-search="{{ search_term }}">{{ result_count }} ລາຍການ</div>
           <select name="sort" id="sort-select" onchange="document.getElementById('filter-form').submit()">
             <option value="default" {% if sort == "default" %}selected{% endif %}>···</option>
             <option value="price-asc" {% if sort == "price-asc" %}selected{% endif %}>₭ ↑</option>
@@ -87,7 +87,7 @@
                     <span style="width:10px; height:10px; border-radius:50%; background:var(--primary); display:inline-block;"></span>
                     {% if group.subcategory %}{{ group.subcategory.name }}{% else %}{{ group.name }}{% endif %}
                   </h3>
-                  <span style="font-size:12px; font-weight:500; color:var(--text-muted); background:var(--bg-hover); padding:4px 10px; border-radius:12px;">{{ group.products|length }} รายการ</span>
+                  <span style="font-size:12px; font-weight:500; color:var(--text-muted); background:var(--bg-hover); padding:4px 10px; border-radius:12px;">{{ group.products|length }} ລາຍການ</span>
                 </div>
                 <div class="product-grid">
                   {% for p in group.products %}{% include "store/_product_card.html" %}{% endfor %}

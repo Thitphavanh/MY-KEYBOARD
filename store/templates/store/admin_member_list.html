@@ -13,7 +13,7 @@
 
 <div class="admin-card" style="padding: 24px;">
   <form method="get" style="display:flex; gap:10px; max-width:420px; margin-bottom:20px;">
-    <input type="text" name="q" value="{{ query }}" data-i18n-ph="ph_search_member" placeholder="ค้นหาอีเมล ชื่อสมาชิก..." style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); flex:1;">
+    <input type="text" name="q" value="{{ query }}" data-i18n-ph="ph_search_member" placeholder="ຄົ້ນຫາອີເມວ ຊື່ສະມາຊິກ..." style="background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px; padding:10px 14px; font-size:13px; color:var(--text); flex:1;">
     <button type="submit" class="btn btn-outline" style="padding:10px 16px;"><span class="ic" data-ic="search"></span></button>
   </form>
   <div style="overflow-x: auto;">
@@ -30,7 +30,7 @@
       </thead>
       <tbody>
         {% if not members %}
-        <tr><td colspan="6" class="empty-row" data-i18n="admin_no_members_found">ไม่พบสมาชิกที่ตรงกับการค้นหา</td></tr>
+        <tr><td colspan="6" class="empty-row" data-i18n="admin_no_members_found">ບໍ່ພົບສະມາຊິກທີ່ກົງກັບການຄົ້ນຫາ</td></tr>
         {% endif %}
         {% for member in members %}
         <tr style="border-bottom: 1px solid var(--border); transition: background 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.01)'" onmouseout="this.style.background='transparent'">

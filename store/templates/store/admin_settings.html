@@ -92,15 +92,15 @@
 
           <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px; margin-bottom:10px;">
             <div>{{ form.stat_metric_1 }}</div>
-            <div><input type="number" name="stat_override_1" value="{{ form.stat_override_1.value|default:'' }}" placeholder="ใช้ค่าจริง"></div>
+            <div><input type="number" name="stat_override_1" value="{{ form.stat_override_1.value|default:'' }}" placeholder="ໃຊ້ຄ່າຈິງ"></div>
           </div>
           <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px; margin-bottom:10px;">
             <div>{{ form.stat_metric_2 }}</div>
-            <div><input type="number" name="stat_override_2" value="{{ form.stat_override_2.value|default:'' }}" placeholder="ใช้ค่าจริง"></div>
+            <div><input type="number" name="stat_override_2" value="{{ form.stat_override_2.value|default:'' }}" placeholder="ໃຊ້ຄ່າຈິງ"></div>
           </div>
           <div style="display:grid; grid-template-columns:1.5fr 1fr; gap:12px;">
             <div>{{ form.stat_metric_3 }}</div>
-            <div><input type="number" name="stat_override_3" value="{{ form.stat_override_3.value|default:'' }}" placeholder="ใช้ค่าจริง"></div>
+            <div><input type="number" name="stat_override_3" value="{{ form.stat_override_3.value|default:'' }}" placeholder="ໃຊ້ຄ່າຈິງ"></div>
           </div>
         </div>
 
@@ -279,7 +279,7 @@
 
           <div class="field">
             <label>ໂຄ້ດ CSS ຕົກແຕ່ງເພີ່ມເຕີມ</label>
-            <textarea name="custom_css" placeholder="/* เช่น .product-card { box-shadow: 0 4px 10px rgba(0,0,0,0.5); } */" style="font-family: monospace; font-size: 13.5px; height: 120px; width: 100%; resize: vertical;">{{ form.custom_css.value|default:'' }}</textarea>
+            <textarea name="custom_css" placeholder="/* ເຊັ່ນ .product-card { box-shadow: 0 4px 10px rgba(0,0,0,0.5); } */" style="font-family: monospace; font-size: 13.5px; height: 120px; width: 100%; resize: vertical;">{{ form.custom_css.value|default:'' }}</textarea>
           </div>
         </div>
       </div>

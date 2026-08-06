@@ -3,7 +3,7 @@
 
 {% block admin_title %}{{ title }} — MY KEYBOARD{% endblock %}
 {% block admin_header_title %}{{ title }}{% endblock %}
-{% block admin_header_sub %}กรอกข้อมูลสินค้าและจัดการรูปภาพประกอบ{% endblock %}
+{% block admin_header_sub %}ກອກຂໍ້ມູນສິນຄ້າ ແລະ ຈັດການຮູບພາບປະກອບ{% endblock %}
 
 {% block admin_content %}
 <div class="admin-card">
@@ -12,7 +12,7 @@
     
     {% if form.errors %}
     <div style="background:rgba(239,68,68,0.15); color:#ef4444; border:1px solid rgba(239,68,68,0.25); padding:16px; border-radius:8px; margin-bottom:20px; font-size:13px;">
-      <strong>กรุณาแก้ไขข้อผิดพลาดต่อไปนี้:</strong>
+      <strong>ກະລຸນາແກ້ໄຂຂໍ້ຜິດພາດຕໍ່ໄປນີ້:</strong>
       <ul style="margin-top:6px; margin-left:20px;">
         {% for field, errors in form.errors.items %}
         <li>{{ field }}: {{ errors.0 }}</li>
@@ -26,17 +26,17 @@
       <!-- Left Column: Primary Fields -->
       <div>
         <div class="field">
-          <label>ชื่อสินค้า *</label>
-          <input type="text" name="name" value="{{ form.name.value|default:'' }}" required placeholder="เช่น ASUS ROG Zephyrus G14">
+          <label>ຊື່ສິນຄ້າ *</label>
+          <input type="text" name="name" value="{{ form.name.value|default:'' }}" required placeholder="ເຊັ່ນ ASUS ROG Zephyrus G14">
         </div>
         
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div class="field">
-            <label>แบรนด์</label>
+            <label>ແບຣນ</label>
             {{ form.brand }}
           </div>
           <div class="field">
-            <label>หมวดหมู่หลัก *</label>
+            <label>ໝວດໝູ່ຫຼັກ *</label>
             {{ form.category }}
           </div>
         </div>
@@ -57,12 +57,12 @@
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div class="field">
-            <label>ราคาขายจริง (กีบ ₭) *</label>
-            <input type="number" id="id_price" name="price" value="{{ form.price.value|default:'' }}" required placeholder="เช่น 15000000">
+            <label>ລາຄາຂາຍຈິງ (ກີບ ₭) *</label>
+            <input type="number" id="id_price" name="price" value="{{ form.price.value|default:'' }}" required placeholder="ເຊັ່ນ 15000000">
           </div>
           <div class="field">
-            <label>ราคาเก่าก่อนลด (กีบ ₭)</label>
-            <input type="number" name="old_price" value="{{ form.old_price.value|default:'' }}" placeholder="ถ้ามี เช่น 18000000">
+            <label>ລາຄາເກົ່າກ່ອນຫຼຸດ (ກີບ ₭)</label>
+            <input type="number" name="old_price" value="{{ form.old_price.value|default:'' }}" placeholder="ຖ້າມີ ເຊັ່ນ 18000000">
           </div>
         </div>
 
@@ -91,14 +91,8 @@
         </div>
 
         <div class="field">
-          <label>รายละเอียดสินค้า</label>
-          <textarea name="desc" rows="6" placeholder="คำอธิบาย รายละเอียดคุณสมบัติสินค้า...">{{ form.desc.value|default:'' }}</textarea>
-        </div>
-
-        <div class="field">
-          <label>ข้อมูลสเปกเครื่อง (ใส่หัวข้อแยกทีละบรรทัด)</label>
-          <textarea name="specs_raw" rows="6" placeholder="เช่น&#10;CPU: Intel Core i9-14900K&#10;GPU: RTX 4090 24GB&#10;RAM: 32GB DDR5">{{ form.specs_raw.value|default:'' }}</textarea>
-          <p style="font-size:11px; color:var(--text-faint); margin-top:4px;">* ใส่ชื่อหัวข้อและรายละเอียดคั่นด้วยเครื่องหมาย colon (:) เช่น "RAM: 16GB"</p>
+          <textarea name="specs_raw" rows="6" placeholder="ເຊັ່ນ&#10;CPU: Intel Core i9-14900K&#10;GPU: RTX 4090 24GB&#10;RAM: 32GB DDR5">{{ form.specs_raw.value|default:'' }}</textarea>
+          <p style="font-size:11px; color:var(--text-faint); margin-top:4px;">* ໃສ່ຊື່ຫົວຂໍ້ ແລະ ຣາຍລະອຽດຄັ້ນດ້ວຍເຄື່ອງໝາຍ colon (:) ເຊັ່ນ "RAM: 16GB"</p>
         </div>
 
         <div class="field">
@@ -117,7 +111,7 @@
       <!-- Right Column: Settings, Flags, Images -->
       <div>
         <div class="field">
-          <label>จำนวนในคลังสินค้า *</label>
+          <label>ຈຳນວນໃນຄັງສິນຄ້າ *</label>
           <input type="number" name="stock" value="{{ form.stock.value|default:0 }}" required>
         </div>
 
@@ -128,33 +122,33 @@
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div class="field">
-            <label>Emoji ไอคอน</label>
+            <label>Emoji ໄອຄອນ</label>
             <input type="text" name="icon" value="{{ form.icon.value|default:'💻' }}" placeholder="💻">
           </div>
           <div class="field">
-            <label>ป้ายกำกับสินค้า</label>
-            <input type="text" name="tag" value="{{ form.tag.value|default:'' }}" placeholder="เช่น Hot, Sale">
+            <label>ປ້າຍກຳກັບສິນຄ້າ</label>
+            <input type="text" name="tag" value="{{ form.tag.value|default:'' }}" placeholder="ເຊັ່ນ Hot, Sale">
           </div>
         </div>
 
         <div class="admin-card" style="padding:16px; margin-bottom:18px; background:rgba(255,255,255,0.01);">
-          <h4 style="font-size:12.5px; margin-bottom:12px; color:var(--text-dim);">ป้ายสถานะสินค้า</h4>
+          <h4 style="font-size:12.5px; margin-bottom:12px; color:var(--text-dim);">ປ້າຍສະຖານະສິນຄ້າ</h4>
           <div class="field" style="display:flex; align-items:center; margin-bottom:10px;">
             <input type="checkbox" name="featured" id="id_featured" {% if form.featured.value %}checked{% endif %}>
-            <label for="id_featured" style="margin-bottom:0; cursor:pointer;">แสดงแนะนำหน้าแรก</label>
+            <label for="id_featured" style="margin-bottom:0; cursor:pointer;">ສະແດງແນະນຳໜ້າທຳອິດ</label>
           </div>
           <div class="field" style="display:flex; align-items:center; margin-bottom:10px;">
             <input type="checkbox" name="best_seller" id="id_best_seller" {% if form.best_seller.value %}checked{% endif %}>
-            <label for="id_best_seller" style="margin-bottom:0; cursor:pointer;">สินค้าขายดี (Best Seller)</label>
+            <label for="id_best_seller" style="margin-bottom:0; cursor:pointer;">ສິນຄ້າຂາຍດີ (Best Seller)</label>
           </div>
           <div class="field" style="display:flex; align-items:center; margin-bottom:0;">
             <input type="checkbox" name="is_new" id="id_is_new" {% if form.is_new.value %}checked{% endif %}>
-            <label for="id_is_new" style="margin-bottom:0; cursor:pointer;">สินค้าเข้าใหม่ (New Arrival)</label>
+            <label for="id_is_new" style="margin-bottom:0; cursor:pointer;">ສິນຄ້າເຂົ້າໃໝ່ (New Arrival)</label>
           </div>
         </div>
 
         <div class="admin-card" style="padding:16px; margin-bottom:0; background:rgba(255,255,255,0.01);">
-          <h4 style="font-size:12.5px; margin-bottom:12px; color:var(--text-dim);">รูปภาพสินค้า</h4>
+          <h4 style="font-size:12.5px; margin-bottom:12px; color:var(--text-dim);">ຮູບພາບສິນຄ້າ</h4>
           
           {% if product and product.images.all %}
           <div class="img-grid">
@@ -168,18 +162,18 @@
             </div>
             {% endfor %}
           </div>
-          <p style="font-size:10.5px; color:#ef4444; margin-bottom:12px;">* ติ๊กถูกที่มุมรูปภาพเพื่อลบภาพนั้น</p>
+          <p style="font-size:10.5px; color:#ef4444; margin-bottom:12px;">* ຕິກຖືກທີ່ມຸມຮູບພາບເພື່ອລົບພາບນັ້ນ</p>
           {% endif %}
 
           <div class="field" id="image-upload-container">
-            <label>อัปโหลดรูปภาพใหม่ / ຫຼືໃສ່ລິ້ງຮູບ</label>
+            <label>ອັບໂຫລດຮູບພາບໃໝ່ / ຫຼືໃສ່ລິ້ງຮູບ</label>
             <div class="image-input-row" style="display:flex; gap:10px; margin-bottom:8px;">
               <input type="file" name="new_images" accept="image/*" style="font-size:12.5px; color:var(--text-dim); flex:1;">
               <input type="url" name="new_image_urls" placeholder="ຫຼືໃສ່ລິ້ງຮູບ" style="font-size:12.5px; flex:1;">
             </div>
           </div>
           <button type="button" class="btn btn-outline" onclick="addImageRow()" style="font-size:11.5px; padding:6px 12px; display:inline-flex; align-items:center; gap:6px; margin-top:2px; margin-bottom:16px;">
-            <span class="ic sm" data-ic="plus"></span> เพิ่มช่องอัปโหลดรูปภาพ / ເພີ່ມຊ່ອງອັບໂຫລດຮູບພາບ
+            <span class="ic sm" data-ic="plus"></span> ເພີ່ມຊ່ອງອັບໂຫລດຮູບພາບ
           </button>
 
           <div class="admin-card" style="border:1px solid var(--border-strong); padding:16px; margin-top:16px; background:var(--panel-2);">
@@ -248,11 +242,11 @@
     </div>
 
     <div style="display:flex; gap:12px; justify-content:flex-end; border-top:1px solid var(--border); padding-top:20px; margin-top:26px;">
-      <a href="{% url 'admin_product_list' %}" class="btn btn-outline">ยกเลิก</a>
+      <a href="{% url 'admin_product_list' %}" class="btn btn-outline">ຍົກເລີກ</a>
       {% if not product %}
       <button type="submit" name="again" value="1" class="btn btn-outline" style="padding:10px 24px;">ບັນທຶກ ແລະ ເພີ່ມສິນຄ້າຄ້າຍກັນອີກ</button>
       {% endif %}
-      <button type="submit" class="btn btn-solid" style="padding:10px 24px;">บันทึกข้อมูลสินค้า</button>
+      <button type="submit" class="btn btn-solid" style="padding:10px 24px;">ບັນທຶກຂໍ້ມູນສິນຄ້າ</button>
     </div>
   </form>
 </div>
