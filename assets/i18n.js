@@ -546,10 +546,16 @@ const LANG_FLAGS = {
   en: '<svg viewBox="0 0 60 30" width="100%" height="100%"><rect width="60" height="30" fill="#00247d"/><g stroke="#fff" stroke-width="6"><path d="M0,0 L60,30 M60,0 L0,30"/></g><g stroke="#cf142b" stroke-width="2"><path d="M0,0 L60,30 M60,0 L0,30"/></g><g stroke="#fff" stroke-width="10"><path d="M30,0 V30 M0,15 H60"/></g><g stroke="#cf142b" stroke-width="6"><path d="M30,0 V30 M0,15 H60"/></g></svg>',
 };
 
-window.NB_LANG = localStorage.getItem("nb_lang") || "lo";
+let _savedLang = localStorage.getItem("nb_lang");
+if (!_savedLang || !I18N[_savedLang]) {
+  _savedLang = "lo";
+  localStorage.setItem("nb_lang", "lo");
+}
+window.NB_LANG = _savedLang;
 
 function t(key) {
-  return (I18N[window.NB_LANG] && I18N[window.NB_LANG][key]) || I18N.lo[key] || key;
+  const currentLang = (window.NB_LANG && I18N[window.NB_LANG]) ? window.NB_LANG : "lo";
+  return (I18N[currentLang] && I18N[currentLang][key]) || I18N.lo[key] || key;
 }
 
 function catName(id) {
