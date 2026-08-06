@@ -883,6 +883,90 @@ def admin_product_bulk_delete(request):
     return redirect("admin_product_list")
 
 
+@staff_required
+def admin_product_bulk_update(request):
+    if request.method == "POST":
+        ids = request.POST.getlist("selected")
+        if not ids:
+            messages.error(request, "ກະລຸນາເລືອກສິນຄ້າຢ່າງໜ້ອຍ 1 ລາຍການກ່ອນປັບແກ້")
+            return redirect("admin_product_list")
+
+        qs = Product.objects.filter(pk__in=ids)
+        action_type = request.POST.get("bulk_action_type", "image_settings")
+        updated_fields = {}
+
+        if action_type == "image_settings":
+            if request.POST.get("change_image_fit"):
+                fit_val = request.POST.get("image_fit", "contain")
+                if fit_val in ["contain", "cover", "original"]:
+                    updated_fields["image_fit"] = fit_val
+
+            if request.POST.get("change_image_zoom"):
+                try:
+                    zoom_val = int(request.POST.get("image_zoom", 100))
+                    updated_fields["image_zoom"] = max(20, min(300, zoom_val))
+                except (ValueError, TypeError):
+                    pass
+
+            if request.POST.get("change_image_padding"):
+                try:
+                    pad_val = int(request.POST.get("image_padding", 16))
+                    updated_fields["image_padding"] = max(0, min(100, pad_val))
+                except (ValueError, TypeError):
+                    pass
+
+            if request.POST.get("change_image_bg"):
+                bg_val = request.POST.get("image_bg", "#ffffff").strip()
+                if bg_val:
+                    updated_fields["image_bg"] = bg_val
+
+            if request.POST.get("change_image_blend"):
+                blend_val = request.POST.get("image_blend") == "1"
+                updated_fields["image_blend"] = blend_val
+
+            if updated_fields:
+                qs.update(**updated_fields)
+                messages.success(request, f"ປັບຂະໜາດ ແລະ ຮູບແບບຮູບພາບໃຫ້ {qs.count()} ລາຍການ ຮຽບຮ້ອຍແລ້ວ!")
+            else:
+                messages.warning(request, "ບໍ່ມີຂໍ້ມູນຮູບແບບຮູບພາບທີ່ຖືກເລືອກປ່ຽນ")
+
+        elif action_type == "product_details":
+            if request.POST.get("change_category"):
+                cat_slug = request.POST.get("category", "").strip()
+                if cat_slug:
+                    cat = Category.objects.filter(slug=cat_slug).first()
+                    if cat:
+                        updated_fields["category"] = cat
+
+            if request.POST.get("change_stock"):
+                try:
+                    stock_val = int(request.POST.get("stock", 0))
+                    updated_fields["stock"] = max(0, stock_val)
+                except (ValueError, TypeError):
+                    pass
+
+            if request.POST.get("change_is_preorder"):
+                updated_fields["is_preorder"] = request.POST.get("is_preorder") == "1"
+
+            if request.POST.get("change_featured"):
+                updated_fields["featured"] = request.POST.get("featured") == "1"
+
+            if request.POST.get("change_best_seller"):
+                updated_fields["best_seller"] = request.POST.get("best_seller") == "1"
+
+            if request.POST.get("change_is_new"):
+                updated_fields["is_new"] = request.POST.get("is_new") == "1"
+
+            if updated_fields:
+                qs.update(**updated_fields)
+                messages.success(request, f"ອັບເດດຂໍ້ມູນສິນຄ້າໃຫ້ {qs.count()} ລາຍການ ຮຽບຮ້ອຍແລ້ວ!")
+            else:
+                messages.warning(request, "ບໍ່ມີຂໍ້ມູນສິນຄ້າທີ່ຖືກເລືອກປ່ຽນ")
+
+    return redirect("admin_product_list")
+
+
+
 # ----------------- CATEGORY CRUD -----------------
 
 @staff_required

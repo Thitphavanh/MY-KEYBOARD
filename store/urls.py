@@ -55,6 +55,7 @@ urlpatterns = [
     path('dashboard/products/<int:pk>/edit/', views.admin_product_edit, name='admin_product_edit'),
     path('dashboard/products/<int:pk>/delete/', views.admin_product_delete, name='admin_product_delete'),
     path('dashboard/products/bulk-delete/', views.admin_product_bulk_delete, name='admin_product_bulk_delete'),
+    path('dashboard/products/bulk-update/', views.admin_product_bulk_update, name='admin_product_bulk_update'),
     path('dashboard/categories/', views.admin_category_list, name='admin_category_list'),
     path('dashboard/categories/create/', views.admin_category_create, name='admin_category_create'),
     path('dashboard/categories/<slug:slug>/edit/', views.admin_category_edit, name='admin_category_edit'),

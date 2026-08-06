@@ -31,14 +31,29 @@
     </div>
   </div>
 
-  <form method="post" action="{% url 'admin_product_bulk_delete' %}" id="bulk-delete-form">
-    {% csrf_token %}
-    <div style="display:flex; align-items:center; gap:12px; margin-bottom:12px;">
-      <button type="submit" class="btn btn-danger btn-sm" id="bulk-delete-btn" style="display:none;" onclick="return confirm('ຢືນຢັນລົບສິນຄ້າທີ່ເລືອກ (' + document.querySelectorAll('.row-check:checked').length + ' ລາຍການ)?');">
+  <!-- Bulk Action Bar -->
+  <div id="bulk-action-bar" style="display:none; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:16px; padding:12px 16px; background:var(--panel-2); border:1px solid var(--violet-2); border-radius:10px; animation:fadeIn 0.2s ease;">
+    <div style="display:flex; align-items:center; gap:10px;">
+      <span style="font-size:13px; font-weight:700; color:var(--violet-2);" id="bulk-select-count">ເລືອກແລ້ວ 0 ລາຍການ</span>
+    </div>
+
+    <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+      <button type="button" class="btn btn-solid btn-sm" onclick="openBulkImageModal()" style="background:linear-gradient(135deg, #7c3aed, #6366f1); display:inline-flex; align-items:center; gap:6px;">
+        📐 ປັບຂະໜາດຮູບ (Bulk Resize)
+      </button>
+
+      <button type="button" class="btn btn-outline btn-sm" onclick="openBulkDetailsModal()" style="display:inline-flex; align-items:center; gap:6px;">
+        ✏️ ປັບຂໍ້ມູນສິນຄ້າ
+      </button>
+
+      <button type="button" class="btn btn-danger btn-sm" onclick="confirmBulkDelete()" style="display:inline-flex; align-items:center; gap:6px;">
         <span class="ic sm" data-ic="trash"></span> ລົບທີ່ເລືອກ
       </button>
-      <span id="bulk-select-count" style="font-size:12.5px; color:var(--text-dim);"></span>
     </div>
+  </div>
+
+  <form method="post" action="{% url 'admin_product_bulk_delete' %}" id="bulk-delete-form">
+    {% csrf_token %}
     <div style="overflow-x:auto;">
       <table class="admin-table">
         <thead>
@@ -58,7 +73,9 @@
             <td><input type="checkbox" name="selected" value="{{ p.pk }}" class="row-check"></td>
             <td>
               {% if p.first_image %}
-              <img src="{{ p.first_image }}" style="width:48px; height:48px; object-fit:cover; border-radius:6px; border:1px solid var(--border);">
+              <div style="width:48px; height:48px; border-radius:6px; border:1px solid var(--border); overflow:hidden; background:{{ p.image_bg }}; display:flex; align-items:center; justify-content:center; padding:{{ p.image_padding|default:4 }}px; box-sizing:border-box;">
+                <img src="{{ p.first_image }}" style="max-width:100%; max-height:100%; object-fit:{{ p.image_fit|default:'contain' }}; transform:scale({{ p.image_scale|default:1.0 }}); {% if p.image_blend %}mix-blend-mode:multiply;{% endif %}">
+              </div>
               {% else %}
               <div style="width:48px; height:48px; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border-radius:6px; font-size:20px; border:1px solid var(--border);">
                 {{ p.icon|default:"💻" }}
@@ -67,7 +84,10 @@
             </td>
             <td>
               <div style="font-weight:600;"><a href="{% url 'admin_product_edit' p.pk %}" style="color:var(--text); text-decoration:none;">{{ p.name }}</a></div>
-              <div style="font-size:11px; color:var(--text-faint);">{% if p.brand %}{{ p.brand.name }}{% else %}-{% endif %}</div>
+              <div style="font-size:11px; color:var(--text-faint);">
+                {% if p.brand %}{{ p.brand.name }}{% else %}-{% endif %}
+                • Fit: {{ p.image_fit }} | Zoom: {{ p.image_zoom }}%
+              </div>
             </td>
             <td style="color:var(--text-dim);">{{ p.category.name }}</td>
             <td>
@@ -99,25 +119,334 @@
   </form>
 </div>
 
+<!-- ================= Modal: Bulk Image Resize & Scale Settings ================= -->
+<div id="bulk-image-modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:999; align-items:center; justify-content:center; padding:16px; opacity:0; transition:opacity 0.2s ease;">
+  <div style="background:var(--panel); border:1px solid var(--border-strong); border-radius:16px; width:100%; max-width:580px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.6); animation:modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+    
+    <!-- Modal Header -->
+    <div style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02);">
+      <div>
+        <h3 style="font-size:16px; font-weight:800; color:var(--text); margin:0;">📐 ປັບຂະໜາດ ແລະ ຮູບແບບຮູບພາບ (Bulk Image Sizing)</h3>
+        <p style="font-size:12px; color:var(--text-dim); margin:2px 0 0 0;" id="modal-img-count-desc">ປັບຂະໜາດຮູບພາບໃຫ້ກັບ 0 ລາຍການທີ່ເລືອກ</p>
+      </div>
+      <button type="button" onclick="closeBulkImageModal()" style="background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer; padding:4px 8px;">✕</button>
+    </div>
+
+    <!-- Modal Form -->
+    <form method="post" action="{% url 'admin_product_bulk_update' %}" id="bulk-image-form" style="padding:24px;">
+      {% csrf_token %}
+      <input type="hidden" name="bulk_action_type" value="image_settings">
+      <div id="bulk-image-selected-ids"></div>
+
+      <!-- Realtime Live Preview Box -->
+      <div style="display:flex; gap:20px; align-items:center; background:var(--panel-2); border:1px solid var(--border-strong); border-radius:12px; padding:14px; margin-bottom:20px;">
+        <div style="width:100px; height:100px; background:#ffffff; border-radius:10px; border:1px solid var(--border); overflow:hidden; display:flex; align-items:center; justify-content:center; padding:16px; box-sizing:border-box; shrink:0;" id="modal-preview-box">
+          <img id="modal-preview-img" src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 24 24' fill='none' stroke='%238b7cf6' stroke-width='1.5'><rect x='3' y='3' width='18' height='18' rx='2'/><circle cx='8.5' cy='8.5' r='1.5'/><polyline points='21 15 16 10 5 21'/></svg>" style="max-width:100%; max-height:100%; object-fit:contain; transition:all 0.15s ease; transform:scale(1);">
+        </div>
+        <div style="flex:1;">
+          <h4 style="font-size:13px; font-weight:700; color:var(--text); margin:0 0 4px 0;">👁️ ຕົວຢ່າງຂະໜາດຮູບ (Realtime Preview)</h4>
+          <p style="font-size:11.5px; color:var(--text-dim); margin:0 0 8px 0;">ປັບຄ່າຕ່າງໆດ້ານລຸ່ມເພື່ອເບິ່ງຕົວຢ່າງຂະໜາດຮູບພາບຕົວຢ່າງ</p>
+          <span style="font-size:11px; padding:3px 8px; border-radius:6px; background:rgba(124,58,237,0.15); color:var(--violet-2); font-weight:600;" id="modal-preview-status">Fit: contain | Zoom: 100%</span>
+        </div>
+      </div>
+
+      <!-- Controls -->
+      <div style="display:flex; flex-direction:column; gap:16px;">
+        
+        <!-- Field 1: Image Fit -->
+        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+          <input type="checkbox" name="change_image_fit" value="1" id="chk_fit" checked style="accent-color:var(--violet-2); width:18px; height:18px;">
+          <div style="flex:1;">
+            <label for="chk_fit" style="font-size:13px; font-weight:600; color:var(--text); display:block; cursor:pointer;">🖼️ ຮູບແບບກອບຮູບ (Image Fit)</label>
+            <select name="image_fit" id="modal_image_fit" onchange="updateModalPreview()" style="margin-top:6px; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--text);">
+              <option value="contain" selected>ກອບພໍດີກ່ອງ (Contain — ຮູບຄົບບໍ່ຕັດຂອບ)</option>
+              <option value="cover">ກອບເຕັມກ່ອງ (Cover — ຮູບເຕັມກ່ອງ)</option>
+              <option value="original">ຂະໜາດເດີມ (Original — ອັດຕາສ່ວນເດີມ)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Field 2: Image Zoom -->
+        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+          <input type="checkbox" name="change_image_zoom" value="1" id="chk_zoom" checked style="accent-color:var(--violet-2); width:18px; height:18px;">
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label for="chk_zoom" style="font-size:13px; font-weight:600; color:var(--text); cursor:pointer;">🔍 ລະດັບຊູມ / ປັບຂະໜາດຮູບ (%)</label>
+              <span id="modal_zoom_val" style="font-size:13px; font-weight:800; color:var(--violet-2);">100%</span>
+            </div>
+            <div style="display:flex; align-items:center; gap:12px; margin-top:8px;">
+              <input type="range" name="image_zoom" id="modal_image_zoom" min="30" max="250" value="100" oninput="updateModalPreview()" style="flex:1; accent-color:var(--violet-2);">
+              <input type="number" min="30" max="250" value="100" id="modal_image_zoom_num" oninput="document.getElementById('modal_image_zoom').value=this.value; updateModalPreview();" style="width:70px; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:6px; padding:6px; font-size:12.5px; color:var(--text); text-align:center;">
+            </div>
+          </div>
+        </div>
+
+        <!-- Field 3: Image Padding -->
+        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+          <input type="checkbox" name="change_image_padding" value="1" id="chk_padding" checked style="accent-color:var(--violet-2); width:18px; height:18px;">
+          <div style="flex:1;">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <label for="chk_padding" style="font-size:13px; font-weight:600; color:var(--text); cursor:pointer;">📐 ໄລຍະຫ່າງຂອບກອບຮູບ (Padding px)</label>
+              <span id="modal_pad_val" style="font-size:13px; font-weight:800; color:var(--violet-2);">16px</span>
+            </div>
+            <input type="range" name="image_padding" id="modal_image_padding" min="0" max="60" value="16" oninput="updateModalPreview()" style="width:100%; margin-top:8px; accent-color:var(--violet-2);">
+          </div>
+        </div>
+
+        <!-- Field 4: Background Color & Blend Mode -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+            <input type="checkbox" name="change_image_bg" value="1" id="chk_bg" style="accent-color:var(--violet-2); width:18px; height:18px;">
+            <div style="flex:1;">
+              <label for="chk_bg" style="font-size:12px; font-weight:600; color:var(--text); display:block; cursor:pointer;">🎨 ສີພື້ນຫຼັງກອບ</label>
+              <input type="color" name="image_bg" id="modal_image_bg" value="#ffffff" onchange="updateModalPreview()" style="width:100%; height:32px; border:none; border-radius:6px; background:none; cursor:pointer; margin-top:4px;">
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+            <input type="checkbox" name="change_image_blend" value="1" id="chk_blend" style="accent-color:var(--violet-2); width:18px; height:18px;">
+            <div style="flex:1;">
+              <label for="chk_blend" style="font-size:12px; font-weight:600; color:var(--text); display:block; cursor:pointer;">✨ ລົບພື້ນຫຼັງສີຂາວ</label>
+              <select name="image_blend" id="modal_image_blend" onchange="updateModalPreview()" style="margin-top:4px; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:6px; padding:6px; font-size:12px; color:var(--text);">
+                <option value="0">ບໍ່ລົບ (ປົກກະຕິ)</option>
+                <option value="1">ລົບ (Multiply Blend)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+        <button type="button" class="btn btn-outline" onclick="closeBulkImageModal()">ຍົກເລີກ</button>
+        <button type="submit" class="btn btn-solid" style="background:linear-gradient(135deg, #7c3aed, #6366f1); padding:10px 24px; font-weight:700;">
+          💾 ບັນທຶກການປັບຂະໜາດທັງໝົດ
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ================= Modal: Bulk Details Update ================= -->
+<div id="bulk-details-modal-backdrop" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(6px); z-index:999; align-items:center; justify-content:center; padding:16px; opacity:0; transition:opacity 0.2s ease;">
+  <div style="background:var(--panel); border:1px solid var(--border-strong); border-radius:16px; width:100%; max-width:540px; overflow:hidden; box-shadow:0 20px 40px rgba(0,0,0,0.6); animation:modalSlideUp 0.25s cubic-bezier(0.16, 1, 0.3, 1);">
+    
+    <!-- Modal Header -->
+    <div style="padding:18px 24px; border-bottom:1px solid var(--border); display:flex; justify-content:space-between; align-items:center; background:rgba(255,255,255,0.02);">
+      <div>
+        <h3 style="font-size:16px; font-weight:800; color:var(--text); margin:0;">✏️ ປັບປ່ຽນຂໍ້ມູນສິນຄ້າ (Bulk Details Update)</h3>
+        <p style="font-size:12px; color:var(--text-dim); margin:2px 0 0 0;" id="modal-details-count-desc">ອັບເດດຂໍ້ມູນໃຫ້ກັບ 0 ລາຍການທີ່ເລືອກ</p>
+      </div>
+      <button type="button" onclick="closeBulkDetailsModal()" style="background:none; border:none; color:var(--text-dim); font-size:20px; cursor:pointer; padding:4px 8px;">✕</button>
+    </div>
+
+    <!-- Modal Form -->
+    <form method="post" action="{% url 'admin_product_bulk_update' %}" id="bulk-details-form" style="padding:24px;">
+      {% csrf_token %}
+      <input type="hidden" name="bulk_action_type" value="product_details">
+      <div id="bulk-details-selected-ids"></div>
+
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        
+        <!-- Category -->
+        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+          <input type="checkbox" name="change_category" value="1" id="chk_cat" style="accent-color:var(--violet-2); width:18px; height:18px;">
+          <div style="flex:1;">
+            <label for="chk_cat" style="font-size:12.5px; font-weight:600; color:var(--text); display:block; cursor:pointer;">📁 ປ່ຽນໝວດໝູ່ສິນຄ້າ</label>
+            <select name="category" style="margin-top:6px; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--text);">
+              {% for c in categories %}
+              <option value="{{ c.slug }}">{{ c.name }}</option>
+              {% endfor %}
+            </select>
+          </div>
+        </div>
+
+        <!-- Stock -->
+        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+          <input type="checkbox" name="change_stock" value="1" id="chk_stock" style="accent-color:var(--violet-2); width:18px; height:18px;">
+          <div style="flex:1;">
+            <label for="chk_stock" style="font-size:12.5px; font-weight:600; color:var(--text); display:block; cursor:pointer;">📦 ປ່ຽນຈຳນວນສິນຄ້າໃນສາງ (Stock)</label>
+            <input type="number" name="stock" value="10" min="0" style="margin-top:6px; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--text);">
+          </div>
+        </div>
+
+        <!-- Preorder Flag -->
+        <div style="display:flex; align-items:center; gap:12px; background:rgba(255,255,255,0.02); padding:12px; border-radius:10px; border:1px solid var(--border);">
+          <input type="checkbox" name="change_is_preorder" value="1" id="chk_preorder" style="accent-color:var(--violet-2); width:18px; height:18px;">
+          <div style="flex:1;">
+            <label for="chk_preorder" style="font-size:12.5px; font-weight:600; color:var(--text); display:block; cursor:pointer;">⏳ ປ່ຽນສະຖານະ ພຣີອໍເດີ້ (Preorder)</label>
+            <select name="is_preorder" style="margin-top:6px; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:8px; padding:8px 12px; font-size:13px; color:var(--text);">
+              <option value="1">ເປີດພຣີອໍເດີ້ (Yes)</option>
+              <option value="0">ຂາຍປົກກະຕິ (No)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Featured & Best Seller Status -->
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:10px; border:1px solid var(--border);">
+            <input type="checkbox" name="change_featured" value="1" id="chk_feat" style="accent-color:var(--violet-2); width:16px; height:16px;">
+            <div style="flex:1;">
+              <label for="chk_feat" style="font-size:11.5px; font-weight:600; color:var(--text); display:block; cursor:pointer;">⭐ ແນະນຳ (Featured)</label>
+              <select name="featured" style="margin-top:4px; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:6px; padding:4px 8px; font-size:12px; color:var(--text);">
+                <option value="1">ແມ່ນ (Yes)</option>
+                <option value="0">ບໍ່ (No)</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px; background:rgba(255,255,255,0.02); padding:10px; border-radius:10px; border:1px solid var(--border);">
+            <input type="checkbox" name="change_best_seller" value="1" id="chk_best" style="accent-color:var(--violet-2); width:16px; height:16px;">
+            <div style="flex:1;">
+              <label for="chk_best" style="font-size:11.5px; font-weight:600; color:var(--text); display:block; cursor:pointer;">🔥 ຂາຍດີ (Best Seller)</label>
+              <select name="best_seller" style="margin-top:4px; width:100%; background:rgba(0,0,0,0.3); border:1px solid var(--border); border-radius:6px; padding:4px 8px; font-size:12px; color:var(--text);">
+                <option value="1">ແມ່ນ (Yes)</option>
+                <option value="0">ບໍ່ (No)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div style="margin-top:24px; display:flex; justify-content:flex-end; gap:12px;">
+        <button type="button" class="btn btn-outline" onclick="closeBulkDetailsModal()">ຍົກເລີກ</button>
+        <button type="submit" class="btn btn-solid" style="padding:10px 24px; font-weight:700;">
+          💾 ບັນທຶກການອັບເດດ
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<style>
+  @keyframes modalSlideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+</style>
+
 <script>
   (function () {
     var selectAll = document.getElementById('select-all-products');
-    var bulkBtn = document.getElementById('bulk-delete-btn');
+    var bulkBar = document.getElementById('bulk-action-bar');
     var countLabel = document.getElementById('bulk-select-count');
     if (!selectAll) return;
 
     function updateBulkBar() {
       var checked = document.querySelectorAll('.row-check:checked').length;
-      bulkBtn.style.display = checked > 0 ? 'inline-flex' : 'none';
-      countLabel.textContent = checked > 0 ? 'ເລືອກແລ້ວ ' + checked + ' ລາຍການ' : '';
+      if (checked > 0) {
+        bulkBar.style.display = 'flex';
+        countLabel.textContent = 'ເລືອກແລ້ວ ' + checked + ' ລາຍການ';
+      } else {
+        bulkBar.style.display = 'none';
+      }
     }
+
     selectAll.addEventListener('change', function () {
       document.querySelectorAll('.row-check').forEach(function (cb) { cb.checked = selectAll.checked; });
       updateBulkBar();
     });
+
     document.querySelectorAll('.row-check').forEach(function (cb) {
       cb.addEventListener('change', updateBulkBar);
     });
   })();
+
+  function getSelectedIds() {
+    var ids = [];
+    document.querySelectorAll('.row-check:checked').forEach(function (cb) {
+      ids.push(cb.value);
+    });
+    return ids;
+  }
+
+  function populateHiddenInputs(containerId) {
+    var container = document.getElementById(containerId);
+    container.innerHTML = '';
+    var ids = getSelectedIds();
+    ids.forEach(function (id) {
+      var input = document.createElement('input');
+      input.type = 'hidden';
+      input.name = 'selected';
+      input.value = id;
+      container.appendChild(input);
+    });
+  }
+
+  // --- Bulk Image Modal JS ---
+  function openBulkImageModal() {
+    var ids = getSelectedIds();
+    if (ids.length === 0) return;
+    populateHiddenInputs('bulk-image-selected-ids');
+    document.getElementById('modal-img-count-desc').textContent = 'ປັບຂະໜາດຮູບພາບໃຫ້ກັບ ' + ids.length + ' ລາຍການທີ່ເລືອກ';
+    
+    var backdrop = document.getElementById('bulk-image-modal-backdrop');
+    backdrop.style.display = 'flex';
+    setTimeout(function() { backdrop.style.opacity = '1'; }, 10);
+    updateModalPreview();
+  }
+
+  function closeBulkImageModal() {
+    var backdrop = document.getElementById('bulk-image-modal-backdrop');
+    backdrop.style.opacity = '0';
+    setTimeout(function() { backdrop.style.display = 'none'; }, 200);
+  }
+
+  function updateModalPreview() {
+    var fit = document.getElementById('modal_image_fit').value;
+    var zoom = document.getElementById('modal_image_zoom').value;
+    var padding = document.getElementById('modal_image_padding').value;
+    var bg = document.getElementById('modal_image_bg').value;
+    var blend = document.getElementById('modal_image_blend').value;
+
+    document.getElementById('modal_image_zoom_num').value = zoom;
+    document.getElementById('modal_zoom_val').textContent = zoom + '%';
+    document.getElementById('modal_pad_val').textContent = padding + 'px';
+
+    var box = document.getElementById('modal-preview-box');
+    var img = document.getElementById('modal-preview-img');
+
+    box.style.background = bg;
+    box.style.padding = padding + 'px';
+    img.style.objectFit = fit;
+    img.style.transform = 'scale(' + (zoom / 100) + ')';
+    img.style.mixBlendMode = blend === '1' ? 'multiply' : 'normal';
+
+    document.getElementById('modal-preview-status').textContent = 'Fit: ' + fit + ' | Zoom: ' + zoom + '% | Pad: ' + padding + 'px';
+  }
+
+  // --- Bulk Details Modal JS ---
+  function openBulkDetailsModal() {
+    var ids = getSelectedIds();
+    if (ids.length === 0) return;
+    populateHiddenInputs('bulk-details-selected-ids');
+    document.getElementById('modal-details-count-desc').textContent = 'ອັບເດດຂໍ້ມູນໃຫ້ກັບ ' + ids.length + ' ລາຍການທີ່ເລືອກ';
+    
+    var backdrop = document.getElementById('bulk-details-modal-backdrop');
+    backdrop.style.display = 'flex';
+    setTimeout(function() { backdrop.style.opacity = '1'; }, 10);
+  }
+
+  function closeBulkDetailsModal() {
+    var backdrop = document.getElementById('bulk-details-modal-backdrop');
+    backdrop.style.opacity = '0';
+    setTimeout(function() { backdrop.style.display = 'none'; }, 200);
+  }
+
+  function confirmBulkDelete() {
+    var ids = getSelectedIds();
+    if (ids.length === 0) return;
+    if (confirm('ຢືນຢັນລົບສິນຄ້າທີ່ເລືອກ (' + ids.length + ' ລາຍການ)?')) {
+      document.getElementById('bulk-delete-form').submit();
+    }
+  }
 </script>
 {% endblock %}
+
